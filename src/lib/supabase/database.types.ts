@@ -1,0 +1,140 @@
+export type AdminRole =
+  | "super_admin"
+  | "technical_admin"
+  | "executive_assistant"
+  | "executive_reviewer"
+  | "inbox_manager"
+  | "resource_manager"
+  | "read_only_auditor";
+
+export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
+
+export interface AdminProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  role: AdminRole;
+  account_state: AdminAccountState;
+  invited_by: string | null;
+  invited_at: string | null;
+  last_sign_in_at: string | null;
+  session_revoked_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbBookingRequest {
+  id: string;
+  reference: string;
+  access_token: string;
+  organizer_email: string;
+  status: string;
+  internal_status: string;
+  priority: string;
+  assigned_ea_id: string | null;
+  conflict_detected: boolean;
+  submission_source: string;
+  form_data: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  assigned_ea?: { full_name: string } | null;
+}
+
+export interface DbBookingStatusEvent {
+  id: string;
+  booking_request_id: string;
+  previous_status: string | null;
+  new_status: string;
+  actor: string;
+  internal_reason: string | null;
+  organizer_message: string | null;
+  created_at: string;
+}
+
+export interface DbEnquiry {
+  id: string;
+  source: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  organization: string | null;
+  subject: string | null;
+  message: string | null;
+  status: string;
+  priority: string;
+  assigned_admin_id: string | null;
+  booking_request_id: string | null;
+  payload: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbAuditEvent {
+  id: string;
+  actor_id: string | null;
+  actor_role: AdminRole | null;
+  event_type: string;
+  target_type: string | null;
+  target_id: string | null;
+  summary: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface CreateBookingResult {
+  id: string;
+  reference: string;
+  access_token: string;
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      admin_profiles: {
+        Row: AdminProfile;
+        Insert: Partial<AdminProfile> & Pick<AdminProfile, "id" | "email" | "full_name" | "role">;
+        Update: Partial<AdminProfile>;
+      };
+      booking_requests: {
+        Row: DbBookingRequest;
+        Insert: never;
+        Update: Partial<DbBookingRequest>;
+      };
+      booking_status_events: {
+        Row: DbBookingStatusEvent;
+        Insert: Partial<DbBookingStatusEvent>;
+        Update: never;
+      };
+      enquiries: {
+        Row: DbEnquiry;
+        Insert: Partial<DbEnquiry>;
+        Update: Partial<DbEnquiry>;
+      };
+      audit_events: {
+        Row: DbAuditEvent;
+        Insert: Partial<DbAuditEvent>;
+        Update: never;
+      };
+    };
+    Functions: {
+      create_booking_request: {
+        Args: { p_form: Record<string, unknown>; p_source?: string };
+        Returns: CreateBookingResult;
+      };
+      get_booking_for_organizer: {
+        Args: { p_reference: string; p_access_token: string };
+        Returns: Record<string, unknown> | null;
+      };
+      log_audit_event: {
+        Args: {
+          p_event_type: string;
+          p_target_type?: string;
+          p_target_id?: string;
+          p_summary?: Record<string, unknown>;
+          p_metadata?: Record<string, unknown>;
+        };
+        Returns: string;
+      };
+    };
+  };
+}

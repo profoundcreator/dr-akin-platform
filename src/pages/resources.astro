@@ -1,0 +1,9 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ResourcesPage } from "@/components/pages/marketing-page";
+import { LIBRARY_BOOKS } from "@/data/site-content";
+---
+
+<Layout title="Resources — Library & Archives" description="Books, frameworks, and leadership resources from Dr. Akin Akinpelu.">
+  <ResourcesPage client:load books={LIBRARY_BOOKS} />
+</Layout>

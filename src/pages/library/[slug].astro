@@ -1,0 +1,18 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { LibraryBookPage } from "@/components/pages/library-book-page";
+import { LIBRARY_BOOKS } from "@/data/site-content";
+
+export function getStaticPaths() {
+  return LIBRARY_BOOKS.map((book) => ({
+    params: { slug: book.slug },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+---
+
+<Layout title={`${book.title} — Library`} description={`${book.title} by Dr. Akin Akinpelu (${book.year})`}>
+  <LibraryBookPage client:load book={book} />
+</Layout>

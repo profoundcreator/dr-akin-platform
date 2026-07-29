@@ -11,6 +11,9 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ["motion/react"],
+    },
     resolve: {
       alias: {
         "@": path.resolve(root, "./src"),

@@ -64,8 +64,10 @@ export function Button({
     );
   }
 
+  const { type = "button", ...buttonProps } = props;
+
   return (
-    <button className={classes} {...props}>
+    <button type={type} className={classes} {...buttonProps}>
       {children}
       {arrow}
     </button>

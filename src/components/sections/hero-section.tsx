@@ -3,12 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { openEnquiryModal } from "@/lib/enquiry";
 
 export function HeroSection() {
-  const handleInquire = () => {
-    window.dispatchEvent(new CustomEvent("open-enquiry-modal"));
-  };
-
   return (
     <section className="ploy-section pt-8 lg:pt-12">
       <div className="ploy-container">
@@ -28,15 +25,16 @@ export function HeroSection() {
 
             <div className="flex flex-wrap items-center gap-4">
               <Button
+                type="button"
                 variant="primary"
                 size="lg"
                 showArrow
                 className="group"
-                onClick={handleInquire}
+                onClick={openEnquiryModal}
               >
                 Book a conversation
               </Button>
-              <Button variant="secondary" size="lg" href="/library">
+              <Button variant="secondary" size="lg" href="/resources">
                 Explore the library
               </Button>
             </div>

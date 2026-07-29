@@ -1,0 +1,14 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { TrackerPage } from "@/components/pages/tracker-page";
+
+export function getStaticPaths() {
+  return [{ params: { ref: "DAA-8492" } }];
+}
+
+const { ref } = Astro.params;
+---
+
+<Layout title={`Booking Status — ${ref}`}>
+  <TrackerPage client:load reference={ref ?? ""} />
+</Layout>

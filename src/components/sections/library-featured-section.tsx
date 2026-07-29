@@ -91,7 +91,7 @@ export function LibraryFeaturedSection() {
                 <Button variant="primary" showArrow href="/library/leadership-blueprint">
                   Read more
                 </Button>
-                <Button variant="secondary" href="/library">
+                <Button variant="secondary" href="/resources">
                   View full catalog
                 </Button>
               </div>
@@ -103,7 +103,7 @@ export function LibraryFeaturedSection() {
           {catalog.map((book, index) => (
             <Reveal key={book.title} delay={index * 0.05}>
               <a
-                href={`/library/${book.title.toLowerCase().replace(/\s+/g, "-")}`}
+                href={`/library/${book.cover.split("/").pop()?.replace(".svg", "")}`}
                 className="group block space-y-3"
               >
                 <div className="aspect-[3/4] overflow-hidden rounded-[var(--ploy-radius-md)] bg-[var(--ploy-background-tertiary)] shadow-[var(--ploy-shadow-sm)] transition-transform group-hover:-translate-y-1">
