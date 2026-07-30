@@ -1,0 +1,10 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { EventDetailBySlug } from "@/components/pages/event-detail-by-slug";
+
+const slug = Astro.url.searchParams.get("slug") ?? "";
+---
+
+<Layout title="Event — Dr. Akin Akinpelu" description="Event details and registration">
+  <EventDetailBySlug client:load slug={slug} />
+</Layout>

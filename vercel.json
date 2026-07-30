@@ -1,5 +1,9 @@
 {
   "rewrites": [
-    { "source": "/booking/:ref", "destination": "/booking/DAA-8492" }
+    { "source": "/booking/:ref", "destination": "/booking/DAA-8492" },
+    {
+      "source": "/events/:slug((?!view$)[a-z0-9-]+)",
+      "destination": "/events/view?slug=:slug"
+    }
   ]
 }
