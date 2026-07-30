@@ -10,6 +10,14 @@ export interface NavGroup {
   links: NavLink[];
 }
 
+export const TOP_LEVEL_LINKS: NavLink[] = [
+  {
+    label: "Events",
+    href: "/events",
+    description: "Upcoming gatherings & registrations",
+  },
+];
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Work",
@@ -78,6 +86,7 @@ export const FOOTER_COLUMNS = [
   {
     title: "Connect",
     links: [
+      { label: "Events", href: "/events" },
       { label: "Book Dr. Akin", href: "/book-dr-akin" },
       { label: "Track a Booking", href: "/booking/DAA-8492" },
       { label: "Organizer Resources", href: "/organizer-resources" },

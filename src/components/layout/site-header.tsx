@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NAV_GROUPS } from "@/lib/navigation";
+import { NAV_GROUPS, TOP_LEVEL_LINKS } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +71,15 @@ export function SiteHeader() {
               )}
             </div>
           ))}
+          {TOP_LEVEL_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="inline-flex items-center rounded-lg px-4 text-sm font-medium text-[var(--ploy-text-secondary)] transition-colors hover:bg-[var(--ploy-background-secondary)] hover:text-[var(--ploy-text-primary)]"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -129,6 +138,23 @@ export function SiteHeader() {
               </ul>
             </div>
           ))}
+
+          <div className="space-y-3">
+            <p className="ploy-eyebrow">Events</p>
+            <ul className="space-y-1">
+              {TOP_LEVEL_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="block rounded-md px-3 py-2.5 text-base font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-background-secondary)]"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <Button
             type="button"

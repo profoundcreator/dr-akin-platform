@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox, Headphones, LayoutDashboard, LogOut } from "lucide-react";
+import { CalendarDays, Headphones, Inbox, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { formatAdminRole } from "@/lib/auth/permissions";
@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 const NAV_ITEMS = [
   { label: "Requests", href: "/admin/requests", icon: LayoutDashboard },
   { label: "Inbox", href: "/admin/inbox", icon: Inbox },
+  { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Featured Episodes", href: "/admin/audio", icon: Headphones },
 ];
 

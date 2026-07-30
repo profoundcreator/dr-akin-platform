@@ -8,6 +8,7 @@ import tailwindcss from "@tailwindcss/vite";
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  site: "https://dr-akin-platform.vercel.app",
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

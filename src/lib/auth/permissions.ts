@@ -2,6 +2,7 @@ import type { AdminProfile, AdminRole } from "@/lib/supabase/database.types";
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
   super_admin: "Super Admin",
+  admin_manager: "Admin Manager",
   technical_admin: "Technical Admin",
   executive_assistant: "Executive Assistant",
   executive_reviewer: "Executive Reviewer",
@@ -12,7 +13,14 @@ export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
 
 export const PRIVILEGED_ROLES: AdminRole[] = ["super_admin", "technical_admin"];
 
+export const EVENT_APPROVER_ROLES: AdminRole[] = [
+  "super_admin",
+  "executive_assistant",
+  "admin_manager",
+];
+
 export const OPERATIONAL_ROLES: AdminRole[] = [
+  "admin_manager",
   "executive_assistant",
   "executive_reviewer",
   "inbox_manager",
@@ -37,6 +45,37 @@ export function canManageUsers(profile: AdminProfile | null): boolean {
 export function canWriteBookings(profile: AdminProfile | null): boolean {
   if (!canAccessAdmin(profile)) return false;
   return profile!.role !== "read_only_auditor";
+}
+
+export function canCreateEvents(profile: AdminProfile | null): boolean {
+  return canWriteBookings(profile);
+}
+
+export function canApproveEvents(profile: AdminProfile | null): boolean {
+  return (
+    canAccessAdmin(profile) &&
+    EVENT_APPROVER_ROLES.includes(profile!.role)
+  );
+}
+
+export function canManageInbox(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "admin_manager" ||
+    profile!.role === "inbox_manager" ||
+    profile!.role === "executive_assistant"
+  );
+}
+
+export function canManageResources(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "admin_manager" ||
+    profile!.role === "resource_manager" ||
+    profile!.role === "executive_assistant"
+  );
 }
 
 export function formatAdminRole(role: AdminRole): string {

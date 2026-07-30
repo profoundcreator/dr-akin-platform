@@ -1,11 +1,24 @@
 export type AdminRole =
   | "super_admin"
+  | "admin_manager"
   | "technical_admin"
   | "executive_assistant"
   | "executive_reviewer"
   | "inbox_manager"
   | "resource_manager"
   | "read_only_auditor";
+
+export type EventType = "hosted_by_dr_akin" | "featured_appearance" | "org_brand";
+
+export type EventBrand =
+  | "dr_akin"
+  | "aald"
+  | "erudio"
+  | "performx"
+  | "tc_resource"
+  | "other";
+
+export type EventStatus = "draft" | "pending_approval" | "published" | "hidden";
 
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
 
@@ -81,6 +94,35 @@ export interface DbAuditEvent {
   created_at: string;
 }
 
+export interface DbEvent {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  seo_description: string | null;
+  event_type: EventType;
+  brand: EventBrand;
+  starts_at: string;
+  ends_at: string;
+  timezone: string;
+  location: string | null;
+  location_type: string;
+  cover_image_path: string | null;
+  registration_url: string | null;
+  registration_embed_url: string | null;
+  payment_url: string | null;
+  payment_label: string | null;
+  status: EventStatus;
+  manually_hidden: boolean;
+  submitted_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  rejection_note: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbFeaturedPodcastEpisode {
   id: string;
   title: string;
@@ -134,6 +176,11 @@ export interface Database {
         Insert: Partial<DbFeaturedPodcastEpisode> &
           Pick<DbFeaturedPodcastEpisode, "title" | "spotify_url">;
         Update: Partial<DbFeaturedPodcastEpisode>;
+      };
+      events: {
+        Row: DbEvent;
+        Insert: Partial<DbEvent> & Pick<DbEvent, "slug" | "title" | "starts_at" | "ends_at">;
+        Update: Partial<DbEvent>;
       };
     };
     Functions: {
