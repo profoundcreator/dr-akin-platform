@@ -12,14 +12,32 @@ export function SiteHeader() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    if (!mobileOpen) {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
     return () => {
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, [mobileOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)]/95 backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-50 border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)]/95 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-[var(--ploy-canvas-wide)] items-center justify-between gap-6 px-6 md:px-10 lg:px-14 xl:px-20">
         <a
           href="/"
@@ -105,15 +123,17 @@ export function SiteHeader() {
           </button>
         </div>
       </div>
+      </header>
 
       <div
+        id="mobile-nav"
         className={cn(
-          "fixed inset-0 top-20 z-40 overflow-y-auto bg-[var(--ploy-background-primary)] lg:hidden",
+          "fixed inset-x-0 bottom-0 top-20 z-40 overflow-y-auto overscroll-y-contain bg-[var(--ploy-background-primary)] lg:hidden",
           mobileOpen ? "block" : "hidden",
         )}
         aria-hidden={!mobileOpen}
       >
-        <nav className="ploy-container flex flex-col gap-6 py-8" aria-label="Mobile">
+        <nav className="mx-auto max-w-[var(--ploy-container-max)] px-6 pb-10 pt-8 flex flex-col gap-6" aria-label="Mobile">
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="space-y-3">
               <a
@@ -171,6 +191,6 @@ export function SiteHeader() {
           </Button>
         </nav>
       </div>
-    </header>
+    </>
   );
 }
