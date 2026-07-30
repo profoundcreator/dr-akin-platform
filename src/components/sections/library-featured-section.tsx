@@ -4,48 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal, RevealItem } from "@/components/ui/reveal";
-
-const FEATURED_BOOK_URL =
-  "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/2cb19b46-slurp-2282d963-a2c158d4-the-agenda-the-rise-of-kings-and-priests.webp";
-
-const catalog = [
-  {
-    title: "The Leadership Blueprint",
-    slug: "leadership-blueprint",
-    year: "2024",
-    cover: "/images/books/leadership-blueprint.svg",
-  },
-  {
-    title: "Culture by Design",
-    slug: "culture-by-design",
-    year: "2023",
-    cover: "/images/books/culture-by-design.svg",
-  },
-  {
-    title: "Executive Presence",
-    slug: "executive-presence",
-    year: "2022",
-    cover: "/images/books/executive-presence.svg",
-  },
-  {
-    title: "Transform or Be Transformed",
-    slug: "transform-or-be-transformed",
-    year: "2021",
-    cover: "/images/books/transform-or-be-transformed.svg",
-  },
-  {
-    title: "Leading Africa Forward",
-    slug: "leading-africa-forward",
-    year: "2020",
-    cover: "/images/books/leading-africa-forward.svg",
-  },
-  {
-    title: "The Coaching Mindset",
-    slug: "coaching-mindset",
-    year: "2019",
-    cover: "/images/books/coaching-mindset.svg",
-  },
-];
+import { FEATURED_BOOK, LIBRARY_CATALOG } from "@/data/site-content";
 
 export function LibraryFeaturedSection() {
   return (
@@ -55,25 +14,25 @@ export function LibraryFeaturedSection() {
           <Reveal>
             <p className="ploy-eyebrow">The library · Featured</p>
             <Heading as="h2" size="section" className="mt-7">
-              The Agenda
+              {FEATURED_BOOK.title}
             </Heading>
-            <p className="mt-3 text-xl font-medium text-[var(--ploy-text-secondary)]">
-              The Rise of Kings and Priests
-            </p>
+            {FEATURED_BOOK.subtitle && (
+              <p className="mt-3 text-xl font-medium text-[var(--ploy-text-secondary)]">
+                {FEATURED_BOOK.subtitle}
+              </p>
+            )}
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
-              A globally minded call to believers and leaders shaping culture, law,
-              government, and business—a blueprint for stepping into the rooms where
-              civilization is being formed.
+              {FEATURED_BOOK.description}
             </p>
-            <Button variant="primary" showArrow href="/resources" className="mt-9">
+            <Button variant="primary" showArrow href={`/library/${FEATURED_BOOK.slug}`} className="mt-9">
               Explore the book
             </Button>
           </Reveal>
 
           <Reveal delay={0.1} className="rounded-xl bg-[var(--ploy-background-secondary)] p-8 md:p-14">
             <img
-              src={FEATURED_BOOK_URL}
-              alt="The Agenda — The Rise of Kings and Priests"
+              src={FEATURED_BOOK.cover}
+              alt={`${FEATURED_BOOK.title}${FEATURED_BOOK.subtitle ? ` — ${FEATURED_BOOK.subtitle}` : ""}`}
               className="mx-auto w-full max-w-lg object-contain"
             />
           </Reveal>
@@ -94,7 +53,7 @@ export function LibraryFeaturedSection() {
           </div>
 
           <Reveal stagger className="mt-9 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-6">
-            {catalog.map((book) => (
+            {LIBRARY_CATALOG.map((book) => (
               <RevealItem key={book.slug}>
                 <a href={`/library/${book.slug}`} className="group block">
                   <div className="aspect-[2/3] overflow-x-hidden rounded-lg border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)]">

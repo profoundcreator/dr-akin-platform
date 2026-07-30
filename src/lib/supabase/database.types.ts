@@ -81,6 +81,20 @@ export interface DbAuditEvent {
   created_at: string;
 }
 
+export interface DbFeaturedPodcastEpisode {
+  id: string;
+  title: string;
+  description: string | null;
+  spotify_url: string;
+  episode_date: string | null;
+  duration_label: string | null;
+  sort_order: number;
+  is_published: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateBookingResult {
   id: string;
   reference: string;
@@ -114,6 +128,12 @@ export interface Database {
         Row: DbAuditEvent;
         Insert: Partial<DbAuditEvent>;
         Update: never;
+      };
+      featured_podcast_episodes: {
+        Row: DbFeaturedPodcastEpisode;
+        Insert: Partial<DbFeaturedPodcastEpisode> &
+          Pick<DbFeaturedPodcastEpisode, "title" | "spotify_url">;
+        Update: Partial<DbFeaturedPodcastEpisode>;
       };
     };
     Functions: {

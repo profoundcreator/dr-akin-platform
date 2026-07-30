@@ -227,8 +227,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   resources: {
     slug: "resources",
     title: "Resources — Library & Archives",
-    kicker: "Resources",
+    kicker: "Resources · Library · Archives",
     headline: "Books, frameworks, and leadership resources",
+    headlineSecondary: "for builders of institutions.",
     description:
       "Nine published titles and a growing archive of essays, keynotes, and teaching materials for leaders, educators, and marketplace practitioners.",
     sections: [
@@ -336,11 +337,219 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
   },
 ];
 
-export const LIBRARY_BOOKS = [
-  { slug: "leadership-blueprint", title: "The Leadership Blueprint", year: "2024", category: "Leadership" },
-  { slug: "culture-by-design", title: "Culture by Design", year: "2023", category: "Organisational Development" },
-  { slug: "executive-presence", title: "Executive Presence", year: "2022", category: "Personal Development" },
-  { slug: "transform-or-be-transformed", title: "Transform or Be Transformed", year: "2021", category: "Strategy" },
-  { slug: "leading-africa-forward", title: "Leading Africa Forward", year: "2020", category: "Leadership" },
-  { slug: "coaching-mindset", title: "The Coaching Mindset", year: "2019", category: "Coaching" },
+export interface PurchaseLink {
+  label: string;
+  url: string;
+}
+
+export interface LibraryBook {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  year?: string;
+  category: string;
+  cover: string;
+  description: string;
+  purchaseLinks?: PurchaseLink[];
+  featured?: boolean;
+}
+
+export const LIBRARY_BOOKS: LibraryBook[] = [
+  {
+    slug: "the-agenda",
+    title: "The Agenda",
+    subtitle: "The Rise of Kings and Priests",
+    category: "Marketplace Ministry",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/2cb19b46-slurp-2282d963-a2c158d4-the-agenda-the-rise-of-kings-and-priests.webp",
+    description:
+      "A globally minded call to believers and leaders shaping culture, law, government, and business—a blueprint for stepping into the rooms where civilization is being formed.",
+    featured: true,
+    purchaseLinks: [{ label: "Selfany", url: "https://selfany.com/theagendabook" }],
+  },
+  {
+    slug: "called-but-missing",
+    title: "Called But Missing",
+    category: "Marketplace Ministry",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/cc7d90c1-slurp-0d82a1e2-4b008842-called-but-missing.webp",
+    description:
+      "A call to believers who carry influence in the marketplace to step fully into their God-given assignment.",
+    purchaseLinks: [
+      { label: "Selfany", url: "https://selfany.com/cbm" },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/called-but-missing-bmjwbr" },
+    ],
+  },
+  {
+    slug: "from-the-streets-to-forbes",
+    title: "From the Streets to Forbes",
+    category: "High Performance",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/180bb7a5-slurp-cca30cc3-8467f6ee-from-the-streets-to-forbes-.webp",
+    description:
+      "The journey from humble beginnings to global recognition — and the disciplines that sustain leaders under pressure.",
+    purchaseLinks: [
+      { label: "Paystack (Paperback - NGN)", url: "https://paystack.com/buy/streets-to-forbes-hardcopy" },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/streets-to-forbes-ebook" },
+      { label: "Selar", url: "https://selar.com/537g39" },
+    ],
+  },
+  {
+    slug: "networking-your-way-to-the-top",
+    title: "Networking Your Way to the Top",
+    category: "High Performance",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/e13a9c37-slurp-6425a529-44d7c750-networking-your-way-to-the-top-.webp",
+    description:
+      "Strategic relationship-building for leaders who understand that influence is built through people, not platforms alone.",
+    purchaseLinks: [
+      {
+        label: "Amazon Paperback",
+        url: "https://www.amazon.com/Networking-Your-Way-Top-people-networth/dp/B0D1NZ51F1",
+      },
+      {
+        label: "Amazon Kindle",
+        url: "https://www.amazon.com/Networking-Your-Way-Top-people-networth-ebook/dp/B0DXZS74KQ/ref=monarch_sidesheet_title",
+      },
+      { label: "Selar", url: "https://selar.com/a34xl7" },
+    ],
+  },
+  {
+    slug: "stay-in-your-process",
+    title: "Stay in Your Process",
+    category: "Marketplace Ministry",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/35fcd639-slurp-6e21cc26-23e3dd0b-stay-in-your-process-.webp",
+    description:
+      "Why process discipline — not shortcuts — is the foundation of lasting success in leadership and enterprise.",
+    purchaseLinks: [
+      {
+        label: "Flutterwave (Paperback & Audio Book - USD)",
+        url: "https://flutterwave.com/pay/siyp3",
+      },
+      {
+        label: "Paystack (Paperback - NGN)",
+        url: "https://paystack.com/buy/stay-in-your-process-hard-copy--audio-book-vnceir",
+      },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/stay-in-your-process-prtybx" },
+      { label: "Flutterwave (Audio Book - USD)", url: "https://flutterwave.com/pay/siyp2" },
+      {
+        label: "Paystack (Audio Book - NGN)",
+        url: "https://paystack.com/buy/stay-in-your-process-audio-book-ngn-netbbf",
+      },
+    ],
+  },
+  {
+    slug: "not-guilty",
+    title: "Not Guilty",
+    subtitle: "Understanding the Scandal of Grace",
+    category: "Marketplace Ministry",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/2cbca2a3-slurp-484be223-e8733223-not-guilty-understanding-the-scandal-of-g.webp",
+    description:
+      "A theological and practical exploration of grace, conviction, and influence in the life of the marketplace believer.",
+    purchaseLinks: [
+      { label: "Paystack (Paperback - NGN)", url: "https://paystack.com/buy/notguilty-hardcopy" },
+      {
+        label: "Amazon Kindle",
+        url: "https://www.amazon.com/Not-Guilty-Understanding-Scandal-Grace-ebook/dp/B0DXQGF63R/",
+      },
+      { label: "Paystack (eBook - USD)", url: "https://paystack.com/buy/notguilty-usd" },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/notguilty" },
+    ],
+  },
+  {
+    slug: "dominion",
+    title: "Dominion",
+    subtitle: "The Now Technology of the Spirit To Unlock the Power of Heaven Within You",
+    category: "Marketplace Ministry",
+    cover:
+      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/8a87a632-slurp-ed49fccb-1ca9a578-dominion.webp",
+    description:
+      "Reclaiming God-given authority in culture, commerce, and public life — for leaders called to shape nations.",
+    purchaseLinks: [
+      { label: "Paystack (Paperback - NGN)", url: "https://paystack.com/buy/dominion" },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/dominion-soft-copy" },
+      {
+        label: "Amazon Kindle",
+        url: "https://www.amazon.com/Dominion-Technology-Spirit-Akin-Akinpelu-ebook/dp/B0DY1VPMNW?ref_=ast_author_dp&th=1&psc=1",
+      },
+    ],
+  },
+  {
+    slug: "the-seven-star-student",
+    title: "The Seven Star Student",
+    category: "Academic Excellence",
+    cover: "/images/books/the-seven-star-student.png",
+    description:
+      "A framework for students building leadership, innovation, and community impact — aligned with the disciplines that shape Africa's next generation of builders.",
+    purchaseLinks: [
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/7-star-student" },
+      {
+        label: "Amazon Kindle",
+        url: "https://www.amazon.com/Seven-Star-Student-Akin-Akinpelu-ebook/dp/B0DXVZ653N?ref_=ast_author_dp&th=1&psc=1",
+      },
+    ],
+  },
+  {
+    slug: "the-seven-star-teacher",
+    title: "The Seven Star Teacher",
+    subtitle: "Towards Improving Transformative Learning In Africa",
+    category: "Academic Excellence",
+    cover: "/images/books/the-seven-star-teacher.png",
+    description:
+      "A call to educators and institutional leaders to raise the standard of teaching, governance, and transformative learning across the continent.",
+    purchaseLinks: [
+      {
+        label: "Amazon Paperback",
+        url: "https://www.amazon.com/Star-Teacher-Improving-Transformative-Learning/dp/B0D2TYZMXX",
+      },
+      { label: "Paystack (Paperback - NGN)", url: "https://paystack.com/buy/the-7-star-teacher" },
+      { label: "Paystack (eBook - NGN)", url: "https://paystack.com/buy/the-7-star-teacher-ebook" },
+    ],
+  },
 ];
+
+export const FEATURED_BOOK = LIBRARY_BOOKS.find((book) => book.featured)!;
+
+export const LIBRARY_CATALOG = LIBRARY_BOOKS.filter((book) => !book.featured);
+
+export const RESOURCE_SECTIONS = [
+  {
+    id: "marketplace-ministry",
+    title: "Marketplace Ministry",
+    bookCategory: "Marketplace Ministry",
+    description:
+      "Faith-driven leadership for believers shaping culture, law, government, and business.",
+    bullets: ["Books and teaching series", "Conference keynotes", "Mentorship frameworks"],
+  },
+  {
+    id: "high-performance",
+    title: "High Performance",
+    bookCategory: "High Performance",
+    description:
+      "Process, execution, and operational excellence for leaders under pressure.",
+    bullets: ["Execution frameworks", "Networking and influence", "Process discipline"],
+  },
+  {
+    id: "academic",
+    title: "Academic Excellence",
+    bookCategory: "Academic Excellence",
+    description:
+      "Resources for students, educators, and institutional leaders pursuing reform and rigour.",
+    bullets: ["Educational leadership", "Institutional governance", "Youth development"],
+  },
+  {
+    id: "audio",
+    title: "Audio Archives",
+    description:
+      "Selected keynotes and conversations available for organisational learning and team development.",
+    bullets: ["Keynote recordings", "Leadership conversations", "Teaching series"],
+  },
+] as const;
+
+export function booksForResourceSection(sectionId: string): LibraryBook[] {
+  const section = RESOURCE_SECTIONS.find((item) => item.id === sectionId);
+  if (!section || !("bookCategory" in section)) return [];
+  return LIBRARY_BOOKS.filter((book) => book.category === section.bookCategory);
+}

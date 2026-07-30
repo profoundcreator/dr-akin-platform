@@ -36,6 +36,8 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   showArrow?: boolean;
   href?: string;
+  target?: string;
+  rel?: string;
 }
 
 export function Button({
@@ -44,6 +46,8 @@ export function Button({
   size,
   showArrow = false,
   href,
+  target,
+  rel,
   children,
   ...props
 }: ButtonProps) {
@@ -57,7 +61,7 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <a href={href} className={classes} target={target} rel={rel}>
         {children}
         {arrow}
       </a>

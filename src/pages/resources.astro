@@ -1,9 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { ResourcesPage } from "@/components/pages/marketing-page";
-import { LIBRARY_BOOKS } from "@/data/site-content";
+import { ResourcesHubPage } from "@/components/pages/resources-hub-page";
+import { SITE_PAGES } from "@/data/site-content";
+
+const content = SITE_PAGES.resources;
 ---
 
-<Layout title="Resources — Library & Archives" description="Books, frameworks, and leadership resources from Dr. Akin Akinpelu.">
-  <ResourcesPage client:load books={LIBRARY_BOOKS} />
+<Layout title={content.title} description={content.description}>
+  <ResourcesHubPage client:load content={content} />
 </Layout>

@@ -20,7 +20,8 @@ Fill in `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY`.
 In the Supabase **SQL Editor**, run in order:
 
 1. `migrations/001_initial_schema.sql`
-2. `migrations/002_rls_policies.sql`
+2. `migrations/002_rls_policies.sql` (or `002a`, `002b`, `002c` if split)
+3. `migrations/005_featured_podcast_episodes.sql`
 
 ## 4. Configure Auth
 

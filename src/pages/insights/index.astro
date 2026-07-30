@@ -1,9 +1,9 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { InsightsIndexPage } from "@/components/pages/marketing-page";
+import { InsightsHubPage } from "@/components/pages/insights-hub-page";
 import { INSIGHT_ARTICLES } from "@/data/site-content";
 ---
 
 <Layout title="Insights & Writing" description="Essays and field notes on leadership and transformation.">
-  <InsightsIndexPage client:load articles={INSIGHT_ARTICLES} />
+  <InsightsHubPage client:load articles={INSIGHT_ARTICLES} />
 </Layout>

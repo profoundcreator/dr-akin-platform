@@ -42,7 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Marketplace Ministry", href: "/resources#marketplace-ministry", description: "Faith & influence" },
       { label: "High Performance", href: "/resources#high-performance", description: "Process & execution" },
       { label: "Academic Excellence", href: "/resources#academic", description: "Students & educators" },
-      { label: "Audio Archives", href: "/resources#audio", description: "Keynotes & conversations" },
+      { label: "Audio Archives", href: "/resources/audio", description: "Keynotes & conversations" },
     ],
   },
 ];
@@ -72,7 +72,7 @@ export const FOOTER_COLUMNS = [
       { label: "Insights & Writing", href: "/insights" },
       { label: "The Library", href: "/resources" },
       { label: "Marketplace Ministry", href: "/resources#marketplace-ministry" },
-      { label: "Audio Archives", href: "/resources#audio" },
+      { label: "Audio Archives", href: "/resources/audio" },
     ],
   },
   {
