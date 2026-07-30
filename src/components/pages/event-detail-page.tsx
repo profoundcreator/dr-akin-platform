@@ -69,12 +69,23 @@ export function EventDetailPage({ event }: EventDetailPageProps) {
               {upcoming && <EventCountdown targetDate={event.startsAt} className="pt-4" />}
               <div className="flex flex-wrap gap-4 pt-4">
                 {event.registrationUrl && (
-                  <Button variant="primary" showArrow href={event.registrationUrl}>
+                  <Button
+                    variant="primary"
+                    showArrow
+                    href={event.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Register
                   </Button>
                 )}
                 {event.paymentUrl && (
-                  <Button variant="secondary" href={event.paymentUrl}>
+                  <Button
+                    variant="secondary"
+                    href={event.paymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {event.paymentLabel || "Pay now"}
                   </Button>
                 )}
