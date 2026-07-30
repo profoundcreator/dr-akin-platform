@@ -9,9 +9,11 @@ export interface PageContent {
   title: string;
   kicker: string;
   headline: string;
+  headlineSecondary?: string;
   description: string;
   sections: PageSection[];
   cta?: { label: string; href: string };
+  secondaryCta?: { label: string; href: string };
   relatedLinks?: { label: string; href: string }[];
 }
 
@@ -19,8 +21,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   work: {
     slug: "work",
     title: "Work — Dr. Akin Akinpelu",
-    kicker: "Work",
-    headline: "Four operating arms building institutions that endure",
+    kicker: "Corporate · Academic · Public Policy · Marketplace",
+    headline: "One leader. Four operating arms.",
+    headlineSecondary: "A single agenda.",
     description:
       "Dr. Akin Akinpelu works across corporate transformation, educational reform, execution strategy, and technology alliances — helping leaders turn vision into durable systems.",
     sections: [
@@ -40,7 +43,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
   "work-aald": {
     slug: "work/aald",
     title: "AALD — Corporate Transformation",
-    kicker: "Corporate Transformation",
+    kicker: "AALD · Corporate Transformation",
     headline: "African Academy of Leadership Development",
     description:
       "AALD develops leaders at every level through structured programmes, corporate consulting, and a community of purpose-driven executives.",
@@ -61,8 +64,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   "work-erudio-hub": {
     slug: "work/erudio-hub",
     title: "Erudio Hub — Educational Reform",
-    kicker: "Educational Reform",
-    headline: "Reforming how a continent teaches and governs",
+    kicker: "Erudio Hub · Educational Reform",
+    headline: "Reforming how a continent teaches",
+    headlineSecondary: "and governs.",
     description:
       "Erudio Hub drives systemic reform of how nations teach, govern schools, and develop the next generation of African educators and administrators.",
     sections: [
@@ -82,8 +86,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   "work-performx": {
     slug: "work/performx",
     title: "PERFORMX — Execution Think Tank",
-    kicker: "Execution Think Tank",
-    headline: "Turning strategy into disciplined execution",
+    kicker: "PERFORMX · Execution Think Tank",
+    headline: "Turning strategy into",
+    headlineSecondary: "disciplined execution.",
     description:
       "PERFORMX is a high-performance practice helping leaders and operating teams convert ambitious plans into measurable outcomes.",
     sections: [
@@ -103,8 +108,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   "work-tc": {
     slug: "work/tc-resource-technology",
     title: "TC Resource Technology",
-    kicker: "Tech Alliances",
-    headline: "Technology partnerships for institutional scale",
+    kicker: "TC Resource Tech · Tech Alliances",
+    headline: "Technology partnerships for",
+    headlineSecondary: "institutional scale.",
     description:
       "TC Resource Technology connects enterprises and institutions with the technology alliances needed to scale operations and deliver impact.",
     sections: [
@@ -124,8 +130,9 @@ export const SITE_PAGES: Record<string, PageContent> = {
   "meet-akin": {
     slug: "meet-akin",
     title: "Meet Dr. Akin",
-    kicker: "Meet Dr. Akin",
-    headline: "Leadership across four spheres of influence",
+    kicker: "Corporate · Academic · Public Policy · Marketplace",
+    headline: "Leadership across four spheres",
+    headlineSecondary: "of influence.",
     description:
       "Dr. Akin Akinpelu Ph.D is an executive coach, author, and corporate transformation strategist working at the intersection of business, education, public policy, and marketplace ministry.",
     sections: [
@@ -134,17 +141,12 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "His work spans corporate boardrooms, classrooms, policy chambers, and faith-driven marketplace leadership — with a single through-line: building institutions that outlast their founders.",
       },
     ],
-    relatedLinks: [
-      { label: "Profile & credentials", href: "/meet-akin/profile" },
-      { label: "Continental mandate", href: "/meet-akin/au-ambassador" },
-      { label: "Board governance", href: "/meet-akin/edu-governance" },
-      { label: "Keynote speaking", href: "/meet-akin/speaking" },
-    ],
+    cta: { label: "Inquire for advisory", href: "/meet-akin/speaking" },
   },
   "meet-profile": {
     slug: "meet-akin/profile",
     title: "Profile — Dr. Akin Akinpelu",
-    kicker: "Profile",
+    kicker: "Profile · Biography & credentials",
     headline: "Biography and credentials",
     description:
       "Dr. Akin Akinpelu brings decades of experience in executive coaching, organisational consulting, and leadership development across Africa and the global diaspora.",
@@ -160,26 +162,30 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
+    cta: { label: "Book a conversation", href: "/book-dr-akin" },
   },
   "meet-au": {
     slug: "meet-akin/au-ambassador",
     title: "Continental Mandate — AU Agenda 2063",
-    kicker: "Continental Mandate",
-    headline: "African Union Agenda 2063 and continental leadership",
+    kicker: "Continental Mandate · AU Agenda 2063",
+    headline: "Advancing governance and strategic engagement",
+    headlineSecondary: "across Africa.",
     description:
-      "Dr. Akin serves as a voice for Africa's transformation agenda, connecting continental aspirations with practical leadership development.",
+      "Dr. Akin serves as Ambassador for the African Union Agenda 2063 Ambassadors Assembly, advancing political affairs, strategic engagement, and governance advocacy across the continent.",
     sections: [
       {
         title: "Agenda 2063",
         body: "Working with leaders and institutions aligned with the African Union's vision for an integrated, prosperous, and peaceful Africa.",
       },
     ],
+    cta: { label: "Start a conversation", href: "/book-dr-akin" },
   },
   "meet-edu": {
     slug: "meet-akin/edu-governance",
     title: "Board Governance — Dr. Akin Akinpelu",
-    kicker: "Board Governance",
-    headline: "Boards, advisory roles, and governance excellence",
+    kicker: "Board Governance · Advisory",
+    headline: "Boards, advisory roles, and",
+    headlineSecondary: "governance excellence.",
     description:
       "Dr. Akin advises boards and governance bodies on leadership transitions, fiduciary responsibility, and long-term institutional stewardship.",
     sections: [
@@ -188,12 +194,15 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "Supporting boards through complexity — from succession planning to stakeholder alignment and ethical leadership.",
       },
     ],
+    cta: { label: "Inquire for advisory", href: "/book-dr-akin" },
   },
   "meet-speaking": {
     slug: "meet-akin/speaking",
     title: "Keynote Speaking — Dr. Akin Akinpelu",
-    kicker: "Keynote Speaking",
-    headline: "Stages, summits, and executive engagements",
+    kicker:
+      "Dr. Akin Akinpelu · Keynote Speaker · Consultant · Author · Strategist",
+    headline: "A speaker who moves rooms",
+    headlineSecondary: "from the main stage to the boardroom.",
     description:
       "Dr. Akin delivers keynotes, panel contributions, workshops, and fireside conversations for conferences, corporate retreats, and leadership summits worldwide.",
     sections: [
@@ -212,7 +221,8 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "After submission you receive a booking reference, confirmation email, and secure tracking link. Initial status: Received. Response within 3–5 business days.",
       },
     ],
-    cta: { label: "Submit a speaking invitation", href: "/book-dr-akin" },
+    cta: { label: "Book Dr. Akin", href: "/book-dr-akin" },
+    secondaryCta: { label: "About Dr. Akin", href: "/meet-akin/profile" },
   },
   resources: {
     slug: "resources",

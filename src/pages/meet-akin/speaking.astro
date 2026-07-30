@@ -1,11 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { MarketingPage } from "@/components/pages/marketing-page";
+import { SpeakingPage } from "@/components/pages/speaking-page";
 import { SITE_PAGES } from "@/data/site-content";
 
 const content = SITE_PAGES["meet-speaking"];
 ---
 
 <Layout title={content.title} description={content.description}>
-  <MarketingPage client:load content={content} />
+  <SpeakingPage client:load />
 </Layout>
