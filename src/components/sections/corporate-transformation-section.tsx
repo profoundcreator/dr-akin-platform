@@ -2,80 +2,87 @@
 
 import { ArrowUpRight } from "lucide-react";
 import { Heading } from "@/components/ui/heading";
-import { Reveal } from "@/components/ui/reveal";
+import { Reveal, RevealItem } from "@/components/ui/reveal";
 
-const insights = [
+const INSIGHTS = [
   {
-    title: "Culture as a Strategic Asset",
-    summary:
-      "How high-performing organisations embed values into daily decisions, not just boardroom slides.",
-    tag: "Corporate Transformation",
     href: "/insights/culture-as-strategic-asset",
+    category: "Corporate transformation",
+    title: "Leadership Systems That Hold Under Pressure",
+    description:
+      "Why leadership training fades—and how to embed capability into the structure of an organisation so change compounds.",
   },
   {
-    title: "The Executive Mindset Shift",
-    summary:
-      "Why the transition from functional expert to enterprise leader demands a new identity, not just new skills.",
-    tag: "Executive Coaching",
     href: "/insights/executive-mindset-shift",
+    category: "High performance",
+    title: "Strategy Is Cheap. Execution Is the Moat.",
+    description:
+      "The operating discipline that separates ambitious strategy from durable competitive advantage.",
   },
   {
-    title: "Leading Through Disruption",
-    summary:
-      "Frameworks for maintaining clarity, trust, and momentum when markets and teams are under pressure.",
-    tag: "Leadership",
     href: "/insights/leading-through-disruption",
-  },
-  {
-    title: "Measuring Transformation ROI",
-    summary:
-      "Connecting people development initiatives to revenue, retention, and operational excellence.",
-    tag: "Strategy",
-    href: "/insights/measuring-transformation-roi",
+    category: "Education reform",
+    title: "Reforming How a Continent Teaches and Governs",
+    description:
+      "Why lasting educational change depends on governance, capability, and incentives—not curriculum alone.",
   },
 ];
 
 export function CorporateTransformationSection() {
   return (
-    <section className="ploy-section bg-[var(--ploy-background-secondary)]">
-      <div className="ploy-container space-y-12">
-        <Reveal className="max-w-3xl space-y-4">
-          <p className="ploy-kicker">Corporate Transformation</p>
-          <Heading as="h2" size="section" className="ploy-text-balance">
-            Insights for leaders navigating change at scale
-          </Heading>
-          <p className="text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
-            Practical perspectives drawn from decades of executive coaching,
-            organisational consulting, and real-world transformation programmes.
-          </p>
+    <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">
+      <div className="mx-auto max-w-[var(--ploy-canvas-main)]">
+        <Reveal className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+          <div>
+            <p className="ploy-eyebrow">Insights & writing</p>
+          </div>
+          <div>
+            <Heading as="h2" size="section" className="ploy-text-balance">
+              Ideas become durable when they are built into systems.
+            </Heading>
+            <div className="mt-7 flex items-end justify-between gap-8">
+              <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
+                Essays and field notes on leadership, execution, education reform, and the
+                institutions that shape public life.
+              </p>
+              <a
+                href="/insights"
+                className="ploy-text-link-underline hidden shrink-0 md:block"
+              >
+                View all writing
+              </a>
+            </div>
+          </div>
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          {insights.map((item, index) => (
-            <Reveal key={item.href} delay={index * 0.08}>
+        <Reveal stagger className="mt-14 grid border-l border-t border-[var(--ploy-border-primary)] md:grid-cols-3">
+          {INSIGHTS.map((item) => (
+            <RevealItem key={item.title}>
               <a
                 href={item.href}
-                className="group flex h-full flex-col justify-between gap-6 ploy-surface-elevated p-6 transition-all hover:-translate-y-0.5 hover:shadow-[var(--ploy-shadow-md)] lg:p-8"
+                className="group flex min-h-[25rem] flex-col justify-between border-b border-r border-[var(--ploy-border-primary)] p-7 transition-colors duration-300 hover:bg-[var(--ploy-background-secondary)] md:p-9"
               >
-                <div className="space-y-4">
-                  <span className="inline-block rounded-full bg-[var(--ploy-background-accent-muted)] px-3 py-1 text-xs font-medium text-[var(--ploy-text-accent)]">
-                    {item.tag}
-                  </span>
-                  <Heading as="h3" size="card">
+                <div>
+                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
+                    {item.category}
+                  </p>
+                  <Heading as="h3" size="card" className="mt-10">
                     {item.title}
                   </Heading>
-                  <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-                    {item.summary}
-                  </p>
                 </div>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-[var(--ploy-text-accent)]">
-                  Read insight
-                  <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </span>
+                <div>
+                  <p className="leading-relaxed text-[var(--ploy-text-secondary)]">
+                    {item.description}
+                  </p>
+                  <ArrowUpRight
+                    className="mt-8 size-5 transition-colors group-hover:text-[var(--ploy-accent-primary)]"
+                    aria-hidden="true"
+                  />
+                </div>
               </a>
-            </Reveal>
+            </RevealItem>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );

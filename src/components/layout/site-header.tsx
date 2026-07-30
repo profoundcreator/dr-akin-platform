@@ -19,26 +19,29 @@ export function SiteHeader() {
   }, [mobileOpen]);
 
   return (
-    <header className="sticky top-0 z-50 h-20 border-b border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-primary)]/90 backdrop-blur-md">
-      <div className="ploy-container flex h-full items-center justify-between gap-6">
+    <header className="sticky top-0 z-50 border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)]/95 backdrop-blur-md">
+      <div className="mx-auto flex h-20 max-w-[var(--ploy-canvas-wide)] items-center justify-between gap-6 px-6 md:px-10 lg:px-14 xl:px-20">
         <a
           href="/"
-          className="shrink-0 text-lg font-semibold tracking-[var(--ploy-tracking-tight)] text-[var(--ploy-text-primary)]"
+          className="shrink-0 text-lg font-semibold tracking-[-0.035em] text-[var(--ploy-text-primary)]"
         >
-          Dr. Akin Akinpelu
+          Dr. Akin Akinpelu{" "}
+          <span className="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
+            Ph.D
+          </span>
         </a>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav className="hidden items-stretch gap-1 lg:flex" aria-label="Primary">
           {NAV_GROUPS.map((group) => (
             <div
               key={group.label}
-              className="relative"
+              className="relative flex items-stretch"
               onMouseEnter={() => setOpenDropdown(group.label)}
               onMouseLeave={() => setOpenDropdown(null)}
             >
               <a
                 href={group.href}
-                className="flex items-center gap-1 rounded-[var(--ploy-radius-md)] px-3 py-2 text-sm font-medium text-[var(--ploy-text-secondary)] transition-colors hover:bg-[var(--ploy-interactive-secondary)] hover:text-[var(--ploy-text-primary)]"
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 text-sm font-medium text-[var(--ploy-text-secondary)] transition-colors hover:bg-[var(--ploy-background-secondary)] hover:text-[var(--ploy-text-primary)]"
                 aria-expanded={openDropdown === group.label}
                 aria-haspopup="true"
               >
@@ -47,18 +50,18 @@ export function SiteHeader() {
               </a>
 
               {openDropdown === group.label && (
-                <div className="absolute left-0 top-full z-50 min-w-[16rem] animate-ploy-slide-down rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-elevated)] p-2 shadow-[var(--ploy-shadow-md)]">
+                <div className="absolute left-0 top-full z-50 min-w-[16rem] animate-ploy-slide-down rounded-lg border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] p-2 shadow-[var(--ploy-shadow-md)]">
                   {group.links.map((link) => (
                     <a
                       key={link.href}
                       href={link.href}
-                      className="block rounded-[var(--ploy-radius-md)] px-3 py-2.5 transition-colors hover:bg-[var(--ploy-interactive-secondary)]"
+                      className="block rounded-md px-3 py-2.5 transition-colors hover:bg-[var(--ploy-background-secondary)]"
                     >
                       <span className="block text-sm font-medium text-[var(--ploy-text-primary)]">
                         {link.label}
                       </span>
                       {link.description && (
-                        <span className="block text-xs text-[var(--ploy-text-tertiary)]">
+                        <span className="block text-xs text-[var(--ploy-text-secondary)]">
                           {link.description}
                         </span>
                       )}
@@ -84,7 +87,7 @@ export function SiteHeader() {
 
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] text-[var(--ploy-text-primary)] lg:hidden"
+            className="inline-flex size-10 items-center justify-center rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] text-[var(--ploy-text-primary)] lg:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((prev) => !prev)}
@@ -106,7 +109,7 @@ export function SiteHeader() {
             <div key={group.label} className="space-y-3">
               <a
                 href={group.href}
-                className="ploy-kicker block"
+                className="ploy-eyebrow block"
                 onClick={() => setMobileOpen(false)}
               >
                 {group.label}
@@ -116,7 +119,7 @@ export function SiteHeader() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="block rounded-[var(--ploy-radius-md)] px-3 py-2.5 text-base font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-interactive-secondary)]"
+                      className="block rounded-md px-3 py-2.5 text-base font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-background-secondary)]"
                       onClick={() => setMobileOpen(false)}
                     >
                       {link.label}

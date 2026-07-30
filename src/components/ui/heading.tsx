@@ -1,15 +1,15 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const headingVariants = cva("font-semibold tracking-[var(--ploy-tracking-tight)] text-[var(--ploy-text-primary)]", {
+const headingVariants = cva("font-semibold tracking-[-0.035em] text-[var(--ploy-text-primary)]", {
   variants: {
     size: {
       display:
-        "text-[clamp(2.5rem,5vw,var(--ploy-text-5xl))] leading-[var(--ploy-leading-tight)]",
+        "text-[clamp(2.75rem,5.5vw,4.5rem)] leading-[1.02]",
       section:
-        "text-[clamp(2rem,3.5vw,var(--ploy-text-4xl))] leading-[var(--ploy-leading-snug)]",
+        "text-[clamp(2rem,3.5vw,var(--ploy-text-4xl))] leading-[var(--ploy-leading-snug)] tracking-[-0.03em]",
       card:
-        "text-[clamp(1.25rem,2vw,var(--ploy-text-2xl))] leading-[var(--ploy-leading-snug)]",
+        "text-[clamp(1.25rem,2vw,var(--ploy-text-2xl))] leading-[var(--ploy-leading-snug)] tracking-[-0.025em]",
       label:
         "text-[var(--ploy-text-lg)] leading-[var(--ploy-leading-snug)] font-medium",
     },

@@ -1,139 +1,119 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
-import { cn } from "@/lib/utils";
 
-const ecosystemTabs = [
+const SYSTEM_VISUAL_URL =
+  "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/3a077906-ai-generated-1784225940885.webp";
+
+const ECOSYSTEM_ARMS = [
   {
-    id: "academy",
-    label: "AALD Academy",
-    title: "Develop leaders at every level",
+    title: "Corporate Transformation",
+    label: "AALD",
+    href: "/work/aald",
     description:
-      "Structured learning pathways for emerging managers, senior executives, and C-suite leaders — combining coaching, cohort learning, and applied practice.",
-    highlights: [
-      "Executive leadership programmes",
-      "Manager acceleration tracks",
-      "Certification pathways",
-    ],
+      "Leadership systems and institutional capability designed to hold under pressure and compound over time.",
   },
   {
-    id: "consulting",
-    label: "Consulting",
-    title: "Transform organisations with precision",
+    title: "Educational Reform",
+    label: "Erudio Hub",
+    href: "/work/erudio-hub",
     description:
-      "End-to-end corporate transformation engagements — from diagnostic assessments to culture redesign, change management, and sustained performance.",
-    highlights: [
-      "Organisational diagnostics",
-      "Culture & values alignment",
-      "Change leadership support",
-    ],
+      "Systemic reform of how nations teach, govern schools, and develop the next generation of African educators.",
   },
   {
-    id: "community",
-    label: "Community",
-    title: "A network of purpose-driven leaders",
+    title: "Execution Think Tank",
+    label: "PERFORMX",
+    href: "/work/performx",
     description:
-      "The AALD community connects executives, entrepreneurs, and changemakers across Africa for peer learning, mentorship, and collaborative impact.",
-    highlights: [
-      "Executive roundtables",
-      "Mentorship circles",
-      "Annual leadership summit",
-    ],
+      "A high-performance practice turning strategy into disciplined execution for leaders and operating teams.",
   },
   {
-    id: "media",
-    label: "Media",
-    title: "Ideas that reach beyond the boardroom",
+    title: "Tech Alliances",
+    label: "TC Resource Tech",
+    href: "/work/tc-resource-technology",
     description:
-      "Podcasts, publications, and digital content that extend Dr. Akin's frameworks to leaders who may never sit in a coaching room.",
-    highlights: [
-      "Leadership podcast series",
-      "Weekly insights newsletter",
-      "Digital learning library",
-    ],
+      "Technology partnerships and infrastructure extending the reach of every other arm of the ecosystem.",
   },
 ];
 
 export function AaldSection() {
-  const [activeTab, setActiveTab] = useState(ecosystemTabs[0].id);
-  const active = ecosystemTabs.find((tab) => tab.id === activeTab) ?? ecosystemTabs[0];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeItem = ECOSYSTEM_ARMS[activeIndex] ?? ECOSYSTEM_ARMS[0];
 
   return (
-    <section className="ploy-section">
-      <div className="ploy-container">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <Reveal className="space-y-6">
-            <p className="ploy-kicker">AALD Ecosystem</p>
-            <Heading as="h2" size="section" className="ploy-text-balance">
-              A unified platform for leadership development
-            </Heading>
-            <p className="text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
-              The African Academy of Leadership Development (AALD) is Dr. Akin&apos;s
-              integrated ecosystem — combining academy, consulting, community, and media
-              to develop leaders who build lasting institutions.
-            </p>
+    <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">
+      <div className="mx-auto max-w-[var(--ploy-canvas-main)]">
+        <Reveal className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <p className="ploy-eyebrow">The ecosystem</p>
+          <Heading as="h2" size="section" className="ploy-text-balance">
+            A connected system for building leaders, institutions, and public impact.
+          </Heading>
+        </Reveal>
 
-            <div
-              className="flex flex-wrap gap-2"
-              role="tablist"
-              aria-label="AALD ecosystem areas"
-            >
-              {ecosystemTabs.map((tab) => (
+        <div className="mt-14 grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+          <div className="border-t border-[var(--ploy-border-primary)]">
+            {ECOSYSTEM_ARMS.map((item, index) => {
+              const isActive = index === activeIndex;
+              return (
                 <button
-                  key={tab.id}
+                  key={item.title}
                   type="button"
-                  role="tab"
-                  aria-selected={activeTab === tab.id}
-                  aria-controls={`aald-panel-${tab.id}`}
-                  id={`aald-tab-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition-all",
-                    activeTab === tab.id
-                      ? "bg-[var(--ploy-interactive-primary)] text-[var(--ploy-text-inverse)]"
-                      : "bg-[var(--ploy-interactive-secondary)] text-[var(--ploy-text-secondary)] hover:text-[var(--ploy-text-primary)]",
-                  )}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onFocus={() => setActiveIndex(index)}
+                  onClick={() => setActiveIndex(index)}
+                  aria-pressed={isActive}
+                  className="grid w-full grid-cols-[1fr_auto] gap-5 border-b border-[var(--ploy-border-primary)] py-6 text-left"
                 >
-                  {tab.label}
+                  <span>
+                    <span
+                      className={`block text-xl font-semibold tracking-[-0.025em] transition-colors md:text-2xl ${
+                        isActive
+                          ? "text-[var(--ploy-text-primary)]"
+                          : "text-[var(--ploy-text-secondary)]"
+                      }`}
+                    >
+                      {item.title}
+                    </span>
+                    <span className="mt-2 block font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
+                      {item.label}
+                    </span>
+                  </span>
+                  <ArrowUpRight
+                    className={`mt-1 size-5 transition-colors ${
+                      isActive
+                        ? "text-[var(--ploy-accent-primary)]"
+                        : "text-[var(--ploy-text-secondary)]"
+                    }`}
+                    aria-hidden="true"
+                  />
                 </button>
-              ))}
-            </div>
-          </Reveal>
+              );
+            })}
+          </div>
 
-          <Reveal delay={0.1}>
-            <div
-              id={`aald-panel-${active.id}`}
-              role="tabpanel"
-              aria-labelledby={`aald-tab-${active.id}`}
-              className="ploy-surface-elevated space-y-6 p-8 lg:p-10"
-            >
-              <div className="space-y-4">
-                <Heading as="h3" size="card">
-                  {active.title}
-                </Heading>
-                <p className="leading-relaxed text-[var(--ploy-text-secondary)]">
-                  {active.description}
-                </p>
-              </div>
-
-              <ul className="space-y-3">
-                {active.highlights.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 text-sm text-[var(--ploy-text-primary)]"
-                  >
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--ploy-background-accent)]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <Button variant="secondary" showArrow href="/aald">
-                Explore {active.label}
-              </Button>
+          <Reveal className="relative overflow-x-hidden rounded-xl bg-[var(--ploy-neutral-inverse)]">
+            <img
+              src={SYSTEM_VISUAL_URL}
+              alt="Abstract architectural forms representing durable institutional systems"
+              className="min-h-[36rem] w-full object-cover"
+            />
+            <div className="absolute inset-x-5 bottom-5 rounded-lg bg-[var(--ploy-background-primary)]/95 p-6 backdrop-blur md:inset-x-8 md:bottom-8 md:p-8">
+              <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
+                {activeItem.label}
+              </p>
+              <p className="mt-3 max-w-xl text-lg leading-relaxed text-[var(--ploy-text-primary)]">
+                {activeItem.description}
+              </p>
+              <a
+                href={activeItem.href}
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]"
+              >
+                Explore platform
+                <ArrowUpRight className="size-4" aria-hidden="true" />
+              </a>
             </div>
           </Reveal>
         </div>

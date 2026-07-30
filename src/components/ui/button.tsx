@@ -3,25 +3,25 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         primary:
           "bg-[var(--ploy-interactive-primary)] text-[var(--ploy-text-inverse)] hover:bg-[var(--ploy-interactive-primary-hover)]",
         secondary:
-          "bg-[var(--ploy-interactive-secondary)] text-[var(--ploy-text-primary)] border border-[var(--ploy-border-default)] hover:bg-[var(--ploy-interactive-secondary-hover)]",
+          "bg-[var(--ploy-background-primary)] text-[var(--ploy-text-primary)] border border-[var(--ploy-border-primary)] hover:bg-[var(--ploy-interactive-secondary)]",
         ghost:
           "text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-interactive-secondary)]",
         accent:
           "bg-[var(--ploy-background-accent)] text-[var(--ploy-text-inverse)] hover:opacity-90",
-        link: "text-[var(--ploy-text-link)] underline-offset-4 hover:underline p-0 h-auto",
+        link: "h-auto p-0 text-[var(--ploy-text-primary)] underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]",
       },
       size: {
-        sm: "h-9 px-4 text-sm rounded-[var(--ploy-radius-md)]",
-        md: "h-11 px-6 text-sm rounded-[var(--ploy-radius-md)]",
-        lg: "h-12 px-8 text-base rounded-[var(--ploy-radius-lg)]",
-        icon: "h-10 w-10 rounded-[var(--ploy-radius-md)]",
+        sm: "h-9 px-4 text-sm rounded-[var(--ploy-radius-button)]",
+        md: "h-11 px-5 text-sm rounded-[var(--ploy-radius-button)]",
+        lg: "h-12 px-6 text-sm rounded-[var(--ploy-radius-button)]",
+        icon: "h-10 w-10 rounded-[var(--ploy-radius-button)]",
       },
     },
     defaultVariants: {
