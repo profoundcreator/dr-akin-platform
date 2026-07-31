@@ -1,4 +1,8 @@
 import type { AdminProfile, AdminRole } from "@/lib/supabase/database.types";
+import {
+  OPERATIONAL_TEAM_ROLES,
+  PRIVILEGED_TEAM_ROLES,
+} from "@/lib/team/constants";
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
   super_admin: "Super Admin",
@@ -40,6 +44,47 @@ export function isPrivilegedAdmin(profile: AdminProfile | null): boolean {
 
 export function canManageUsers(profile: AdminProfile | null): boolean {
   return isPrivilegedAdmin(profile);
+}
+
+export function canAccessTeamAdmin(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "technical_admin" ||
+    profile!.role === "admin_manager"
+  );
+}
+
+export function canInviteTeamMembers(profile: AdminProfile | null): boolean {
+  return canAccessTeamAdmin(profile);
+}
+
+export function getAssignableTeamRoles(profile: AdminProfile | null): AdminRole[] {
+  if (!canAccessAdmin(profile)) return [];
+  if (PRIVILEGED_TEAM_ROLES.includes(profile!.role)) {
+    return [...PRIVILEGED_TEAM_ROLES, ...OPERATIONAL_TEAM_ROLES];
+  }
+  if (profile!.role === "admin_manager") {
+    return OPERATIONAL_TEAM_ROLES;
+  }
+  return [];
+}
+
+export function canEditTeamMember(
+  actor: AdminProfile | null,
+  target: AdminProfile,
+): boolean {
+  if (!canAccessTeamAdmin(actor) || !actor) return false;
+  if (target.is_founder && actor.id !== target.id) return false;
+  if (PRIVILEGED_TEAM_ROLES.includes(actor.role)) return true;
+  if (actor.role === "admin_manager") {
+    return OPERATIONAL_TEAM_ROLES.includes(target.role);
+  }
+  return false;
+}
+
+export function canMarkFounder(profile: AdminProfile | null): boolean {
+  return profile?.account_state === "active" && profile.role === "super_admin";
 }
 
 export function canWriteBookings(profile: AdminProfile | null): boolean {

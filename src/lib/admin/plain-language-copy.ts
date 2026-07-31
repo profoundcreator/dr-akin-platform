@@ -49,3 +49,21 @@ export const ADMIN_REBUILD_SEO_COPY = {
   help:
     "Refreshes the public website after you publish or hide content. This helps Google, search results, and link previews (WhatsApp, LinkedIn, etc.) show the latest titles, descriptions, and pages.",
 } as const;
+
+export const TEAM_ADMIN_COPY = {
+  subtitle: "Invite colleagues, assign roles, and manage back-office access",
+  inviteTitle: "Invite team member",
+  inviteHelp:
+    "Sends an email invite. They set a password, then sign in at /admin/login. You can resend the invite if needed.",
+  teamListTitle: "Team members",
+  teamListHelp: "Everyone who can access the private back office, their role, and account status.",
+  founderBadge: "Founder",
+  founderHelp:
+    "The main protected Super Admin account. It cannot be suspended, demoted, or removed by other admins.",
+  markFounder: "Mark as founder",
+  markFounderHelp:
+    "Designate one protected Super Admin account. Do this once for the primary account owner. Co–Super Admins cannot change or remove the founder.",
+  noFounderYet: "No founder account is designated yet. Mark the primary Super Admin as founder for extra protection.",
+  serviceRoleMissing:
+    "Email invites need SUPABASE_SERVICE_ROLE_KEY in Vercel. Until then, add users manually in Supabase Auth and run the profile SQL snippet.",
+} as const;

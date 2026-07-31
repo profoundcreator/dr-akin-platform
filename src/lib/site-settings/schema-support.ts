@@ -10,6 +10,9 @@ export const MIGRATION_010_HINT =
 export const MIGRATION_011_HINT =
   "Run supabase/migrations/011_work_orgs.sql in the Supabase SQL Editor, then refresh.";
 
+export const MIGRATION_012_HINT =
+  "Run supabase/migrations/012_team_admin.sql in the Supabase SQL Editor, then refresh.";
+
 export function isMissingPhase1SchemaError(message: string): boolean {
   const normalized = message.toLowerCase();
   return (
@@ -34,6 +37,19 @@ export function isMissingPhase4SchemaError(message: string): boolean {
   );
 }
 
+export function isMissingPhase5SchemaError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("is_founder") ||
+    normalized.includes("update_admin_team_member") ||
+    normalized.includes("mark_admin_as_founder")
+  );
+}
+
+export function isPhase5SchemaError(message: string): boolean {
+  return isMissingPhase5SchemaError(message);
+}
+
 export function formatSchemaSetupError(message: string): string {
   if (isMissingPhase1SchemaError(message)) {
     return `${message} ${MIGRATION_007_HINT}`;
@@ -46,6 +62,9 @@ export function formatSchemaSetupError(message: string): string {
   }
   if (isMissingPhase4SchemaError(message)) {
     return `${message} ${MIGRATION_011_HINT}`;
+  }
+  if (isMissingPhase5SchemaError(message)) {
+    return `${message} ${MIGRATION_012_HINT}`;
   }
   return message;
 }

@@ -27,7 +27,7 @@ export async function signInAdmin(email: string, password: string) {
   if (error) throw error;
   if (!data.user) throw new Error("Sign in failed");
 
-  const profile = await fetchAdminProfile(data.user.id);
+  let profile = await fetchAdminProfile(data.user.id);
 
   if (!profile) {
     await supabase.auth.signOut();
@@ -45,8 +45,20 @@ export async function signInAdmin(email: string, password: string) {
   }
 
   if (profile.account_state === "invited") {
-    await supabase.auth.signOut();
-    throw new Error("Please complete your account setup before signing in.");
+    const emailConfirmed = Boolean(data.user.email_confirmed_at ?? data.user.confirmed_at);
+    if (emailConfirmed) {
+      const supabase = tryGetSupabaseClient();
+      if (supabase) {
+        await supabase
+          .from("admin_profiles")
+          .update({ account_state: "active" })
+          .eq("id", profile.id);
+      }
+      profile = { ...profile, account_state: "active" };
+    } else {
+      await supabase.auth.signOut();
+      throw new Error("Please confirm your email from the invite link before signing in.");
+    }
   }
 
   if (profile.session_revoked_at) {

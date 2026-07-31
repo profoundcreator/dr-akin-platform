@@ -28,6 +28,7 @@ In the Supabase **SQL Editor**, run in order:
 7. `migrations/009_library_books.sql`
 8. `migrations/010_insights_articles.sql`
 9. `migrations/011_work_orgs.sql`
+10. `migrations/012_team_admin.sql`
 
 ## 4. Configure Auth
 
@@ -53,7 +54,14 @@ VALUES (
 );
 ```
 
-## 6. Verify
+Optionally set `is_founder = true` on the primary Super Admin (see `seed-admin.sql`).
+
+## 6. Team invites (optional)
+
+1. Add `SUPABASE_SERVICE_ROLE_KEY` and `PUBLIC_SITE_URL` in Vercel environment variables
+2. Open **Admin → Team** to invite colleagues by email
+
+## 7. Verify
 
 ```bash
 npm run verify:supabase   # checks .env vars are set
@@ -62,13 +70,11 @@ npm run dev
 
 - Submit booking at `/book-dr-akin`
 - Sign in at `/admin/login`
-- Admin dashboard shows **Supabase Connected** badge (not demo mode)
-- Track at `/booking/DAA-XXXX?token=...`
+- Admin dashboard loads at `/admin/login` (demo mode if `.env` is missing)
+- **Team** appears in the sidebar for Super Admin, Technical Admin, and Admin Manager
 
-Without `.env`, the app uses localStorage demo mode with 5 sample requests.
-
-## 7. Deploy to Vercel
+## 8. Deploy to Vercel
 
 1. Connect this repo to [Vercel](https://vercel.com)
-2. Set environment variables: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK_URL` (optional — triggers SEO rebuild when events, books, insights, or work orgs are published)
+2. Set environment variables: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (for Team invites), `VERCEL_DEPLOY_HOOK_URL` (optional — triggers SEO rebuild when events, books, insights, or work orgs are published)
 3. Deploy — `vercel.json` includes the booking tracker rewrite

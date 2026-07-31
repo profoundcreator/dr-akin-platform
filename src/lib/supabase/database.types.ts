@@ -36,6 +36,7 @@ export interface AdminProfile {
   full_name: string;
   role: AdminRole;
   account_state: AdminAccountState;
+  is_founder?: boolean;
   invited_by: string | null;
   invited_at: string | null;
   last_sign_in_at: string | null;
@@ -332,6 +333,19 @@ export interface Database {
           p_metadata?: Record<string, unknown>;
         };
         Returns: string;
+      };
+      update_admin_team_member: {
+        Args: {
+          p_target_id: string;
+          p_role?: AdminRole;
+          p_account_state?: AdminAccountState;
+          p_full_name?: string;
+        };
+        Returns: AdminProfile;
+      };
+      mark_admin_as_founder: {
+        Args: { p_target_id: string };
+        Returns: AdminProfile;
       };
     };
   };

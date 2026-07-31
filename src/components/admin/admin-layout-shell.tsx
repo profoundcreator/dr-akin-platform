@@ -1,9 +1,9 @@
 "use client";
 
-import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase } from "lucide-react";
+import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
-import { formatAdminRole } from "@/lib/auth/permissions";
+import { canAccessTeamAdmin, formatAdminRole } from "@/lib/auth/permissions";
 import { isSupabaseConfigured } from "@/lib/booking/api";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
@@ -16,8 +16,9 @@ const NAV_ITEMS = [
   { label: "Books", href: "/admin/books", icon: BookOpen },
   { label: "Insights", href: "/admin/insights", icon: FileText },
   { label: "Work", href: "/admin/work", icon: Briefcase },
+  { label: "Team", href: "/admin/team", icon: Users, requiresTeamAccess: true },
   { label: "Featured Episodes", href: "/admin/audio", icon: Headphones },
-];
+] as const;
 
 interface AdminLayoutShellProps {
   children: ReactNode;
@@ -64,7 +65,9 @@ export function AdminLayoutShell({ children, title, subtitle }: AdminLayoutShell
       <div className="mx-auto flex max-w-7xl gap-8 px-6 py-8">
         <aside className="hidden w-48 shrink-0 lg:block">
           <nav className="space-y-1" aria-label="Admin">
-            {NAV_ITEMS.map(({ label, href, icon: Icon }) => (
+            {NAV_ITEMS.filter(
+              (item) => !("requiresTeamAccess" in item && item.requiresTeamAccess) || canAccessTeamAdmin(profile),
+            ).map(({ label, href, icon: Icon }) => (
               <a
                 key={href}
                 href={href}
