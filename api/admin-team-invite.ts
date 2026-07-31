@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { createAuthenticatedServerClient } from "../src/lib/supabase/authenticated-server-client";
-import type { AdminAccountState, AdminRole } from "../src/lib/supabase/database.types";
+import { createAuthenticatedServerClient } from "./lib/authenticated-server-client.ts";
+import type { AdminAccountState, AdminRole } from "./lib/admin-types.ts";
 
 const PRIVILEGED_ROLES = new Set<AdminRole>(["super_admin", "technical_admin"]);
 
@@ -172,6 +172,14 @@ function inviteDeliveryMessage(delivery: "invite" | "password_setup", resend: bo
     : "Invite sent. They will receive an email to set their password and sign in.";
 }
 
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return "Invite failed.";
+}
+
 export default async function handler(
   req: { method?: string; headers: { authorization?: string }; body?: InviteRequestBody },
   res: { status: (code: number) => { json: (body: unknown) => void } },
@@ -301,7 +309,6 @@ export default async function handler(
       memberId: authUser.id,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Invite failed.";
-    return json(res, 500, { error: message });
+    return json(res, 500, { error: errorMessage(error) });
   }
 }

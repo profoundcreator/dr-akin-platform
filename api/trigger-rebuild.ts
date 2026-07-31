@@ -1,4 +1,4 @@
-import { createAuthenticatedServerClient } from "../src/lib/supabase/authenticated-server-client";
+import { createAuthenticatedServerClient } from "./lib/authenticated-server-client.ts";
 
 const APPROVER_ROLES = new Set(["super_admin", "executive_assistant", "admin_manager"]);
 

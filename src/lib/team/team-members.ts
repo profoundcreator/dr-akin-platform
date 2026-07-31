@@ -82,30 +82,60 @@ export async function inviteTeamMember(input: {
     return { ok: false, message: "You must be signed in to invite team members." };
   }
 
-  const response = await fetch("/api/admin-team-invite", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: input.email,
-      fullName: input.fullName,
-      role: input.role,
-      resend: input.resend ?? false,
-    }),
-  });
-
-  const payload = (await response.json().catch(() => ({}))) as {
-    message?: string;
-    error?: string;
-  };
-
-  if (!response.ok) {
+  let response: Response;
+  try {
+    response = await fetch("/api/admin-team-invite", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: input.email,
+        fullName: input.fullName,
+        role: input.role,
+        resend: input.resend ?? false,
+      }),
+    });
+  } catch {
     return {
       ok: false,
-      message: payload.error ?? payload.message ?? "Invite failed.",
+      message: "Could not reach the invite service. Check your connection and try again.",
     };
+  }
+
+  const rawBody = await response.text();
+  let payload: { message?: string; error?: string } = {};
+  if (rawBody) {
+    try {
+      payload = JSON.parse(rawBody) as { message?: string; error?: string };
+    } catch {
+      payload = {};
+    }
+  }
+
+  if (!response.ok) {
+    const serverMessage = payload.error ?? payload.message;
+    if (serverMessage) {
+      return { ok: false, message: serverMessage };
+    }
+
+    if (response.status === 404) {
+      return {
+        ok: false,
+        message: "Invite service is unavailable. The site may still be deploying — try again shortly.",
+      };
+    }
+
+    if (response.status >= 500) {
+      return {
+        ok: false,
+        message:
+          "Invite service error on the server. If this keeps happening, confirm SUPABASE_SERVICE_ROLE_KEY is set in Vercel.",
+      };
+    }
+
+    return { ok: false, message: `Invite failed (${response.status}).` };
   }
 
   return {
