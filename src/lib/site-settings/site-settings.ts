@@ -1,5 +1,6 @@
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 import type { DbSiteSettings, HomepageHeroMode } from "@/lib/supabase/database.types";
+import { formatSchemaSetupError, isMissingPhase1SchemaError } from "@/lib/site-settings/schema-support";
 
 export interface SiteSettings {
   homepageEventsEnabled: boolean;
@@ -42,12 +43,24 @@ export async function getPublicSiteSettings(): Promise<SiteSettings> {
 
   const { data, error } = await supabase.from("site_settings").select("*").eq("id", true).maybeSingle();
 
-  if (error || !data) return DEFAULT_SITE_SETTINGS;
+  if (error) {
+    if (isMissingPhase1SchemaError(error.message)) return DEFAULT_SITE_SETTINGS;
+    return DEFAULT_SITE_SETTINGS;
+  }
+  if (!data) return DEFAULT_SITE_SETTINGS;
   return mapRow(data);
 }
 
 export async function getAdminSiteSettings(): Promise<SiteSettings> {
   return getPublicSiteSettings();
+}
+
+export async function isPhase1SchemaReady(): Promise<boolean> {
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) return false;
+
+  const { error } = await supabase.from("site_settings").select("id").eq("id", true).maybeSingle();
+  return !error;
 }
 
 export interface SiteSettingsInput {
@@ -66,17 +79,17 @@ export async function updateSiteSettings(
 
   const { data, error } = await supabase
     .from("site_settings")
-    .update({
+    .upsert({
+      id: true,
       homepage_events_enabled: input.homepageEventsEnabled,
       homepage_hero_mode: input.homepageHeroMode,
       homepage_banner_image_path: input.homepageBannerImagePath ?? null,
       homepage_portrait_image_path: input.homepagePortraitImagePath ?? null,
       updated_by: updatedBy ?? null,
     })
-    .eq("id", true)
     .select("*")
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(formatSchemaSetupError(error.message));
   return mapRow(data);
 }

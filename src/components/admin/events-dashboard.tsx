@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { ImageUploadHint } from "@/components/ui/image-upload-hint";
@@ -46,6 +47,7 @@ import {
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
 import type { EventBrand, EventStatus, EventType } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { isPhase1SchemaReady } from "@/lib/site-settings/site-settings";
 
 const EMPTY_FORM = {
   slug: "",
@@ -104,12 +106,14 @@ export function EventsDashboard() {
   const [existingCoverPath, setExistingCoverPath] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
+  const [schemaReady, setSchemaReady] = useState(true);
 
   const pendingCount = pending.length;
 
   async function loadEvents() {
     try {
       setError(null);
+      setSchemaReady(await isPhase1SchemaReady());
       const [allEvents, pendingEvents] = await Promise.all([
         getAdminEvents(),
         isApprover ? getPendingEvents() : Promise.resolve([]),
@@ -260,18 +264,36 @@ export function EventsDashboard() {
           publishedBy: profile?.full_name,
         });
 
+        let publishNotice: string | null = null;
+
         if (isApprover && form.isHomepageFeatured) {
-          await setEventHomepageFeatured(saved.id);
+          try {
+            await setEventHomepageFeatured(saved.id);
+          } catch (featuredError) {
+            publishNotice =
+              featuredError instanceof Error
+                ? featuredError.message
+                : "Homepage feature needs migration 007.";
+          }
         } else if (isApprover && editingId && !form.isHomepageFeatured && saved.isHomepageFeatured) {
-          await clearEventHomepageFeatured(saved.id);
+          try {
+            await clearEventHomepageFeatured(saved.id);
+          } catch (featuredError) {
+            publishNotice =
+              featuredError instanceof Error
+                ? featuredError.message
+                : "Could not clear homepage feature.";
+          }
         }
 
-        const rebuild = await triggerSiteRebuild();
-        setNotice(
-          rebuild.ok
+        if (!publishNotice) {
+          const rebuild = await triggerSiteRebuild();
+          publishNotice = rebuild.ok
             ? rebuild.message
-            : `Event published. ${rebuild.message}`,
-        );
+            : `Event published. ${rebuild.message}`;
+        }
+
+        setNotice(publishNotice);
       }
 
       resetForm();
@@ -399,6 +421,7 @@ export function EventsDashboard() {
 
   return (
     <AdminLayoutShell title="Events" subtitle="Create events, manage approvals, and export registrations">
+      {!schemaReady && <AdminSetupNotice />}
       {(error || notice) && (
         <div className="mb-4 space-y-2">
           {error && (

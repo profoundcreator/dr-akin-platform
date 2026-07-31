@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Home, ImagePlus, Save } from "lucide-react";
+import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { ImageUploadHint } from "@/components/ui/image-upload-hint";
@@ -18,6 +19,7 @@ import { uploadHomepageAsset } from "@/lib/site-settings/homepage-upload";
 import {
   getAdminSiteSettings,
   getHomepageAssetUrl,
+  isPhase1SchemaReady,
   updateSiteSettings,
   type SiteSettings,
 } from "@/lib/site-settings/site-settings";
@@ -40,10 +42,12 @@ export function HomepageDashboard() {
   const [portraitFile, setPortraitFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+  const [schemaReady, setSchemaReady] = useState(true);
 
   async function loadSettings() {
     try {
       setError(null);
+      setSchemaReady(await isPhase1SchemaReady());
       const data = await getAdminSiteSettings();
       setSettings(data);
       setHomepageEventsEnabled(data.homepageEventsEnabled);
@@ -121,6 +125,7 @@ export function HomepageDashboard() {
 
   return (
     <AdminLayoutShell title="Homepage" subtitle="Hero banner, events section, and homepage visibility">
+      {!schemaReady && <AdminSetupNotice />}
       {(error || notice) && (
         <div className="mb-4 space-y-2">
           {error && (
@@ -229,6 +234,11 @@ export function HomepageDashboard() {
                     )}
                   </div>
                   <ImageUploadHint hint={HOMEPAGE_BANNER_IMAGE_HINT} />
+                  {!bannerPreview && (
+                    <p className="text-xs text-[var(--ploy-status-warning)]">
+                      Upload a banner image before saving, or the homepage will show the headline without a banner.
+                    </p>
+                  )}
                 </div>
               )}
 

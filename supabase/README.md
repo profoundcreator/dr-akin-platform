@@ -24,6 +24,7 @@ In the Supabase **SQL Editor**, run in order:
 3. `migrations/005_featured_podcast_episodes.sql`
 4. `migrations/006_events.sql`
 5. `migrations/007_site_settings.sql`
+6. `migrations/008_site_settings_insert_policy.sql`
 
 ## 4. Configure Auth
 
