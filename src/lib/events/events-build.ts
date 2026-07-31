@@ -24,6 +24,7 @@ function mapBuildRow(row: DbEvent): PlatformEvent {
     paymentLabel: row.payment_label,
     status: row.status,
     manuallyHidden: row.manually_hidden,
+    isHomepageFeatured: row.is_homepage_featured,
     submittedBy: row.submitted_by,
     approvedBy: row.approved_by,
     approvedAt: row.approved_at,

@@ -78,6 +78,10 @@ export function canManageResources(profile: AdminProfile | null): boolean {
   );
 }
 
+export function canManageHomepage(profile: AdminProfile | null): boolean {
+  return canApproveEvents(profile);
+}
+
 export function formatAdminRole(role: AdminRole): string {
   return ADMIN_ROLE_LABELS[role] ?? role;
 }

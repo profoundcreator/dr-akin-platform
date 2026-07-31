@@ -27,6 +27,7 @@ export interface PlatformEvent {
   paymentLabel: string | null;
   status: EventStatus;
   manuallyHidden: boolean;
+  isHomepageFeatured: boolean;
   submittedBy: string | null;
   approvedBy: string | null;
   approvedAt: string | null;
@@ -55,6 +56,7 @@ export interface EventInput {
   paymentLabel?: string;
   status?: EventStatus;
   manuallyHidden?: boolean;
+  isHomepageFeatured?: boolean;
 }
 
 function mapRow(row: DbEvent): PlatformEvent {
@@ -78,6 +80,7 @@ function mapRow(row: DbEvent): PlatformEvent {
     paymentLabel: row.payment_label,
     status: row.status,
     manuallyHidden: row.manually_hidden,
+    isHomepageFeatured: row.is_homepage_featured,
     submittedBy: row.submitted_by,
     approvedBy: row.approved_by,
     approvedAt: row.approved_at,
@@ -116,6 +119,7 @@ function buildInsertPayload(
     payment_label: input.paymentLabel?.trim() || null,
     status: input.status ?? "draft",
     manually_hidden: input.manuallyHidden ?? false,
+    is_homepage_featured: input.isHomepageFeatured ?? false,
     created_by: meta.createdBy ?? null,
     submitted_by: meta.submittedBy ?? null,
     approved_by: meta.approvedBy ?? null,
@@ -178,6 +182,43 @@ export async function getUpcomingPublishedEvents(): Promise<PlatformEvent[]> {
   const events = await getPublishedEvents();
   const now = Date.now();
   return events.filter((event) => new Date(event.startsAt).getTime() > now);
+}
+
+export async function getHomepageFeaturedEvent(): Promise<PlatformEvent | null> {
+  const upcoming = await getUpcomingPublishedEvents();
+  const featured = upcoming.find((event) => event.isHomepageFeatured);
+  return featured ?? upcoming[0] ?? null;
+}
+
+export async function setEventHomepageFeatured(eventId: string): Promise<void> {
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { error: clearError } = await supabase
+    .from("events")
+    .update({ is_homepage_featured: false })
+    .eq("is_homepage_featured", true);
+
+  if (clearError) throw new Error(clearError.message);
+
+  const { error } = await supabase
+    .from("events")
+    .update({ is_homepage_featured: true })
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function clearEventHomepageFeatured(eventId: string): Promise<void> {
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { error } = await supabase
+    .from("events")
+    .update({ is_homepage_featured: false })
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
 }
 
 export async function getAdminEvents(): Promise<PlatformEvent[]> {
@@ -312,6 +353,7 @@ export async function updateEvent(
   if (input.paymentLabel !== undefined) payload.payment_label = input.paymentLabel.trim() || null;
   if (input.status !== undefined) payload.status = input.status;
   if (input.manuallyHidden !== undefined) payload.manually_hidden = input.manuallyHidden;
+  if (input.isHomepageFeatured !== undefined) payload.is_homepage_featured = input.isHomepageFeatured;
   if (input.rejectionNote !== undefined) payload.rejection_note = input.rejectionNote;
   if (input.approvedBy !== undefined) payload.approved_by = input.approvedBy;
   if (input.approvedAt !== undefined) payload.approved_at = input.approvedAt;

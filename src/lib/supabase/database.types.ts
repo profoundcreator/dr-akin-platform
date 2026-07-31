@@ -20,6 +20,8 @@ export type EventBrand =
 
 export type EventStatus = "draft" | "pending_approval" | "published" | "hidden";
 
+export type HomepageHeroMode = "portrait" | "banner" | "minimal";
+
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
 
 export interface AdminProfile {
@@ -114,11 +116,23 @@ export interface DbEvent {
   payment_label: string | null;
   status: EventStatus;
   manually_hidden: boolean;
+  is_homepage_featured: boolean;
   submitted_by: string | null;
   approved_by: string | null;
   approved_at: string | null;
   rejection_note: string | null;
   created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbSiteSettings {
+  id: boolean;
+  homepage_events_enabled: boolean;
+  homepage_hero_mode: HomepageHeroMode;
+  homepage_banner_image_path: string | null;
+  homepage_portrait_image_path: string | null;
+  updated_by: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -181,6 +195,11 @@ export interface Database {
         Row: DbEvent;
         Insert: Partial<DbEvent> & Pick<DbEvent, "slug" | "title" | "starts_at" | "ends_at">;
         Update: Partial<DbEvent>;
+      };
+      site_settings: {
+        Row: DbSiteSettings;
+        Insert: Partial<DbSiteSettings> & Pick<DbSiteSettings, "id">;
+        Update: Partial<DbSiteSettings>;
       };
     };
     Functions: {

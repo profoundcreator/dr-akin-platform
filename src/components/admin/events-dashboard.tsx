@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
+import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -25,7 +26,9 @@ import {
   EVENT_TYPE_LABELS,
   LOCATION_TYPE_OPTIONS,
 } from "@/lib/events/constants";
+import { EVENT_COVER_IMAGE_HINT } from "@/lib/site-settings/constants";
 import {
+  clearEventHomepageFeatured,
   createEvent,
   deleteEvent,
   eventsToCsv,
@@ -34,6 +37,7 @@ import {
   getPendingEvents,
   isValidEventSlug,
   logEventAudit,
+  setEventHomepageFeatured,
   slugifyEventTitle,
   updateEvent,
   type EventInput,
@@ -59,6 +63,7 @@ const EMPTY_FORM = {
   registrationEmbedUrl: "",
   paymentUrl: "",
   paymentLabel: "",
+  isHomepageFeatured: false,
 };
 
 function toLocalDatetimeValue(iso: string): string {
@@ -153,6 +158,7 @@ export function EventsDashboard() {
       registrationEmbedUrl: event.registrationEmbedUrl ?? "",
       paymentUrl: event.paymentUrl ?? "",
       paymentLabel: event.paymentLabel ?? "",
+      isHomepageFeatured: event.isHomepageFeatured,
     });
     setExistingCoverPath(event.coverImagePath);
     setCoverFile(null);
@@ -254,6 +260,12 @@ export function EventsDashboard() {
           publishedBy: profile?.full_name,
         });
 
+        if (isApprover && form.isHomepageFeatured) {
+          await setEventHomepageFeatured(saved.id);
+        } else if (isApprover && editingId && !form.isHomepageFeatured && saved.isHomepageFeatured) {
+          await clearEventHomepageFeatured(saved.id);
+        }
+
         const rebuild = await triggerSiteRebuild();
         setNotice(
           rebuild.ok
@@ -320,6 +332,29 @@ export function EventsDashboard() {
       await loadEvents();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update visibility");
+    }
+  }
+
+  async function toggleHomepageFeatured(event: PlatformEvent) {
+    if (!isApprover) return;
+    setSaving(true);
+    setError(null);
+    try {
+      if (event.isHomepageFeatured) {
+        await clearEventHomepageFeatured(event.id);
+      } else {
+        await setEventHomepageFeatured(event.id);
+      }
+      setNotice(
+        event.isHomepageFeatured
+          ? "Event removed from homepage feature slot."
+          : "Event set as homepage featured event.",
+      );
+      await loadEvents();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update homepage feature");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -631,7 +666,28 @@ export function EventsDashboard() {
                 <img src={coverPreview} alt="" className="h-16 w-24 rounded-md object-cover" />
               )}
             </div>
+            <ImageUploadHint hint={EVENT_COVER_IMAGE_HINT} />
           </div>
+
+          {isApprover && (
+            <label className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4">
+              <input
+                type="checkbox"
+                checked={form.isHomepageFeatured}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, isHomepageFeatured: e.target.checked }))
+                }
+                className="mt-1"
+              />
+              <span>
+                <span className="block text-sm font-medium">Feature on homepage</span>
+                <span className="mt-1 block text-xs text-[var(--ploy-text-tertiary)]">
+                  Shows this event in the homepage Events section. Only one event can be featured
+                  at a time. Requires the Events section to be enabled in Homepage admin.
+                </span>
+              </span>
+            </label>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="event-registration">Registration link</Label>
@@ -709,6 +765,7 @@ export function EventsDashboard() {
                       <p className="text-xs text-[var(--ploy-text-tertiary)]">
                         /events/{event.slug} · {EVENT_STATUS_LABELS[event.status]}
                         {event.manuallyHidden ? " · Hidden" : ""}
+                        {event.isHomepageFeatured ? " · Homepage featured" : ""}
                       </p>
                       <p className="text-sm text-[var(--ploy-text-secondary)]">
                         {EVENT_TYPE_LABELS[event.eventType]} · {EVENT_BRAND_LABELS[event.brand]}
@@ -718,6 +775,17 @@ export function EventsDashboard() {
                       <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(event)}>
                         Edit
                       </Button>
+                      {isApprover && event.status === "published" && !event.manuallyHidden && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleHomepageFeatured(event)}
+                          disabled={saving}
+                        >
+                          {event.isHomepageFeatured ? "Unfeature on homepage" : "Feature on homepage"}
+                        </Button>
+                      )}
                       {isApprover && event.status === "published" && (
                         <Button type="button" variant="ghost" size="sm" onClick={() => toggleHidden(event)}>
                           {event.manuallyHidden ? "Show" : "Hide"}

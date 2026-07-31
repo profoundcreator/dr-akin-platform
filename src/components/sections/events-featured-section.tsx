@@ -8,10 +8,15 @@ import { Reveal } from "@/components/ui/reveal";
 import { EventCountdown } from "@/components/events/event-countdown";
 import {
   getEventCoverUrl,
-  getUpcomingPublishedEvents,
+  getHomepageFeaturedEvent,
   type PlatformEvent,
 } from "@/lib/events/events";
 import { EVENT_BRAND_LABELS, EVENT_TYPE_LABELS } from "@/lib/events/constants";
+import {
+  DEFAULT_SITE_SETTINGS,
+  getPublicSiteSettings,
+  type SiteSettings,
+} from "@/lib/site-settings/site-settings";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 function formatEventDate(startsAt: string, timezone: string): string {
@@ -23,7 +28,8 @@ function formatEventDate(startsAt: string, timezone: string): string {
 }
 
 export function EventsFeaturedSection() {
-  const [events, setEvents] = useState<PlatformEvent[]>([]);
+  const [featured, setFeatured] = useState<PlatformEvent | null>(null);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SITE_SETTINGS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -32,15 +38,20 @@ export function EventsFeaturedSection() {
       return;
     }
 
-    getUpcomingPublishedEvents()
-      .then(setEvents)
-      .catch(() => setEvents([]))
+    Promise.all([getPublicSiteSettings(), getHomepageFeaturedEvent()])
+      .then(([siteSettings, event]) => {
+        setSettings(siteSettings);
+        setFeatured(event);
+      })
+      .catch(() => {
+        setSettings(DEFAULT_SITE_SETTINGS);
+        setFeatured(null);
+      })
       .finally(() => setLoaded(true));
   }, []);
 
-  if (!loaded || events.length === 0) return null;
+  if (!loaded || !settings.homepageEventsEnabled || !featured) return null;
 
-  const featured = events[0];
   const coverUrl = getEventCoverUrl(featured.coverImagePath);
 
   return (

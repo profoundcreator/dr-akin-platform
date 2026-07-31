@@ -23,6 +23,7 @@ In the Supabase **SQL Editor**, run in order:
 2. `migrations/002_rls_policies.sql` (or `002a`, `002b`, `002c` if split)
 3. `migrations/005_featured_podcast_episodes.sql`
 4. `migrations/006_events.sql`
+5. `migrations/007_site_settings.sql`
 
 ## 4. Configure Auth
 
