@@ -1,10 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { InsightArticlePage } from "@/components/pages/marketing-page";
-import { INSIGHT_ARTICLES } from "@/data/site-content";
+import { fetchAllInsightsForBuild } from "@/lib/insights/articles-build";
 
-export function getStaticPaths() {
-  return INSIGHT_ARTICLES.map((article) => ({
+export async function getStaticPaths() {
+  const articles = await fetchAllInsightsForBuild();
+
+  return articles.map((article) => ({
     params: { slug: article.slug },
     props: { article },
   }));
@@ -18,7 +20,7 @@ const { article } = Astro.props;
     client:load
     title={article.title}
     category={article.category}
-    date={article.date}
+    date={article.publishedAt ?? article.createdAt}
     body={article.body}
   />
 </Layout>

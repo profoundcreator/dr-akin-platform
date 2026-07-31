@@ -1,9 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { InsightsHubPage } from "@/components/pages/insights-hub-page";
-import { INSIGHT_ARTICLES } from "@/data/site-content";
+import { fetchAllInsightsForBuild } from "@/lib/insights/articles-build";
+
+const articles = await fetchAllInsightsForBuild();
 ---
 
 <Layout title="Insights & Writing" description="Essays and field notes on leadership and transformation.">
-  <InsightsHubPage client:load articles={INSIGHT_ARTICLES} />
+  <InsightsHubPage client:load initialArticles={articles} />
 </Layout>

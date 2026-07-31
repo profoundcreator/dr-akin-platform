@@ -22,6 +22,8 @@ export type EventStatus = "draft" | "pending_approval" | "published" | "hidden";
 
 export type LibraryBookStatus = "draft" | "pending_approval" | "published" | "hidden";
 
+export type InsightArticleStatus = "draft" | "pending_approval" | "published" | "hidden";
+
 export type HomepageHeroMode = "portrait" | "banner" | "minimal";
 
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
@@ -151,6 +153,28 @@ export interface DbLibraryBook {
   updated_at: string;
 }
 
+export interface DbInsightArticle {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  summary: string;
+  body: string;
+  published_at: string | null;
+  sort_order: number;
+  is_homepage_featured: boolean;
+  homepage_feature_order: number | null;
+  status: InsightArticleStatus;
+  manually_hidden: boolean;
+  submitted_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  rejection_note: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbSiteSettings {
   id: boolean;
   homepage_events_enabled: boolean;
@@ -230,6 +254,12 @@ export interface Database {
         Row: DbLibraryBook;
         Insert: Partial<DbLibraryBook> & Pick<DbLibraryBook, "slug" | "title" | "category" | "description">;
         Update: Partial<DbLibraryBook>;
+      };
+      insights_articles: {
+        Row: DbInsightArticle;
+        Insert: Partial<DbInsightArticle> &
+          Pick<DbInsightArticle, "slug" | "title" | "category" | "summary">;
+        Update: Partial<DbInsightArticle>;
       };
     };
     Functions: {

@@ -1,10 +1,12 @@
 "use client";
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { InsightArticleBody } from "@/components/insights/insight-article-body";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { formatInsightDate } from "@/lib/insights/articles";
 import type { PageContent } from "@/data/site-content";
 
 interface MarketingPageProps {
@@ -133,6 +135,8 @@ interface InsightArticlePageProps {
 }
 
 export function InsightArticlePage({ title, category, date, body }: InsightArticlePageProps) {
+  const displayDate = date.includes("T") ? formatInsightDate(date) : formatInsightDate(`${date}T12:00:00`);
+
   return (
     <PageShell>
       <section className="ploy-section">
@@ -143,18 +147,12 @@ export function InsightArticlePage({ title, category, date, body }: InsightArtic
               <Heading as="h1" size="section">
                 {title}
               </Heading>
-              <p className="text-sm text-[var(--ploy-text-tertiary)]">
-                {new Date(date).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
+              {displayDate && (
+                <p className="text-sm text-[var(--ploy-text-tertiary)]">{displayDate}</p>
+              )}
             </Reveal>
             <Reveal delay={0.1}>
-              <div className="prose-spacing space-y-4 text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
-                <p>{body}</p>
-              </div>
+              <InsightArticleBody html={body} />
             </Reveal>
             <Button variant="ghost" href="/insights">
               <ArrowRight className="size-4 rotate-180" />

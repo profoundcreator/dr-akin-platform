@@ -8,6 +8,10 @@
     {
       "source": "/library/:slug((?!view$)[a-z0-9-]+)",
       "destination": "/library/view?slug=:slug"
+    },
+    {
+      "source": "/insights/:slug((?!view$)[a-z0-9-]+)",
+      "destination": "/insights/view?slug=:slug"
     }
   ]
 }

@@ -1,17 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal, RevealItem } from "@/components/ui/reveal";
-import type { InsightArticle } from "@/data/site-content";
+import { getPublicInsights } from "@/lib/insights/public-insights";
+import type { PlatformInsight } from "@/lib/insights/types";
 
 interface InsightsHubPageProps {
-  articles: InsightArticle[];
+  initialArticles?: PlatformInsight[];
 }
 
-export function InsightsHubPage({ articles }: InsightsHubPageProps) {
+export function InsightsHubPage({ initialArticles = [] }: InsightsHubPageProps) {
+  const [articles, setArticles] = useState<PlatformInsight[]>(initialArticles);
+
+  useEffect(() => {
+    if (initialArticles.length > 0) {
+      setArticles(initialArticles);
+      return;
+    }
+
+    getPublicInsights().then(setArticles);
+  }, [initialArticles]);
+
   return (
     <PageShell>
       <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">

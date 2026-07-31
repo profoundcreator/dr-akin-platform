@@ -91,6 +91,14 @@ export function canPermanentlyDeleteBooks(profile: AdminProfile | null): boolean
   return profile!.role === "super_admin" || profile!.role === "admin_manager";
 }
 
+export function canApproveInsights(profile: AdminProfile | null): boolean {
+  return canApproveEvents(profile);
+}
+
+export function canPermanentlyDeleteInsights(profile: AdminProfile | null): boolean {
+  return canPermanentlyDeleteBooks(profile);
+}
+
 export function formatAdminRole(role: AdminRole): string {
   return ADMIN_ROLE_LABELS[role] ?? role;
 }
