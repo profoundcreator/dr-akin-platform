@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Check,
@@ -54,6 +54,7 @@ import {
 } from "@/lib/insights/public-insights";
 import type { InsightArticleStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 const EMPTY_FORM = {
   slug: "",
@@ -102,6 +103,14 @@ export function InsightsDashboard() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
+  const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
+  const editorFormRef = useRef<HTMLElement>(null);
+
+  function scrollToEditorForm() {
+    requestAnimationFrame(() => {
+      editorFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   async function loadInsights() {
     try {
@@ -141,9 +150,11 @@ export function InsightsDashboard() {
   function resetForm() {
     setForm(EMPTY_FORM);
     setEditingId(null);
+    setLivePrefillTitle(null);
   }
 
   function startEdit(insight: PlatformInsight) {
+    setLivePrefillTitle(null);
     setEditingId(insight.id);
     setForm({
       slug: insight.slug,
@@ -155,6 +166,7 @@ export function InsightsDashboard() {
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
     });
+    scrollToEditorForm();
   }
 
   function startFromLiveInsight(insight: LiveSiteInsight) {
@@ -164,7 +176,10 @@ export function InsightsDashboard() {
       return;
     }
 
-    resetForm();
+    setError(null);
+    setNotice(INSIGHTS_ADMIN_COPY.startManagingReady(insight.title));
+    setEditingId(null);
+    setLivePrefillTitle(insight.title);
     setForm({
       slug: insight.slug,
       title: insight.title,
@@ -175,6 +190,7 @@ export function InsightsDashboard() {
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
     });
+    scrollToEditorForm();
   }
 
   const homepageFeaturedSlugs = useMemo(
@@ -649,7 +665,12 @@ export function InsightsDashboard() {
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <form
-          className="ploy-surface-elevated space-y-5 p-6"
+          ref={editorFormRef}
+          className={cn(
+            "ploy-surface-elevated scroll-mt-6 space-y-5 p-6",
+            livePrefillTitle &&
+              "ring-2 ring-[var(--ploy-accent-primary)] ring-offset-2 ring-offset-[var(--ploy-background-secondary)]",
+          )}
           onSubmit={(event) => {
             event.preventDefault();
             saveInsight(isApprover ? "publish" : "submit");
@@ -658,11 +679,17 @@ export function InsightsDashboard() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Plus className="size-4 text-[var(--ploy-accent-primary)]" />
-              <h2 className="text-lg font-semibold">{editingId ? "Edit article" : "Add article"}</h2>
+              <h2 className="text-lg font-semibold">
+                {editingId
+                  ? "Edit article"
+                  : livePrefillTitle
+                    ? `Start managing: ${livePrefillTitle}`
+                    : "Add article"}
+              </h2>
             </div>
-            {editingId && (
+            {(editingId || livePrefillTitle) && (
               <Button type="button" variant="ghost" size="sm" onClick={resetForm}>
-                Cancel edit
+                Cancel
               </Button>
             )}
           </div>

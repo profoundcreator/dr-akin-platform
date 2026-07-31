@@ -10,6 +10,8 @@ export const BOOKS_ADMIN_COPY = {
   startManaging: "Start managing",
   startManagingHelp:
     "This book is already on the public website. Use this to copy it into the admin so you can edit the description, cover, purchase links, and featured status yourself.",
+  startManagingReady: (title: string) =>
+    `“${title}” is loaded in the form below. Review the details and publish when you are ready to manage it from the admin.`,
   edit: "Edit",
   managedSectionTitle: "Books you manage",
   managedSectionHelp:
@@ -33,6 +35,8 @@ export const INSIGHTS_ADMIN_COPY = {
   startManaging: "Start managing",
   startManagingHelp:
     "This article is already on the public website. Use this to copy it into the admin so you can edit the text, summary, and homepage placement yourself.",
+  startManagingReady: (title: string) =>
+    `“${title}” is loaded in the form below. Review the details and publish when you are ready to manage it from the admin.`,
   edit: "Edit",
   managedSectionTitle: "Articles you manage",
   managedSectionHelp:

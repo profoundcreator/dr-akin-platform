@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   BookOpen,
@@ -57,6 +57,7 @@ import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
 import { BOOKS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import type { LibraryBookStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 const EMPTY_FORM = {
   slug: "",
@@ -105,6 +106,14 @@ export function BooksDashboard() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
+  const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
+  const editorFormRef = useRef<HTMLElement>(null);
+
+  function scrollToEditorForm() {
+    requestAnimationFrame(() => {
+      editorFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   async function loadBooks() {
     try {
@@ -139,12 +148,14 @@ export function BooksDashboard() {
   function resetForm() {
     setForm(EMPTY_FORM);
     setEditingId(null);
+    setLivePrefillTitle(null);
     setCoverFile(null);
     setCoverPreview(null);
     setExistingCoverPath(null);
   }
 
   function startEdit(book: PlatformBook) {
+    setLivePrefillTitle(null);
     setEditingId(book.id);
     setForm({
       slug: book.slug,
@@ -163,6 +174,7 @@ export function BooksDashboard() {
     setExistingCoverPath(book.coverImagePath);
     setCoverFile(null);
     setCoverPreview(getBookCoverUrl(book.coverImagePath) ?? book.coverUrl);
+    scrollToEditorForm();
   }
 
   function startFromLiveBook(book: LiveSiteBook) {
@@ -172,7 +184,10 @@ export function BooksDashboard() {
       return;
     }
 
-    resetForm();
+    setError(null);
+    setNotice(BOOKS_ADMIN_COPY.startManagingReady(book.title));
+    setEditingId(null);
+    setLivePrefillTitle(book.title);
     setForm({
       slug: book.slug,
       title: book.title,
@@ -189,6 +204,8 @@ export function BooksDashboard() {
     });
     setExistingCoverPath(book.coverImagePath);
     setCoverPreview(book.coverUrl);
+    setCoverFile(null);
+    scrollToEditorForm();
   }
 
   async function buildInput(status?: LibraryBookStatus): Promise<BookInput> {
@@ -650,7 +667,12 @@ export function BooksDashboard() {
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <form
-          className="ploy-surface-elevated space-y-5 p-6"
+          ref={editorFormRef}
+          className={cn(
+            "ploy-surface-elevated scroll-mt-6 space-y-5 p-6",
+            livePrefillTitle &&
+              "ring-2 ring-[var(--ploy-accent-primary)] ring-offset-2 ring-offset-[var(--ploy-background-secondary)]",
+          )}
           onSubmit={(event) => {
             event.preventDefault();
             saveBook(isApprover ? "publish" : "submit");
@@ -659,11 +681,17 @@ export function BooksDashboard() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Plus className="size-4 text-[var(--ploy-accent-primary)]" />
-              <h2 className="text-lg font-semibold">{editingId ? "Edit book" : "Add book"}</h2>
+              <h2 className="text-lg font-semibold">
+                {editingId
+                  ? "Edit book"
+                  : livePrefillTitle
+                    ? `Start managing: ${livePrefillTitle}`
+                    : "Add book"}
+              </h2>
             </div>
-            {editingId && (
+            {(editingId || livePrefillTitle) && (
               <Button type="button" variant="ghost" size="sm" onClick={resetForm}>
-                Cancel edit
+                Cancel
               </Button>
             )}
           </div>
