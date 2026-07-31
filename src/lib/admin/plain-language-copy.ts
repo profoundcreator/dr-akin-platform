@@ -83,7 +83,9 @@ export const ADMIN_REBUILD_SEO_COPY = {
   label: "Rebuild site for SEO",
   rebuilding: "Rebuilding…",
   help:
-    "Refreshes the public website after you publish or hide content. Article pages pick up text and images from the database right away; a rebuild still helps search engines, link previews, and brand-new article URLs.",
+    "Starts a full Vercel redeploy so search engines, link previews (WhatsApp, LinkedIn), and brand-new page URLs pick up the latest content. Article and book pages already refresh from the database on visit — use this after publishing or hiding content for SEO.",
+  deployHookHint:
+    "For automatic rebuilds after publish, add VERCEL_DEPLOY_HOOK_URL in Vercel → Project → Settings → Environment Variables.",
 } as const;
 
 export const TEAM_ADMIN_COPY = {

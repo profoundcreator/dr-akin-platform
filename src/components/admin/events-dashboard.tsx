@@ -45,6 +45,7 @@ import {
   type PlatformEvent,
 } from "@/lib/events/events";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import { publishNoticeWithRebuild } from "@/lib/events/publish-notice";
 import type { EventBrand, EventStatus, EventType } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { isPhase1SchemaReady } from "@/lib/site-settings/site-settings";
@@ -288,9 +289,7 @@ export function EventsDashboard() {
 
         if (!publishNotice) {
           const rebuild = await triggerSiteRebuild();
-          publishNotice = rebuild.ok
-            ? rebuild.message
-            : `Event published. ${rebuild.message}`;
+          publishNotice = publishNoticeWithRebuild("Event published.", rebuild);
         }
 
         setNotice(publishNotice);
@@ -323,7 +322,7 @@ export function EventsDashboard() {
         approvedFromPending: true,
       });
       const rebuild = await triggerSiteRebuild();
-      setNotice(rebuild.ok ? rebuild.message : `Event approved. ${rebuild.message}`);
+      setNotice(publishNoticeWithRebuild("Event approved.", rebuild));
       await loadEvents();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to approve event");

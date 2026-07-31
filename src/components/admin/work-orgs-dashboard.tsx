@@ -24,6 +24,7 @@ import {
   canPermanentlyDeleteWorkOrgs,
 } from "@/lib/auth/permissions";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import { publishNoticeWithRebuild } from "@/lib/events/publish-notice";
 import type { EventBrand, WorkOrgStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import {
@@ -294,7 +295,7 @@ export function WorkOrgsDashboard() {
           publishedBy: profile?.full_name,
         });
         const rebuild = await triggerSiteRebuild();
-        setNotice(rebuild.ok ? rebuild.message : `Platform published. ${rebuild.message}`);
+        setNotice(publishNoticeWithRebuild("Platform published.", rebuild));
       }
 
       resetForm();
@@ -324,7 +325,7 @@ export function WorkOrgsDashboard() {
         approvedFromPending: true,
       });
       const rebuild = await triggerSiteRebuild();
-      setNotice(rebuild.ok ? rebuild.message : `Platform approved. ${rebuild.message}`);
+      setNotice(publishNoticeWithRebuild("Platform approved.", rebuild));
       await loadOrgs();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to approve platform");

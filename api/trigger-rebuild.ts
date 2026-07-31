@@ -2,6 +2,9 @@ import { createAuthenticatedServerClient } from "../src/lib/supabase/authenticat
 
 const APPROVER_ROLES = new Set(["super_admin", "executive_assistant", "admin_manager"]);
 
+const REBUILD_STARTED_MESSAGE =
+  "Site rebuild started. Search engines and link previews will catch up in a few minutes.";
+
 export default async function handler(
   req: { method?: string; headers: { authorization?: string } },
   res: {
@@ -65,6 +68,6 @@ export default async function handler(
   }
 
   return res.status(200).json({
-    message: "Site rebuild started. Event pages will update for search engines shortly.",
+    message: REBUILD_STARTED_MESSAGE,
   });
 }

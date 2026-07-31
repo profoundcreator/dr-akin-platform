@@ -24,13 +24,8 @@ export function WorkHubPage({ content, initialOrgs = [] }: WorkHubPageProps) {
   const [platforms, setPlatforms] = useState<PlatformWorkOrg[]>(initialOrgs);
 
   useEffect(() => {
-    if (initialOrgs.length > 0) {
-      setPlatforms(initialOrgs);
-      return;
-    }
-
     getPublicWorkOrgs().then(setPlatforms);
-  }, [initialOrgs]);
+  }, []);
 
   return (
     <PageShell>

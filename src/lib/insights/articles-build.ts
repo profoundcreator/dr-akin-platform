@@ -5,6 +5,10 @@ import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-sta
 import { fetchPreloadedContentSettingsForBuild } from "@/lib/content/preloaded-content";
 import { plainTextToInsightHtml } from "@/lib/insights/sanitize-html";
 import type { PlatformInsight } from "@/lib/insights/types";
+import {
+  isSupabaseBuildEnvConfigured,
+  warnIfSupabaseBuildEnvMissing,
+} from "@/lib/build/supabase-build-env";
 
 function mapBuildRow(row: DbInsightArticle): PlatformInsight {
   return {
@@ -53,10 +57,13 @@ function staticInsightToPlatform(article: InsightArticle): PlatformInsight {
 }
 
 export async function fetchPublishedInsightsForBuild(): Promise<PlatformInsight[]> {
+  if (!isSupabaseBuildEnvConfigured()) {
+    warnIfSupabaseBuildEnvMissing("insights static paths");
+    return [];
+  }
+
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
-
-  if (!supabaseUrl || !supabaseAnonKey) return [];
 
   try {
     const response = await fetch(

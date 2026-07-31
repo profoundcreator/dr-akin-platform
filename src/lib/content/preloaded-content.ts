@@ -1,5 +1,9 @@
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 import { formatSchemaSetupError, isMissingPhase6SchemaError } from "@/lib/site-settings/schema-support";
+import {
+  isSupabaseBuildEnvConfigured,
+  warnIfSupabaseBuildEnvMissing,
+} from "@/lib/build/supabase-build-env";
 
 export interface PreloadedContentSettings {
   hiddenInsightSlugs: string[];
@@ -127,10 +131,13 @@ export async function restorePreloadedBook(slug: string, updatedBy?: string): Pr
 }
 
 export async function fetchPreloadedContentSettingsForBuild(): Promise<PreloadedContentSettings> {
+  if (!isSupabaseBuildEnvConfigured()) {
+    warnIfSupabaseBuildEnvMissing("preloaded hide/restore settings");
+    return EMPTY_PRELOADED_CONTENT_SETTINGS;
+  }
+
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
-
-  if (!supabaseUrl || !supabaseAnonKey) return EMPTY_PRELOADED_CONTENT_SETTINGS;
 
   try {
     const response = await fetch(

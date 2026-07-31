@@ -5,6 +5,10 @@ import { fetchPreloadedContentSettingsForBuild } from "@/lib/content/preloaded-c
 import { getBookCoverUrl } from "@/lib/library/books";
 import type { PlatformBook } from "@/lib/library/types";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
+import {
+  isSupabaseBuildEnvConfigured,
+  warnIfSupabaseBuildEnvMissing,
+} from "@/lib/build/supabase-build-env";
 
 function mapBuildRow(row: DbLibraryBook): PlatformBook {
   return {
@@ -28,10 +32,13 @@ function mapBuildRow(row: DbLibraryBook): PlatformBook {
 }
 
 export async function fetchPublishedBooksForBuild(): Promise<PlatformBook[]> {
+  if (!isSupabaseBuildEnvConfigured()) {
+    warnIfSupabaseBuildEnvMissing("library static paths");
+    return [];
+  }
+
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
-
-  if (!supabaseUrl || !supabaseAnonKey) return [];
 
   try {
     const response = await fetch(

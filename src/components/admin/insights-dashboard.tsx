@@ -29,6 +29,10 @@ import {
   canPermanentlyDeleteInsights,
 } from "@/lib/auth/permissions";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import {
+  hideRestoreNoticeWithRebuild,
+  publishNoticeWithRebuild,
+} from "@/lib/events/publish-notice";
 import { INSIGHTS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import {
   INSIGHT_CATEGORIES,
@@ -279,8 +283,12 @@ export function InsightsDashboard() {
       await hidePreloadedInsight(article.slug, profile?.id);
       if (isApprover) {
         const rebuild = await triggerSiteRebuild();
-        if (!rebuild.ok) setNotice(INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title));
-        else setNotice(`${INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title)} ${rebuild.message}`);
+        setNotice(
+          hideRestoreNoticeWithRebuild(
+            INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title),
+            rebuild,
+          ),
+        );
       } else {
         setNotice(INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title));
       }
@@ -302,8 +310,12 @@ export function InsightsDashboard() {
       await restorePreloadedInsight(article.slug, profile?.id);
       if (isApprover) {
         const rebuild = await triggerSiteRebuild();
-        if (!rebuild.ok) setNotice(INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title));
-        else setNotice(`${INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title)} ${rebuild.message}`);
+        setNotice(
+          hideRestoreNoticeWithRebuild(
+            INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title),
+            rebuild,
+          ),
+        );
       } else {
         setNotice(INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title));
       }
@@ -473,9 +485,7 @@ export function InsightsDashboard() {
 
         if (!publishNotice) {
           const rebuild = await triggerSiteRebuild();
-          publishNotice = rebuild.ok
-            ? rebuild.message
-            : `Article published. ${rebuild.message}`;
+          publishNotice = publishNoticeWithRebuild("Article published.", rebuild);
         }
 
         setNotice(publishNotice);
@@ -509,7 +519,7 @@ export function InsightsDashboard() {
         approvedFromPending: true,
       });
       const rebuild = await triggerSiteRebuild();
-      setNotice(rebuild.ok ? rebuild.message : `Article approved. ${rebuild.message}`);
+      setNotice(publishNoticeWithRebuild("Article approved.", rebuild));
       await loadInsights();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to approve article");

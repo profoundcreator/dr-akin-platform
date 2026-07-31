@@ -30,3 +30,9 @@ if (!key || key.includes("your-anon")) {
 
 console.log("✅ Supabase environment variables are set");
 console.log(`   URL: ${url}`);
+
+const deployHook = env.match(/^VERCEL_DEPLOY_HOOK_URL=(.+)$/m)?.[1]?.trim();
+if (!deployHook || deployHook.includes("your-hook-id")) {
+  console.warn("\n⚠️  VERCEL_DEPLOY_HOOK_URL is not set (optional for local dev).");
+  console.warn("   Add a Vercel Deploy Hook in production so admin publish triggers SEO rebuilds.\n");
+}

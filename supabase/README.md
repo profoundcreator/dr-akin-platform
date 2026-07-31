@@ -76,5 +76,24 @@ npm run dev
 ## 8. Deploy to Vercel
 
 1. Connect this repo to [Vercel](https://vercel.com)
-2. Set environment variables: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (for Team invites), `VERCEL_DEPLOY_HOOK_URL` (optional — triggers SEO rebuild when events, books, insights, or work orgs are published)
-3. Deploy — `vercel.json` includes the booking tracker rewrite
+2. Set environment variables in **Vercel → Project → Settings → Environment Variables**:
+   - `PUBLIC_SUPABASE_URL`
+   - `PUBLIC_SUPABASE_ANON_KEY`
+   - `PUBLIC_SITE_URL` (your public site URL, e.g. `https://dr-akin-platform.vercel.app`)
+   - `SUPABASE_SERVICE_ROLE_KEY` (for Team invites)
+   - `VERCEL_DEPLOY_HOOK_URL` (recommended — see below)
+3. Deploy — `vercel.json` includes CMS slug rewrites and the booking tracker
+
+### Automatic SEO rebuild (recommended)
+
+When admins publish or hide content, the site can trigger a fresh Vercel deploy so search engines and link previews pick up new pages.
+
+1. In Vercel, open **Project → Settings → Git → Deploy Hooks**
+2. Create a hook for the **Production** branch (name it e.g. `cms-publish`)
+3. Copy the hook URL
+4. Add it as `VERCEL_DEPLOY_HOOK_URL` in Environment Variables (Production)
+5. Redeploy once so the API route sees the new variable
+
+Without the hook, content still goes live immediately on article/book/event pages (they read from Supabase), but **Rebuild site for SEO** in admin will show a setup message until the hook is added.
+
+Also run migrations **013** (`013_preloaded_content_controls.sql`) and **014** (`014_insight_hero_images.sql`) if not already applied.

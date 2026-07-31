@@ -2,6 +2,10 @@ import { tryGetSupabaseClient } from "@/lib/supabase/client";
 import type { PlatformEvent } from "@/lib/events/events";
 import { isEventPubliclyVisible } from "@/lib/events/event-visibility";
 import type { DbEvent } from "@/lib/supabase/database.types";
+import {
+  isSupabaseBuildEnvConfigured,
+  warnIfSupabaseBuildEnvMissing,
+} from "@/lib/build/supabase-build-env";
 
 function mapBuildRow(row: DbEvent): PlatformEvent {
   return {
@@ -36,10 +40,13 @@ function mapBuildRow(row: DbEvent): PlatformEvent {
 }
 
 export async function fetchPublishedEventsForBuild(): Promise<PlatformEvent[]> {
+  if (!isSupabaseBuildEnvConfigured()) {
+    warnIfSupabaseBuildEnvMissing("events static paths");
+    return [];
+  }
+
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
-
-  if (!supabaseUrl || !supabaseAnonKey) return [];
 
   try {
     const response = await fetch(

@@ -61,6 +61,10 @@ import {
 } from "@/lib/content/preloaded-content";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import {
+  hideRestoreNoticeWithRebuild,
+  publishNoticeWithRebuild,
+} from "@/lib/events/publish-notice";
 import { BOOKS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import type { LibraryBookStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -196,9 +200,7 @@ export function BooksDashboard() {
       await hidePreloadedBook(book.slug, profile?.id);
       const rebuild = await triggerSiteRebuild();
       setNotice(
-        rebuild.ok
-          ? `${BOOKS_ADMIN_COPY.removedFromSiteNotice(book.title)} ${rebuild.message}`
-          : BOOKS_ADMIN_COPY.removedFromSiteNotice(book.title),
+        hideRestoreNoticeWithRebuild(BOOKS_ADMIN_COPY.removedFromSiteNotice(book.title), rebuild),
       );
       await loadBooks();
     } catch (err) {
@@ -218,9 +220,7 @@ export function BooksDashboard() {
       await restorePreloadedBook(book.slug, profile?.id);
       const rebuild = await triggerSiteRebuild();
       setNotice(
-        rebuild.ok
-          ? `${BOOKS_ADMIN_COPY.restoredToSiteNotice(book.title)} ${rebuild.message}`
-          : BOOKS_ADMIN_COPY.restoredToSiteNotice(book.title),
+        hideRestoreNoticeWithRebuild(BOOKS_ADMIN_COPY.restoredToSiteNotice(book.title), rebuild),
       );
       await loadBooks();
     } catch (err) {
@@ -405,9 +405,7 @@ export function BooksDashboard() {
 
         if (!publishNotice) {
           const rebuild = await triggerSiteRebuild();
-          publishNotice = rebuild.ok
-            ? rebuild.message
-            : `Book published. ${rebuild.message}`;
+          publishNotice = publishNoticeWithRebuild("Book published.", rebuild);
         }
 
         setNotice(publishNotice);
@@ -440,7 +438,7 @@ export function BooksDashboard() {
         approvedFromPending: true,
       });
       const rebuild = await triggerSiteRebuild();
-      setNotice(rebuild.ok ? rebuild.message : `Book approved. ${rebuild.message}`);
+      setNotice(publishNoticeWithRebuild("Book approved.", rebuild));
       await loadBooks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to approve book");

@@ -1,6 +1,15 @@
 import { getSupabaseClient } from "@/lib/supabase/client";
+import type { RebuildResult } from "@/lib/events/publish-notice";
 
-export async function triggerSiteRebuild(): Promise<{ ok: boolean; message: string }> {
+export type { RebuildResult };
+
+export const REBUILD_STARTED_MESSAGE =
+  "Site rebuild started. Search engines and link previews will catch up in a few minutes.";
+
+export const REBUILD_HOOK_MISSING_MESSAGE =
+  "Content is live on the website, but automatic SEO rebuild is not set up. Add VERCEL_DEPLOY_HOOK_URL in Vercel project settings, or click Rebuild site for SEO after publishing.";
+
+export async function triggerSiteRebuild(): Promise<RebuildResult> {
   const supabase = getSupabaseClient();
   const {
     data: { session },
@@ -21,14 +30,15 @@ export async function triggerSiteRebuild(): Promise<{ ok: boolean; message: stri
   const payload = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
 
   if (!response.ok) {
-    return {
-      ok: false,
-      message: payload.error ?? payload.message ?? "Rebuild request failed.",
-    };
+    const message =
+      response.status === 503 && payload.error?.includes("Deploy hook")
+        ? REBUILD_HOOK_MISSING_MESSAGE
+        : (payload.error ?? payload.message ?? "Rebuild request failed.");
+    return { ok: false, message };
   }
 
   return {
     ok: true,
-    message: payload.message ?? "Site rebuild started. New event pages will be live in a few minutes.",
+    message: payload.message ?? REBUILD_STARTED_MESSAGE,
   };
 }

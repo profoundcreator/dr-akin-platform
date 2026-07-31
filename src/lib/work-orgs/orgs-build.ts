@@ -5,6 +5,10 @@ import { getWorkOrgHeroUrl } from "@/lib/work-orgs/orgs";
 import type { PlatformWorkOrg, WorkOrgLink, WorkOrgSection } from "@/lib/work-orgs/types";
 import { SITE_PAGES } from "@/data/site-content";
 import type { EventBrand } from "@/lib/supabase/database.types";
+import {
+  isSupabaseBuildEnvConfigured,
+  warnIfSupabaseBuildEnvMissing,
+} from "@/lib/build/supabase-build-env";
 
 function mapBuildRow(row: DbWorkOrg): PlatformWorkOrg {
   return {
@@ -69,10 +73,13 @@ function staticOrgToPlatform(meta: (typeof STATIC_WORK_ORG_META)[number]): Platf
 }
 
 export async function fetchPublishedWorkOrgsForBuild(): Promise<PlatformWorkOrg[]> {
+  if (!isSupabaseBuildEnvConfigured()) {
+    warnIfSupabaseBuildEnvMissing("work org static paths");
+    return [];
+  }
+
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
-
-  if (!supabaseUrl || !supabaseAnonKey) return [];
 
   try {
     const response = await fetch(
