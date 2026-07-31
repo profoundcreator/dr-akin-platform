@@ -1,15 +1,26 @@
-import { createAuthenticatedServerClient } from "./lib/authenticated-server-client.ts";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const APPROVER_ROLES = new Set(["super_admin", "executive_assistant", "admin_manager"]);
 
 const REBUILD_STARTED_MESSAGE =
   "Site rebuild started. Search engines and link previews will catch up in a few minutes.";
 
+function createAuthenticatedServerClient(accessToken: string): SupabaseClient | null {
+  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
+  const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
+  if (!supabaseUrl || !anonKey || !accessToken) return null;
+
+  return createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 function jsonResponse(status: number, body: unknown): Response {
   return Response.json(body, { status });
 }
 
-async function handleRebuild(request: Request): Promise<Response> {
+export async function POST(request: Request): Promise<Response> {
   const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
   if (!deployHookUrl) {
     return jsonResponse(503, {
@@ -67,12 +78,3 @@ async function handleRebuild(request: Request): Promise<Response> {
     message: REBUILD_STARTED_MESSAGE,
   });
 }
-
-export default {
-  async fetch(request: Request): Promise<Response> {
-    if (request.method !== "POST") {
-      return jsonResponse(405, { error: "Method not allowed." });
-    }
-    return handleRebuild(request);
-  },
-};

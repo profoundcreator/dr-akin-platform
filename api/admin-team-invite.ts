@@ -1,6 +1,16 @@
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { createAuthenticatedServerClient } from "./lib/authenticated-server-client.ts";
-import type { AdminAccountState, AdminRole } from "./lib/admin-types.ts";
+
+type AdminRole =
+  | "super_admin"
+  | "technical_admin"
+  | "admin_manager"
+  | "executive_assistant"
+  | "executive_reviewer"
+  | "inbox_manager"
+  | "resource_manager"
+  | "read_only_auditor";
+
+type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
 
 const PRIVILEGED_ROLES = new Set<AdminRole>(["super_admin", "technical_admin"]);
 
@@ -24,6 +34,17 @@ interface InviteRequestBody {
   fullName?: string;
   role?: AdminRole;
   resend?: boolean;
+}
+
+function createAuthenticatedServerClient(accessToken: string): SupabaseClient | null {
+  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
+  const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
+  if (!supabaseUrl || !anonKey || !accessToken) return null;
+
+  return createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 function jsonResponse(status: number, body: unknown): Response {
@@ -106,7 +127,6 @@ function isExistingAuthUserError(error: { message?: string; status?: number }): 
   );
 }
 
-/** Sends a new-user invite, or a password-setup email when Auth already has this address. */
 async function sendInviteEmail(
   adminClient: SupabaseClient,
   email: string,
@@ -164,7 +184,7 @@ function errorMessage(error: unknown): string {
   return "Invite failed.";
 }
 
-async function handleInvite(request: Request): Promise<Response> {
+export async function POST(request: Request): Promise<Response> {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
 
@@ -296,12 +316,3 @@ async function handleInvite(request: Request): Promise<Response> {
     return jsonResponse(500, { error: errorMessage(error) });
   }
 }
-
-export default {
-  async fetch(request: Request): Promise<Response> {
-    if (request.method !== "POST") {
-      return jsonResponse(405, { error: "Method not allowed." });
-    }
-    return handleInvite(request);
-  },
-};
