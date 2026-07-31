@@ -65,6 +65,10 @@ export const INSIGHTS_ADMIN_COPY = {
   hiddenPreloadedHelp: "These pre-loaded articles are hidden from the public site. Restore them anytime.",
   removedFromSiteNotice: (title: string) => `“${title}” was removed from the public site.`,
   restoredToSiteNotice: (title: string) => `“${title}” is live on the public site again.`,
+  previewArticle: "Preview article",
+  previewHelp:
+    "See how this article will look on the public insights page before you publish. The summary box shows the teaser used on cards and the homepage.",
+  previewMissingFields: "Add a title and body before previewing.",
   notConnected:
     "The back office is not connected yet. Public visitors still see articles at /insights.",
 } as const;

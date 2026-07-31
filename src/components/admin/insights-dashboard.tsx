@@ -5,12 +5,14 @@ import {
   ArrowUpRight,
   Check,
   Download,
+  Eye,
   FileText,
   Plus,
   Star,
   Trash2,
   X,
 } from "lucide-react";
+import { AdminInsightPreviewModal, type InsightPreviewData } from "@/components/admin/admin-insight-preview-modal";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
@@ -113,6 +115,8 @@ export function InsightsDashboard() {
   const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
   const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
   const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewArticle, setPreviewArticle] = useState<InsightPreviewData | null>(null);
   const editorFormRef = useRef<HTMLElement>(null);
 
   function scrollToEditorForm() {
@@ -283,6 +287,36 @@ export function InsightsDashboard() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function openPreviewFromForm() {
+    if (!form.title.trim() || !form.body.trim()) {
+      setError(INSIGHTS_ADMIN_COPY.previewMissingFields);
+      return;
+    }
+
+    setError(null);
+    setPreviewArticle({
+      title: form.title.trim(),
+      category: form.category,
+      summary: form.summary.trim(),
+      body: form.body,
+      publishedAt: form.publishedAt,
+      slug: form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title),
+    });
+    setPreviewOpen(true);
+  }
+
+  function openPreviewFromInsight(insight: PlatformInsight) {
+    setPreviewArticle({
+      title: insight.title,
+      category: insight.category,
+      summary: insight.summary,
+      body: insight.body,
+      publishedAt: toDateInputValue(insight.publishedAt),
+      slug: insight.slug,
+    });
+    setPreviewOpen(true);
   }
 
   async function buildInput(status?: InsightArticleStatus): Promise<InsightInput> {
@@ -1006,6 +1040,13 @@ export function InsightsDashboard() {
             <Button type="button" variant="secondary" disabled={saving} onClick={() => saveInsight("draft")}>
               Save draft
             </Button>
+            <div className="inline-flex items-center gap-1">
+              <Button type="button" variant="ghost" disabled={saving} onClick={openPreviewFromForm}>
+                <Eye className="size-4" />
+                {INSIGHTS_ADMIN_COPY.previewArticle}
+              </Button>
+              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.previewHelp} />
+            </div>
             {isApprover ? (
               <Button type="submit" variant="primary" disabled={saving}>
                 {saving ? "Saving…" : editingId ? "Publish changes" : "Publish article"}
@@ -1057,6 +1098,15 @@ export function InsightsDashboard() {
                       <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(insight)}>
                         Edit
                       </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openPreviewFromInsight(insight)}
+                      >
+                        <Eye className="size-4" />
+                        Preview
+                      </Button>
                       {isApprover && insight.status === "published" && !insight.manuallyHidden && (
                         <Button
                           type="button"
@@ -1087,6 +1137,12 @@ export function InsightsDashboard() {
           )}
         </div>
       </div>
+
+      <AdminInsightPreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        article={previewArticle}
+      />
     </AdminLayoutShell>
   );
 }
