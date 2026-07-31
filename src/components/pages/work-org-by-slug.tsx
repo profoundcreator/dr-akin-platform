@@ -28,23 +28,27 @@ export function WorkOrgBySlug({ slug, initialOrg = null }: WorkOrgBySlugProps) {
 
   useEffect(() => {
     const effectiveSlug = resolveContentSlug(slug, "work", initialOrg?.slug);
-
-    if (initialOrg && effectiveSlug && initialOrg.slug === effectiveSlug) {
-      setOrg(initialOrg);
-      setLoading(false);
-    }
-
     if (!effectiveSlug) {
+      setOrg(null);
       setLoading(false);
       return;
     }
 
+    let cancelled = false;
+
     getPublicWorkOrgBySlug(effectiveSlug)
       .then((data) => {
+        if (cancelled) return;
         setOrg(data);
         if (data) applyClientSeo(data);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug, initialOrg]);
 
   if (loading) {

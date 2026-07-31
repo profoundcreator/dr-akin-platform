@@ -9,10 +9,33 @@ import { Reveal } from "@/components/ui/reveal";
 import { getPublicBookBySlug } from "@/lib/library/public-books";
 import type { PlatformBook } from "@/lib/library/types";
 import { sortPurchaseLinks } from "@/lib/library/purchase-links";
+import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface LibraryBookPageProps {
   slug: string;
   initialBook?: PlatformBook | null;
+}
+
+function applyClientSeo(book: PlatformBook) {
+  document.title = `${book.title} — Library`;
+
+  const description = book.year
+    ? `${book.title} by Dr. Akin Akinpelu (${book.year})`
+    : `${book.title} by Dr. Akin Akinpelu`;
+
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  if (descriptionMeta) descriptionMeta.setAttribute("content", description);
+
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute("content", `${book.title} — Library`);
+
+  const ogDescription = document.querySelector('meta[property="og:description"]');
+  if (ogDescription) ogDescription.setAttribute("content", description);
+
+  if (book.coverUrl) {
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) ogImage.setAttribute("content", book.coverUrl);
+  }
 }
 
 function BookDetail({ book }: { book: PlatformBook }) {
@@ -91,17 +114,44 @@ function BookDetail({ book }: { book: PlatformBook }) {
 export function LibraryBookPage({ slug, initialBook = null }: LibraryBookPageProps) {
   const [book, setBook] = useState<PlatformBook | null>(initialBook);
   const [loading, setLoading] = useState(!initialBook);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (initialBook) {
-      setBook(initialBook);
+    const effectiveSlug = resolveContentSlug(slug, "library", initialBook?.slug);
+    if (!effectiveSlug) {
+      setBook(null);
+      setNotFound(true);
       setLoading(false);
       return;
     }
 
-    getPublicBookBySlug(slug)
-      .then((data) => setBook(data))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+
+    getPublicBookBySlug(effectiveSlug)
+      .then((data) => {
+        if (cancelled) return;
+        if (!data) {
+          setBook(null);
+          setNotFound(true);
+          return;
+        }
+        setNotFound(false);
+        setBook(data);
+        applyClientSeo(data);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setBook(null);
+          setNotFound(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug, initialBook]);
 
   if (loading) {
@@ -116,12 +166,15 @@ export function LibraryBookPage({ slug, initialBook = null }: LibraryBookPagePro
     );
   }
 
-  if (!book) {
+  if (notFound || !book) {
     return (
       <PageShell>
         <section className="ploy-section">
           <div className="ploy-container">
             <Heading as="h1" size="section">Book not found</Heading>
+            <p className="mt-4 text-lg text-[var(--ploy-text-secondary)]">
+              This title may have been moved, hidden, or is not yet published.
+            </p>
             <a href="/resources" className="ploy-text-link-underline mt-6 inline-flex items-center gap-2">
               Back to library
               <ArrowRight className="size-4 rotate-180" aria-hidden="true" />

@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { EventDetailPage } from "@/components/pages/event-detail-page";
+import { EventDetailBySlug } from "@/components/pages/event-detail-by-slug";
 import { fetchPublishedEventsForBuild } from "@/lib/events/events-build";
 import { getEventCoverUrl, getEventMetaDescription } from "@/lib/events/events";
 
@@ -25,5 +25,5 @@ const ogImage = coverUrl ?? new URL("/images/dr-akin-portrait.svg", site).href;
   description={description}
   ogImage={ogImage.startsWith("http") ? ogImage : new URL(ogImage, site).href}
 >
-  <EventDetailPage client:load event={event} />
+  <EventDetailBySlug client:load slug={event.slug} initialEvent={event} />
 </Layout>

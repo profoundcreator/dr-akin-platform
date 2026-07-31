@@ -112,6 +112,13 @@ export async function getPublicInsights(): Promise<PlatformInsight[]> {
 export async function getPublicInsightBySlug(slug: string): Promise<PlatformInsight | null> {
   const fromDb = await getInsightBySlugFromDb(slug);
   if (fromDb) return fromDb;
+
+  const preloaded = await getPreloadedContentSettings();
+  const normalizedSlug = slug.toLowerCase();
+  if (preloaded.hiddenInsightSlugs.some((hidden) => hidden.toLowerCase() === normalizedSlug)) {
+    return null;
+  }
+
   return STATIC_INSIGHTS.find((insight) => insight.slug === slug) ?? null;
 }
 

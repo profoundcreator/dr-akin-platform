@@ -94,6 +94,13 @@ export async function getPublicCatalogBooks(): Promise<PlatformBook[]> {
 export async function getPublicBookBySlug(slug: string): Promise<PlatformBook | null> {
   const fromDb = await getBookBySlugFromDb(slug);
   if (fromDb) return fromDb;
+
+  const preloaded = await getPreloadedContentSettings();
+  const normalizedSlug = slug.toLowerCase();
+  if (preloaded.hiddenBookSlugs.some((hidden) => hidden.toLowerCase() === normalizedSlug)) {
+    return null;
+  }
+
   return STATIC_BOOKS.find((book) => book.slug === slug) ?? null;
 }
 

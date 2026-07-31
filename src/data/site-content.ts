@@ -475,7 +475,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     slug: "the-seven-star-student",
     title: "The Seven Star Student",
     category: "Academic Excellence",
-    cover: "/images/books/the-seven-star-student.png",
+    cover: SITE_IMAGES.books["the-seven-star-student"],
     description:
       "A framework for students building leadership, innovation, and community impact — aligned with the disciplines that shape Africa's next generation of builders.",
     purchaseLinks: [
@@ -491,7 +491,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     title: "The Seven Star Teacher",
     subtitle: "Towards Improving Transformative Learning In Africa",
     category: "Academic Excellence",
-    cover: "/images/books/the-seven-star-teacher.png",
+    cover: SITE_IMAGES.books["the-seven-star-teacher"],
     description:
       "A call to educators and institutional leaders to raise the standard of teaching, governance, and transformative learning across the continent.",
     purchaseLinks: [

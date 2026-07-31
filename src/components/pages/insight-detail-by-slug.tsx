@@ -52,14 +52,19 @@ export function InsightDetailBySlug({ slug, initialInsight = null }: InsightDeta
       .then((data) => {
         if (cancelled) return;
         if (!data) {
-          if (!initialInsight) setNotFound(true);
+          setInsight(null);
+          setNotFound(true);
           return;
         }
+        setNotFound(false);
         setInsight(data);
         applyClientSeo(data);
       })
       .catch(() => {
-        if (!cancelled && !initialInsight) setNotFound(true);
+        if (!cancelled) {
+          setInsight(null);
+          setNotFound(true);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

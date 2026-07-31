@@ -15,6 +15,13 @@ const ALLOWED_TAGS = new Set([
 
 const GLOBAL_STRIP = /<\/?(script|style|iframe|object|embed|form|input|button|textarea|select)[^>]*>/gi;
 
+/** contentEditable often emits div blocks; map them to paragraphs before sanitizing. */
+export function normalizeEditorHtml(html: string): string {
+  return html
+    .replace(/<div(\s[^>]*)?>/gi, "<p>")
+    .replace(/<\/div>/gi, "</p>");
+}
+
 function stripEventHandlers(html: string): string {
   return html.replace(/\s(on\w+|style)=("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
 }
@@ -33,7 +40,7 @@ function sanitizeAnchorTag(tag: string): string {
 export function sanitizeInsightHtml(html: string): string {
   if (!html.trim()) return "";
 
-  let cleaned = html.replace(GLOBAL_STRIP, "");
+  let cleaned = normalizeEditorHtml(html).replace(GLOBAL_STRIP, "");
   cleaned = stripEventHandlers(cleaned);
 
   return cleaned.replace(/<\/?([a-z0-9]+)([^>]*)>/gi, (match, tagName: string, attrs: string) => {

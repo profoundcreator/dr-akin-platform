@@ -10,5 +10,7 @@ export const SITE_IMAGES = {
     "stay-in-your-process": "/images/marketing/books/stay-in-your-process.webp",
     "not-guilty": "/images/marketing/books/not-guilty.webp",
     dominion: "/images/marketing/books/dominion.webp",
+    "the-seven-star-student": "/images/books/leading-africa-forward.svg",
+    "the-seven-star-teacher": "/images/books/coaching-mindset.svg",
   },
 } as const;

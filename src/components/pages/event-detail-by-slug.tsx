@@ -14,6 +14,8 @@ import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface EventDetailBySlugProps {
   slug: string;
+  /** Build-time snapshot for fast first paint; refreshed from Supabase on load. */
+  initialEvent?: PlatformEvent | null;
 }
 
 function applyClientSeo(event: PlatformEvent) {
@@ -37,31 +39,48 @@ function applyClientSeo(event: PlatformEvent) {
   }
 }
 
-export function EventDetailBySlug({ slug }: EventDetailBySlugProps) {
-  const [event, setEvent] = useState<PlatformEvent | null>(null);
-  const [loading, setLoading] = useState(true);
+export function EventDetailBySlug({ slug, initialEvent = null }: EventDetailBySlugProps) {
+  const [event, setEvent] = useState<PlatformEvent | null>(initialEvent);
+  const [loading, setLoading] = useState(!initialEvent);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const effectiveSlug = resolveContentSlug(slug, "events");
+    const effectiveSlug = resolveContentSlug(slug, "events", initialEvent?.slug);
     if (!effectiveSlug) {
+      setEvent(null);
       setNotFound(true);
       setLoading(false);
       return;
     }
 
+    let cancelled = false;
+
     getEventBySlug(effectiveSlug)
       .then((data) => {
+        if (cancelled) return;
         if (!data) {
+          setEvent(null);
           setNotFound(true);
           return;
         }
+        setNotFound(false);
         setEvent(data);
         applyClientSeo(data);
       })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
-  }, [slug]);
+      .catch(() => {
+        if (!cancelled) {
+          setEvent(null);
+          setNotFound(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, initialEvent]);
 
   if (loading) {
     return (
