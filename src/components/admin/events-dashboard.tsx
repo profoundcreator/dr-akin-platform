@@ -8,12 +8,12 @@ import {
   Download,
   ImagePlus,
   Plus,
-  RefreshCw,
   Trash2,
   X,
 } from "lucide-react";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
+import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
 import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
@@ -444,14 +444,11 @@ export function EventsDashboard() {
           size="sm"
           onClick={() => downloadCsv(`events-${new Date().toISOString().slice(0, 10)}.csv`, eventsToCsv(events))}
         >
-          <Download className="size-4" />
+          <Download className="size-4 shrink-0" />
           Export CSV
         </Button>
         {isApprover && (
-          <Button type="button" variant="ghost" size="sm" onClick={handleRebuild} disabled={rebuilding}>
-            <RefreshCw className="size-4" />
-            {rebuilding ? "Rebuilding…" : "Rebuild site for SEO"}
-          </Button>
+          <AdminRebuildSeoButton rebuilding={rebuilding} onClick={handleRebuild} />
         )}
         <a
           href="/events"

@@ -108,7 +108,7 @@ export function Button({
   const content = (
     <>
       {showArrow && <ButtonArrowBadge size={size} variant={variant} />}
-      <span className="relative">{children}</span>
+      <span className="relative inline-flex items-center gap-2">{children}</span>
     </>
   );
 

@@ -42,3 +42,10 @@ export const INSIGHTS_ADMIN_COPY = {
   notConnected:
     "The back office is not connected yet. Public visitors still see articles at /insights.",
 } as const;
+
+export const ADMIN_REBUILD_SEO_COPY = {
+  label: "Rebuild site for SEO",
+  rebuilding: "Rebuilding…",
+  help:
+    "Refreshes the public website after you publish or hide content. This helps Google, search results, and link previews (WhatsApp, LinkedIn, etc.) show the latest titles, descriptions, and pages.",
+} as const;

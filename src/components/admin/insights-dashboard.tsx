@@ -7,7 +7,6 @@ import {
   Download,
   FileText,
   Plus,
-  RefreshCw,
   Star,
   Trash2,
   X,
@@ -15,6 +14,7 @@ import {
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
+import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -447,14 +447,11 @@ export function InsightsDashboard() {
             )
           }
         >
-          <Download className="size-4" />
+          <Download className="size-4 shrink-0" />
           Export CSV
         </Button>
         {isApprover && (
-          <Button type="button" variant="ghost" size="sm" onClick={handleRebuild} disabled={rebuilding}>
-            <RefreshCw className="size-4" />
-            {rebuilding ? "Rebuilding…" : "Rebuild site for SEO"}
-          </Button>
+          <AdminRebuildSeoButton rebuilding={rebuilding} onClick={handleRebuild} />
         )}
         <a
           href="/insights"
