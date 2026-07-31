@@ -51,7 +51,14 @@ import type { LiveSiteInsight } from "@/lib/insights/public-insights";
 import {
   getHomepageFeaturedInsightsLiveOnSite,
   getInsightsLiveOnSite,
+  PRELOADED_INSIGHTS,
 } from "@/lib/insights/public-insights";
+import {
+  getPreloadedContentSettings,
+  hidePreloadedInsight,
+  isPreloadedContentSchemaReady,
+  restorePreloadedInsight,
+} from "@/lib/content/preloaded-content";
 import type { InsightArticleStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -103,6 +110,8 @@ export function InsightsDashboard() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
+  const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
+  const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
   const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
   const editorFormRef = useRef<HTMLElement>(null);
 
@@ -116,6 +125,7 @@ export function InsightsDashboard() {
     try {
       setError(null);
       setSchemaReady(await isPhase3SchemaReady());
+      setPreloadedControlsReady(await isPreloadedContentSchemaReady());
       const [allInsights, pendingInsights, liveOnSite, homepageFeatured] = await Promise.all([
         getAdminInsights(),
         isApprover ? getPendingInsights() : Promise.resolve([]),
@@ -126,6 +136,7 @@ export function InsightsDashboard() {
       setPending(pendingInsights);
       setLiveInsights(liveOnSite);
       setHomepageFeaturedLive(homepageFeatured);
+      setHiddenPreloadedSlugs((await getPreloadedContentSettings()).hiddenInsightSlugs);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load insights");
     } finally {
@@ -197,6 +208,82 @@ export function InsightsDashboard() {
     () => new Set(homepageFeaturedLive.map((insight) => insight.slug)),
     [homepageFeaturedLive],
   );
+
+  const hiddenPreloadedSet = useMemo(
+    () => new Set(hiddenPreloadedSlugs),
+    [hiddenPreloadedSlugs],
+  );
+
+  const visiblePreloadedArticles = useMemo(
+    () => PRELOADED_INSIGHTS.filter((item) => !hiddenPreloadedSet.has(item.slug)),
+    [hiddenPreloadedSet],
+  );
+
+  const hiddenPreloadedArticles = useMemo(
+    () => PRELOADED_INSIGHTS.filter((item) => hiddenPreloadedSet.has(item.slug)),
+    [hiddenPreloadedSet],
+  );
+
+  function startFromPreloadedArticle(article: PlatformInsight) {
+    const live = liveInsights.find((item) => item.slug === article.slug);
+    if (live) {
+      startFromLiveInsight(live);
+      return;
+    }
+
+    startFromLiveInsight({
+      ...article,
+      source: "static",
+      cmsId: null,
+    });
+  }
+
+  async function handleHidePreloadedArticle(article: PlatformInsight) {
+    if (!isApprover || !preloadedControlsReady) return;
+    if (!window.confirm(`Remove “${article.title}” from the public site?`)) return;
+
+    setSaving(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await hidePreloadedInsight(article.slug, profile?.id);
+      if (isApprover) {
+        const rebuild = await triggerSiteRebuild();
+        if (!rebuild.ok) setNotice(INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title));
+        else setNotice(`${INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title)} ${rebuild.message}`);
+      } else {
+        setNotice(INSIGHTS_ADMIN_COPY.removedFromSiteNotice(article.title));
+      }
+      await loadInsights();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove article from site");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRestorePreloadedArticle(article: PlatformInsight) {
+    if (!isApprover || !preloadedControlsReady) return;
+
+    setSaving(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await restorePreloadedInsight(article.slug, profile?.id);
+      if (isApprover) {
+        const rebuild = await triggerSiteRebuild();
+        if (!rebuild.ok) setNotice(INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title));
+        else setNotice(`${INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title)} ${rebuild.message}`);
+      } else {
+        setNotice(INSIGHTS_ADMIN_COPY.restoredToSiteNotice(article.title));
+      }
+      await loadInsights();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to restore article");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function buildInput(status?: InsightArticleStatus): Promise<InsightInput> {
     const slug = form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title);
@@ -436,6 +523,12 @@ export function InsightsDashboard() {
   return (
     <AdminLayoutShell title="Insights" subtitle="Create articles, manage approvals, and feature on homepage">
       {!schemaReady && <AdminSetupNotice variant="insights" />}
+      {schemaReady && !preloadedControlsReady && (
+        <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Run <code className="text-xs">supabase/migrations/013_preloaded_content_controls.sql</code> in Supabase
+          to remove or restore pre-loaded articles from the public site.
+        </div>
+      )}
       {(error || notice) && (
         <div className="mb-4 space-y-2">
           {error && (
@@ -478,6 +571,99 @@ export function InsightsDashboard() {
           View public page
           <ArrowUpRight className="size-4" />
         </a>
+      </div>
+
+      <div className="ploy-surface-elevated mb-8 space-y-5 p-6">
+        <div className="flex items-center gap-2">
+          <FileText className="size-4 text-[var(--ploy-accent-primary)]" />
+          <h2 className="text-lg font-semibold">
+            {INSIGHTS_ADMIN_COPY.preloadedSectionTitle} ({PRELOADED_INSIGHTS.length})
+          </h2>
+          <AdminHelpTip text={INSIGHTS_ADMIN_COPY.preloadedSectionHelp} />
+        </div>
+
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {visiblePreloadedArticles.map((article) => {
+            const managed = insights.find(
+              (item) => item.slug === article.slug && item.status === "published",
+            );
+            return (
+              <li
+                key={article.slug}
+                className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4"
+              >
+                <div className="space-y-1">
+                  <p className="font-medium">{article.title}</p>
+                  <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                    {article.category} · /insights/{article.slug}
+                  </p>
+                  <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                    {managed ? INSIGHTS_ADMIN_COPY.managedLabel : INSIGHTS_ADMIN_COPY.preloadedLabel}
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      managed ? startEdit(managed) : startFromPreloadedArticle(article)
+                    }
+                  >
+                    {managed ? INSIGHTS_ADMIN_COPY.edit : INSIGHTS_ADMIN_COPY.startManaging}
+                  </Button>
+                  {isApprover && preloadedControlsReady && !managed && (
+                    <>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={saving}
+                        onClick={() => handleHidePreloadedArticle(article)}
+                      >
+                        {INSIGHTS_ADMIN_COPY.removeFromSite}
+                      </Button>
+                      <AdminHelpTip text={INSIGHTS_ADMIN_COPY.removeFromSiteHelp} />
+                    </>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        {hiddenPreloadedArticles.length > 0 && (
+          <div className="space-y-3 border-t border-[var(--ploy-border-primary)] pt-5">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold">{INSIGHTS_ADMIN_COPY.hiddenPreloadedTitle}</h3>
+              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.hiddenPreloadedHelp} />
+            </div>
+            <ul className="space-y-3">
+              {hiddenPreloadedArticles.map((article) => (
+                <li
+                  key={article.slug}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3"
+                >
+                  <div>
+                    <p className="font-medium">{article.title}</p>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">/insights/{article.slug}</p>
+                  </div>
+                  {isApprover && preloadedControlsReady && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={saving}
+                      onClick={() => handleRestorePreloadedArticle(article)}
+                    >
+                      {INSIGHTS_ADMIN_COPY.restoreToSite}
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="ploy-surface-elevated mb-8 space-y-5 p-6">

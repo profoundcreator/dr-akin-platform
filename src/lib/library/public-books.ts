@@ -1,5 +1,6 @@
 import { LIBRARY_BOOKS, RESOURCE_SECTIONS, type LibraryBook } from "@/data/site-content";
 import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
+import { getPreloadedContentSettings } from "@/lib/content/preloaded-content";
 import {
   getBookBySlugFromDb,
   getPublishedBooksFromDb,
@@ -48,10 +49,15 @@ function withLiveMetadata(
   };
 }
 
+export const PRELOADED_BOOKS = STATIC_BOOKS;
+
 /** Books visitors see on /resources and the homepage — CMS overrides static by slug. */
 export async function getBooksLiveOnSite(): Promise<LiveSiteBook[]> {
-  const fromDb = await getPublishedBooksFromDb();
-  const merged = mergePublishedWithStatic(fromDb, STATIC_BOOKS);
+  const [fromDb, preloaded] = await Promise.all([
+    getPublishedBooksFromDb(),
+    getPreloadedContentSettings(),
+  ]);
+  const merged = mergePublishedWithStatic(fromDb, STATIC_BOOKS, preloaded.hiddenBookSlugs);
   return merged.map((book) =>
     withLiveMetadata(
       book,
@@ -66,8 +72,11 @@ export async function getFeaturedBookLiveOnSite(): Promise<LiveSiteBook | null> 
 }
 
 export async function getPublicBooks(): Promise<PlatformBook[]> {
-  const fromDb = await getPublishedBooksFromDb();
-  return mergePublishedWithStatic(fromDb, STATIC_BOOKS);
+  const [fromDb, preloaded] = await Promise.all([
+    getPublishedBooksFromDb(),
+    getPreloadedContentSettings(),
+  ]);
+  return mergePublishedWithStatic(fromDb, STATIC_BOOKS, preloaded.hiddenBookSlugs);
 }
 
 export async function getPublicFeaturedBook(): Promise<PlatformBook | null> {

@@ -1,6 +1,7 @@
 import type { DbLibraryBook } from "@/lib/supabase/database.types";
 import { LIBRARY_BOOKS, type LibraryBook } from "@/data/site-content";
 import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
+import { fetchPreloadedContentSettingsForBuild } from "@/lib/content/preloaded-content";
 import { getBookCoverUrl } from "@/lib/library/books";
 import type { PlatformBook } from "@/lib/library/types";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
@@ -77,6 +78,9 @@ export function getStaticBookPaths(): PlatformBook[] {
 }
 
 export async function fetchAllBooksForBuild(): Promise<PlatformBook[]> {
-  const fromDb = await fetchPublishedBooksForBuild();
-  return mergePublishedWithStatic(fromDb, getStaticBookPaths());
+  const [fromDb, preloaded] = await Promise.all([
+    fetchPublishedBooksForBuild(),
+    fetchPreloadedContentSettingsForBuild(),
+  ]);
+  return mergePublishedWithStatic(fromDb, getStaticBookPaths(), preloaded.hiddenBookSlugs);
 }

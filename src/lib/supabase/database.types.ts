@@ -217,6 +217,8 @@ export interface DbSiteSettings {
   homepage_hero_mode: HomepageHeroMode;
   homepage_banner_image_path: string | null;
   homepage_portrait_image_path: string | null;
+  hidden_preloaded_insight_slugs: string[];
+  hidden_preloaded_book_slugs: string[];
   updated_by: string | null;
   created_at: string;
   updated_at: string;

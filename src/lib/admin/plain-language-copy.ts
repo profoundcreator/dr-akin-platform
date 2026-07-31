@@ -18,6 +18,17 @@ export const BOOKS_ADMIN_COPY = {
     "Drafts, items waiting for approval, and books you have published from this admin.",
   noManagedYet:
     "No managed books yet. Tap Start managing on a live title above, or create a new book in the form.",
+  preloadedSectionTitle: "Pre-loaded books",
+  preloadedSectionHelp:
+    "These titles shipped with the original website setup. Remove them from the public site, or start managing one to edit it yourself.",
+  removeFromSite: "Remove from site",
+  removeFromSiteHelp:
+    "Hides this pre-loaded title from the public website. You can restore it later from this admin page.",
+  restoreToSite: "Restore to site",
+  hiddenPreloadedTitle: "Removed pre-loaded books",
+  hiddenPreloadedHelp: "These pre-loaded titles are hidden from the public site. Restore them anytime.",
+  removedFromSiteNotice: (title: string) => `“${title}” was removed from the public site.`,
+  restoredToSiteNotice: (title: string) => `“${title}” is live on the public site again.`,
   notConnected:
     "The back office is not connected yet. Public visitors still see books at /resources.",
 } as const;
@@ -43,6 +54,17 @@ export const INSIGHTS_ADMIN_COPY = {
     "Drafts, items waiting for approval, and articles you have published from this admin.",
   noManagedYet:
     "No managed articles yet. Tap Start managing on a live article above, or create a new article in the form.",
+  preloadedSectionTitle: "Pre-loaded articles",
+  preloadedSectionHelp:
+    "These filler articles shipped with the original website setup. Remove them from the public site, or start managing one to edit it yourself.",
+  removeFromSite: "Remove from site",
+  removeFromSiteHelp:
+    "Hides this pre-loaded article from the public website and homepage. You can restore it later from this admin page.",
+  restoreToSite: "Restore to site",
+  hiddenPreloadedTitle: "Removed pre-loaded articles",
+  hiddenPreloadedHelp: "These pre-loaded articles are hidden from the public site. Restore them anytime.",
+  removedFromSiteNotice: (title: string) => `“${title}” was removed from the public site.`,
+  restoredToSiteNotice: (title: string) => `“${title}” is live on the public site again.`,
   notConnected:
     "The back office is not connected yet. Public visitors still see articles at /insights.",
 } as const;

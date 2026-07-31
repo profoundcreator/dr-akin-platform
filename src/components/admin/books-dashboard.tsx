@@ -51,7 +51,14 @@ import type { LiveSiteBook } from "@/lib/library/public-books";
 import {
   getBooksLiveOnSite,
   getFeaturedBookLiveOnSite,
+  PRELOADED_BOOKS,
 } from "@/lib/library/public-books";
+import {
+  getPreloadedContentSettings,
+  hidePreloadedBook,
+  isPreloadedContentSchemaReady,
+  restorePreloadedBook,
+} from "@/lib/content/preloaded-content";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
 import { BOOKS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
@@ -106,6 +113,8 @@ export function BooksDashboard() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
+  const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
+  const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
   const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
   const editorFormRef = useRef<HTMLElement>(null);
 
@@ -119,6 +128,7 @@ export function BooksDashboard() {
     try {
       setError(null);
       setSchemaReady(await isPhase2SchemaReady());
+      setPreloadedControlsReady(await isPreloadedContentSchemaReady());
       const [allBooks, pendingBooks, liveOnSite, featuredLive] = await Promise.all([
         getAdminBooks(),
         isApprover ? getPendingBooks() : Promise.resolve([]),
@@ -129,6 +139,7 @@ export function BooksDashboard() {
       setPending(pendingBooks);
       setLiveBooks(liveOnSite);
       setFeaturedLiveBook(featuredLive);
+      setHiddenPreloadedSlugs((await getPreloadedContentSettings()).hiddenBookSlugs);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load books");
     } finally {
@@ -144,6 +155,80 @@ export function BooksDashboard() {
     () => [...books].sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title)),
     [books],
   );
+
+  const hiddenPreloadedSet = useMemo(
+    () => new Set(hiddenPreloadedSlugs),
+    [hiddenPreloadedSlugs],
+  );
+
+  const visiblePreloadedBooks = useMemo(
+    () => PRELOADED_BOOKS.filter((item) => !hiddenPreloadedSet.has(item.slug)),
+    [hiddenPreloadedSet],
+  );
+
+  const hiddenPreloadedBooks = useMemo(
+    () => PRELOADED_BOOKS.filter((item) => hiddenPreloadedSet.has(item.slug)),
+    [hiddenPreloadedSet],
+  );
+
+  function startFromPreloadedBook(book: PlatformBook) {
+    const live = liveBooks.find((item) => item.slug === book.slug);
+    if (live) {
+      startFromLiveBook(live);
+      return;
+    }
+
+    startFromLiveBook({
+      ...book,
+      source: "static",
+      cmsId: null,
+    });
+  }
+
+  async function handleHidePreloadedBook(book: PlatformBook) {
+    if (!isApprover || !preloadedControlsReady) return;
+    if (!window.confirm(`Remove “${book.title}” from the public site?`)) return;
+
+    setSaving(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await hidePreloadedBook(book.slug, profile?.id);
+      const rebuild = await triggerSiteRebuild();
+      setNotice(
+        rebuild.ok
+          ? `${BOOKS_ADMIN_COPY.removedFromSiteNotice(book.title)} ${rebuild.message}`
+          : BOOKS_ADMIN_COPY.removedFromSiteNotice(book.title),
+      );
+      await loadBooks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove book from site");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRestorePreloadedBook(book: PlatformBook) {
+    if (!isApprover || !preloadedControlsReady) return;
+
+    setSaving(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await restorePreloadedBook(book.slug, profile?.id);
+      const rebuild = await triggerSiteRebuild();
+      setNotice(
+        rebuild.ok
+          ? `${BOOKS_ADMIN_COPY.restoredToSiteNotice(book.title)} ${rebuild.message}`
+          : BOOKS_ADMIN_COPY.restoredToSiteNotice(book.title),
+      );
+      await loadBooks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to restore book");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function resetForm() {
     setForm(EMPTY_FORM);
@@ -464,6 +549,12 @@ export function BooksDashboard() {
   return (
     <AdminLayoutShell title="Books" subtitle="Create books, manage approvals, and export the catalog">
       {!schemaReady && <AdminSetupNotice variant="books" />}
+      {schemaReady && !preloadedControlsReady && (
+        <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Run <code className="text-xs">supabase/migrations/013_preloaded_content_controls.sql</code> in Supabase
+          to remove or restore pre-loaded books from the public site.
+        </div>
+      )}
       {(error || notice) && (
         <div className="mb-4 space-y-2">
           {error && (
@@ -503,6 +594,104 @@ export function BooksDashboard() {
           View public library
           <ArrowUpRight className="size-4" />
         </a>
+      </div>
+
+      <div className="ploy-surface-elevated mb-8 space-y-5 p-6">
+        <div className="flex items-center gap-2">
+          <BookOpen className="size-4 text-[var(--ploy-accent-primary)]" />
+          <h2 className="text-lg font-semibold">
+            {BOOKS_ADMIN_COPY.preloadedSectionTitle} ({PRELOADED_BOOKS.length})
+          </h2>
+          <AdminHelpTip text={BOOKS_ADMIN_COPY.preloadedSectionHelp} />
+        </div>
+
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {visiblePreloadedBooks.map((book) => {
+            const managed = books.find(
+              (item) => item.slug === book.slug && item.status === "published",
+            );
+            return (
+              <li
+                key={book.slug}
+                className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4"
+              >
+                <img
+                  src={book.coverUrl}
+                  alt=""
+                  className="h-20 w-14 shrink-0 rounded-md object-cover"
+                />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div>
+                    <p className="font-medium">{book.title}</p>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                      {book.category} · /library/{book.slug}
+                    </p>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                      {managed ? BOOKS_ADMIN_COPY.managedLabel : BOOKS_ADMIN_COPY.preloadedLabel}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => (managed ? startEdit(managed) : startFromPreloadedBook(book))}
+                    >
+                      {managed ? BOOKS_ADMIN_COPY.edit : BOOKS_ADMIN_COPY.startManaging}
+                    </Button>
+                    {isApprover && preloadedControlsReady && !managed && (
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          disabled={saving}
+                          onClick={() => handleHidePreloadedBook(book)}
+                        >
+                          {BOOKS_ADMIN_COPY.removeFromSite}
+                        </Button>
+                        <AdminHelpTip text={BOOKS_ADMIN_COPY.removeFromSiteHelp} />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        {hiddenPreloadedBooks.length > 0 && (
+          <div className="space-y-3 border-t border-[var(--ploy-border-primary)] pt-5">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold">{BOOKS_ADMIN_COPY.hiddenPreloadedTitle}</h3>
+              <AdminHelpTip text={BOOKS_ADMIN_COPY.hiddenPreloadedHelp} />
+            </div>
+            <ul className="space-y-3">
+              {hiddenPreloadedBooks.map((book) => (
+                <li
+                  key={book.slug}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3"
+                >
+                  <div>
+                    <p className="font-medium">{book.title}</p>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">/library/{book.slug}</p>
+                  </div>
+                  {isApprover && preloadedControlsReady && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={saving}
+                      onClick={() => handleRestorePreloadedBook(book)}
+                    >
+                      {BOOKS_ADMIN_COPY.restoreToSite}
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="ploy-surface-elevated mb-8 space-y-5 p-6">

@@ -13,6 +13,9 @@ export const MIGRATION_011_HINT =
 export const MIGRATION_012_HINT =
   "Run supabase/migrations/012_team_admin.sql in the Supabase SQL Editor, then refresh.";
 
+export const MIGRATION_013_HINT =
+  "Run supabase/migrations/013_preloaded_content_controls.sql in the Supabase SQL Editor, then refresh.";
+
 export function isMissingPhase1SchemaError(message: string): boolean {
   const normalized = message.toLowerCase();
   return (
@@ -46,6 +49,14 @@ export function isMissingPhase5SchemaError(message: string): boolean {
   );
 }
 
+export function isMissingPhase6SchemaError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("hidden_preloaded_insight_slugs") ||
+    normalized.includes("hidden_preloaded_book_slugs")
+  );
+}
+
 export function isPhase5SchemaError(message: string): boolean {
   return isMissingPhase5SchemaError(message);
 }
@@ -65,6 +76,9 @@ export function formatSchemaSetupError(message: string): string {
   }
   if (isMissingPhase5SchemaError(message)) {
     return `${message} ${MIGRATION_012_HINT}`;
+  }
+  if (isMissingPhase6SchemaError(message)) {
+    return `${message} ${MIGRATION_013_HINT}`;
   }
   return message;
 }
