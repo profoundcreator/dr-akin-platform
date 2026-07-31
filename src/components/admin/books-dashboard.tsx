@@ -9,6 +9,7 @@ import {
   ImagePlus,
   Plus,
   RefreshCw,
+  Star,
   Trash2,
   X,
 } from "lucide-react";
@@ -45,6 +46,11 @@ import {
   updateBook,
 } from "@/lib/library/books";
 import type { BookInput, PlatformBook } from "@/lib/library/types";
+import type { LiveSiteBook } from "@/lib/library/public-books";
+import {
+  getBooksLiveOnSite,
+  getFeaturedBookLiveOnSite,
+} from "@/lib/library/public-books";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
 import type { LibraryBookStatus } from "@/lib/supabase/database.types";
@@ -83,6 +89,8 @@ export function BooksDashboard() {
   const isApprover = canApproveBooks(profile);
   const canDelete = canPermanentlyDeleteBooks(profile);
   const [books, setBooks] = useState<PlatformBook[]>([]);
+  const [liveBooks, setLiveBooks] = useState<LiveSiteBook[]>([]);
+  const [featuredLiveBook, setFeaturedLiveBook] = useState<LiveSiteBook | null>(null);
   const [pending, setPending] = useState<PlatformBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,12 +108,16 @@ export function BooksDashboard() {
     try {
       setError(null);
       setSchemaReady(await isPhase2SchemaReady());
-      const [allBooks, pendingBooks] = await Promise.all([
+      const [allBooks, pendingBooks, liveOnSite, featuredLive] = await Promise.all([
         getAdminBooks(),
         isApprover ? getPendingBooks() : Promise.resolve([]),
+        getBooksLiveOnSite(),
+        getFeaturedBookLiveOnSite(),
       ]);
       setBooks(allBooks);
       setPending(pendingBooks);
+      setLiveBooks(liveOnSite);
+      setFeaturedLiveBook(featuredLive);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load books");
     } finally {
@@ -148,7 +160,33 @@ export function BooksDashboard() {
     });
     setExistingCoverPath(book.coverImagePath);
     setCoverFile(null);
-    setCoverPreview(getBookCoverUrl(book.coverImagePath));
+    setCoverPreview(getBookCoverUrl(book.coverImagePath) ?? book.coverUrl);
+  }
+
+  function startFromLiveBook(book: LiveSiteBook) {
+    const cmsBook = books.find((item) => item.slug === book.slug);
+    if (cmsBook) {
+      startEdit(cmsBook);
+      return;
+    }
+
+    resetForm();
+    setForm({
+      slug: book.slug,
+      title: book.title,
+      subtitle: book.subtitle ?? "",
+      year: book.year ?? "",
+      category: book.category,
+      description: book.description,
+      purchaseLinks:
+        book.purchaseLinks.length > 0
+          ? book.purchaseLinks
+          : [{ label: "", url: "" }],
+      isFeatured: book.isFeatured,
+      sortOrder: book.sortOrder,
+    });
+    setExistingCoverPath(book.coverImagePath);
+    setCoverPreview(book.coverUrl);
   }
 
   async function buildInput(status?: LibraryBookStatus): Promise<BookInput> {
@@ -451,6 +489,114 @@ export function BooksDashboard() {
         </a>
       </div>
 
+      <div className="ploy-surface-elevated mb-8 space-y-5 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-4 text-[var(--ploy-accent-primary)]" />
+              <h2 className="text-lg font-semibold">Live on website ({liveBooks.length})</h2>
+            </div>
+            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
+              These titles are what visitors see on{" "}
+              <a href="/resources" target="_blank" rel="noopener noreferrer" className="underline">
+                /resources
+              </a>{" "}
+              and the homepage featured section.
+            </p>
+          </div>
+          {liveBooks[0]?.source === "static" && (
+            <p className="max-w-sm rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-xs text-[var(--ploy-text-secondary)]">
+              Showing the built-in catalog. Publish books in CMS below to manage them here.
+            </p>
+          )}
+        </div>
+
+        {loading ? (
+          <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading public catalog…</p>
+        ) : liveBooks.length === 0 ? (
+          <p className="text-sm text-[var(--ploy-text-secondary)]">No books are live on the site yet.</p>
+        ) : (
+          <>
+            {featuredLiveBook && (
+              <div className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-accent-primary)]/30 bg-[oklch(0.68_0.145_29/0.06)] p-4 md:p-5">
+                <div className="flex flex-wrap items-start gap-4">
+                  <img
+                    src={featuredLiveBook.coverUrl}
+                    alt=""
+                    className="h-28 w-20 shrink-0 rounded-md object-cover"
+                  />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <p className="inline-flex items-center gap-1.5 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
+                      <Star className="size-3.5 fill-current" />
+                      Featured book
+                    </p>
+                    <p className="text-lg font-semibold">{featuredLiveBook.title}</p>
+                    {featuredLiveBook.subtitle && (
+                      <p className="text-sm text-[var(--ploy-text-secondary)]">
+                        {featuredLiveBook.subtitle}
+                      </p>
+                    )}
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                      /library/{featuredLiveBook.slug}
+                      {featuredLiveBook.source === "static" ? " · Built-in catalog" : " · CMS"}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => startFromLiveBook(featuredLiveBook)}
+                  >
+                    {featuredLiveBook.cmsId ? "Edit in CMS" : "Add to CMS"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {liveBooks.map((book) => (
+                <li
+                  key={book.slug}
+                  className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4"
+                >
+                  <img
+                    src={book.coverUrl}
+                    alt=""
+                    className="h-20 w-14 shrink-0 rounded-md object-cover"
+                  />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium">{book.title}</p>
+                      {book.isFeatured && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.68_0.145_29/0.12)] px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-[var(--ploy-accent-primary)]">
+                          <Star className="size-3 fill-current" />
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                      {book.category} · /library/{book.slug}
+                    </p>
+                    <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                      {book.source === "static" ? "Built-in catalog" : "CMS · Published"}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => startFromLiveBook(book)}
+                  >
+                    {book.cmsId ? "Edit" : "Add to CMS"}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+
       {isApprover && pending.length > 0 && (
         <div className="ploy-surface-elevated mb-8 space-y-4 p-6">
           <div className="flex items-center gap-2">
@@ -711,11 +857,19 @@ export function BooksDashboard() {
         </form>
 
         <div className="ploy-surface-elevated space-y-6 p-6">
-          <h2 className="text-lg font-semibold">All books</h2>
+          <div>
+            <h2 className="text-lg font-semibold">CMS library</h2>
+            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
+              Drafts, pending approvals, and published records in Supabase.
+            </p>
+          </div>
           {loading ? (
             <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading books…</p>
           ) : sortedBooks.length === 0 ? (
-            <p className="text-sm text-[var(--ploy-text-secondary)]">No books yet.</p>
+            <p className="text-sm text-[var(--ploy-text-secondary)]">
+              No CMS records yet. Use &ldquo;Add to CMS&rdquo; on a live title above, or create a new
+              book in the form.
+            </p>
           ) : (
             <ul className="space-y-4">
               {sortedBooks.map((book) => (

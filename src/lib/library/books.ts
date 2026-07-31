@@ -18,7 +18,11 @@ function parsePurchaseLinks(value: unknown): PurchaseLink[] {
 
 export function getBookCoverUrl(coverImagePath: string | null): string | null {
   if (!coverImagePath) return null;
-  if (coverImagePath.startsWith("http://") || coverImagePath.startsWith("https://")) {
+  if (
+    coverImagePath.startsWith("http://") ||
+    coverImagePath.startsWith("https://") ||
+    coverImagePath.startsWith("/")
+  ) {
     return coverImagePath;
   }
 

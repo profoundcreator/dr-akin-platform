@@ -24,6 +24,8 @@ export type LibraryBookStatus = "draft" | "pending_approval" | "published" | "hi
 
 export type InsightArticleStatus = "draft" | "pending_approval" | "published" | "hidden";
 
+export type WorkOrgStatus = "draft" | "pending_approval" | "published" | "hidden";
+
 export type HomepageHeroMode = "portrait" | "banner" | "minimal";
 
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
@@ -175,6 +177,39 @@ export interface DbInsightArticle {
   updated_at: string;
 }
 
+export interface DbWorkOrg {
+  id: string;
+  slug: string;
+  brand_key: string;
+  page_title: string;
+  pillar_title: string;
+  brand_label: string;
+  kicker: string;
+  headline: string;
+  headline_secondary: string | null;
+  description: string;
+  hub_card_description: string;
+  sections: unknown;
+  cta_label: string | null;
+  cta_href: string | null;
+  secondary_cta_label: string | null;
+  secondary_cta_href: string | null;
+  related_links: unknown;
+  hero_image_path: string | null;
+  logo_image_path: string | null;
+  external_url: string | null;
+  sort_order: number;
+  status: WorkOrgStatus;
+  manually_hidden: boolean;
+  submitted_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  rejection_note: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbSiteSettings {
   id: boolean;
   homepage_events_enabled: boolean;
@@ -260,6 +295,23 @@ export interface Database {
         Insert: Partial<DbInsightArticle> &
           Pick<DbInsightArticle, "slug" | "title" | "category" | "summary">;
         Update: Partial<DbInsightArticle>;
+      };
+      work_orgs: {
+        Row: DbWorkOrg;
+        Insert: Partial<DbWorkOrg> &
+          Pick<
+            DbWorkOrg,
+            | "slug"
+            | "brand_key"
+            | "page_title"
+            | "pillar_title"
+            | "brand_label"
+            | "kicker"
+            | "headline"
+            | "description"
+            | "hub_card_description"
+          >;
+        Update: Partial<DbWorkOrg>;
       };
     };
     Functions: {

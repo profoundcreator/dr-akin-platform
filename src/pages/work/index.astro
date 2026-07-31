@@ -2,10 +2,12 @@
 import Layout from "@/layouts/Layout.astro";
 import { WorkHubPage } from "@/components/pages/work-hub-page";
 import { SITE_PAGES } from "@/data/site-content";
+import { fetchAllWorkOrgsForBuild } from "@/lib/work-orgs/orgs-build";
 
 const content = SITE_PAGES["work"];
+const orgs = await fetchAllWorkOrgsForBuild();
 ---
 
 <Layout title={content.title} description={content.description}>
-  <WorkHubPage client:load content={content} />
+  <WorkHubPage client:load content={content} initialOrgs={orgs} />
 </Layout>

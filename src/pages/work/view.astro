@@ -1,0 +1,10 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { WorkOrgBySlug } from "@/components/pages/work-org-by-slug";
+
+const slug = Astro.url.searchParams.get("slug") ?? "";
+---
+
+<Layout title="Work — Dr. Akin Akinpelu" description="Ecosystem platforms and operating arms">
+  <WorkOrgBySlug client:load slug={slug} />
+</Layout>

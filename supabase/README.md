@@ -27,6 +27,7 @@ In the Supabase **SQL Editor**, run in order:
 6. `migrations/008_site_settings_insert_policy.sql`
 7. `migrations/009_library_books.sql`
 8. `migrations/010_insights_articles.sql`
+9. `migrations/011_work_orgs.sql`
 
 ## 4. Configure Auth
 
@@ -69,5 +70,5 @@ Without `.env`, the app uses localStorage demo mode with 5 sample requests.
 ## 7. Deploy to Vercel
 
 1. Connect this repo to [Vercel](https://vercel.com)
-2. Set environment variables: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK_URL` (optional — triggers SEO rebuild when events, books, or insights are published)
+2. Set environment variables: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK_URL` (optional — triggers SEO rebuild when events, books, insights, or work orgs are published)
 3. Deploy — `vercel.json` includes the booking tracker rewrite

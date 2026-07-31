@@ -5,10 +5,11 @@ import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { openEnquiryModal } from "@/lib/enquiry";
+import { SITE_IMAGES } from "@/lib/media/site-images";
 
-const PORTRAIT_URL =
-  "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/75ad6227-slurp-3ed01cc3-akin-akinpelu-burgundy-suit-portrait.webp";
+const PORTRAIT_URL = SITE_IMAGES.portrait;
 
 const STATS = [
   { value: "700,000+", label: "People reached through keynotes, media, and leadership platforms" },
@@ -90,7 +91,14 @@ export function SpeakingPage() {
             </Reveal>
           </div>
           <Reveal delay={0.15} className="relative min-h-[28rem] border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
-            <img src={PORTRAIT_URL} alt="Dr. Akin Akinpelu — Keynote speaker" className="absolute inset-0 size-full object-cover object-top" loading="eager" />
+            <OptimizedImage
+              src={PORTRAIT_URL}
+              alt="Dr. Akin Akinpelu — Keynote speaker"
+              priority
+              width={960}
+              height={1200}
+              className="absolute inset-0 size-full object-cover object-top"
+            />
             <div className="absolute right-0 top-0 h-24 w-3 bg-[var(--ploy-accent-primary)]" aria-hidden="true" />
           </Reveal>
         </div>

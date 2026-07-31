@@ -7,6 +7,9 @@ export const MIGRATION_009_HINT =
 export const MIGRATION_010_HINT =
   "Run supabase/migrations/010_insights_articles.sql in the Supabase SQL Editor, then refresh.";
 
+export const MIGRATION_011_HINT =
+  "Run supabase/migrations/011_work_orgs.sql in the Supabase SQL Editor, then refresh.";
+
 export function isMissingPhase1SchemaError(message: string): boolean {
   const normalized = message.toLowerCase();
   return (
@@ -24,6 +27,13 @@ export function isMissingPhase3SchemaError(message: string): boolean {
   return message.toLowerCase().includes("insights_articles");
 }
 
+export function isMissingPhase4SchemaError(message: string): boolean {
+  return (
+    message.toLowerCase().includes("work_orgs") ||
+    message.toLowerCase().includes("work-org-assets")
+  );
+}
+
 export function formatSchemaSetupError(message: string): string {
   if (isMissingPhase1SchemaError(message)) {
     return `${message} ${MIGRATION_007_HINT}`;
@@ -33,6 +43,9 @@ export function formatSchemaSetupError(message: string): string {
   }
   if (isMissingPhase3SchemaError(message)) {
     return `${message} ${MIGRATION_010_HINT}`;
+  }
+  if (isMissingPhase4SchemaError(message)) {
+    return `${message} ${MIGRATION_011_HINT}`;
   }
   return message;
 }

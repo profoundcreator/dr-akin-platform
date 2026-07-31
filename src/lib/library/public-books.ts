@@ -26,7 +26,40 @@ function staticBookToPlatform(book: LibraryBook): PlatformBook {
   };
 }
 
-const STATIC_BOOKS = LIBRARY_BOOKS.map(staticBookToPlatform);
+export const STATIC_BOOKS = LIBRARY_BOOKS.map(staticBookToPlatform);
+
+export type PublicBookSource = "database" | "static";
+
+export interface LiveSiteBook extends PlatformBook {
+  source: PublicBookSource;
+  /** Real CMS record id when the book is managed in Supabase. */
+  cmsId: string | null;
+}
+
+function withLiveMetadata(
+  book: PlatformBook,
+  source: PublicBookSource,
+): LiveSiteBook {
+  return {
+    ...book,
+    source,
+    cmsId: source === "database" ? book.id : null,
+  };
+}
+
+/** Books visitors see on /resources and the homepage — DB wins when any are published. */
+export async function getBooksLiveOnSite(): Promise<LiveSiteBook[]> {
+  const fromDb = await getPublishedBooksFromDb();
+  if (fromDb.length > 0) {
+    return fromDb.map((book) => withLiveMetadata(book, "database"));
+  }
+  return STATIC_BOOKS.map((book) => withLiveMetadata(book, "static"));
+}
+
+export async function getFeaturedBookLiveOnSite(): Promise<LiveSiteBook | null> {
+  const books = await getBooksLiveOnSite();
+  return books.find((book) => book.isFeatured) ?? books[0] ?? null;
+}
 
 export async function getPublicBooks(): Promise<PlatformBook[]> {
   const fromDb = await getPublishedBooksFromDb();

@@ -1,3 +1,5 @@
+import { SITE_IMAGES } from "@/lib/media/site-images";
+
 export interface PageSection {
   title: string;
   body: string;
@@ -360,8 +362,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     title: "The Agenda",
     subtitle: "The Rise of Kings and Priests",
     category: "Marketplace Ministry",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/2cb19b46-slurp-2282d963-a2c158d4-the-agenda-the-rise-of-kings-and-priests.webp",
+    cover: SITE_IMAGES.books["the-agenda"],
     description:
       "A globally minded call to believers and leaders shaping culture, law, government, and business—a blueprint for stepping into the rooms where civilization is being formed.",
     featured: true,
@@ -371,8 +372,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     slug: "called-but-missing",
     title: "Called But Missing",
     category: "Marketplace Ministry",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/cc7d90c1-slurp-0d82a1e2-4b008842-called-but-missing.webp",
+    cover: SITE_IMAGES.books["called-but-missing"],
     description:
       "A call to believers who carry influence in the marketplace to step fully into their God-given assignment.",
     purchaseLinks: [
@@ -384,8 +384,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     slug: "from-the-streets-to-forbes",
     title: "From the Streets to Forbes",
     category: "High Performance",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/180bb7a5-slurp-cca30cc3-8467f6ee-from-the-streets-to-forbes-.webp",
+    cover: SITE_IMAGES.books["from-the-streets-to-forbes"],
     description:
       "The journey from humble beginnings to global recognition — and the disciplines that sustain leaders under pressure.",
     purchaseLinks: [
@@ -398,8 +397,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     slug: "networking-your-way-to-the-top",
     title: "Networking Your Way to the Top",
     category: "High Performance",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/e13a9c37-slurp-6425a529-44d7c750-networking-your-way-to-the-top-.webp",
+    cover: SITE_IMAGES.books["networking-your-way-to-the-top"],
     description:
       "Strategic relationship-building for leaders who understand that influence is built through people, not platforms alone.",
     purchaseLinks: [
@@ -418,8 +416,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     slug: "stay-in-your-process",
     title: "Stay in Your Process",
     category: "Marketplace Ministry",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/35fcd639-slurp-6e21cc26-23e3dd0b-stay-in-your-process-.webp",
+    cover: SITE_IMAGES.books["stay-in-your-process"],
     description:
       "Why process discipline — not shortcuts — is the foundation of lasting success in leadership and enterprise.",
     purchaseLinks: [
@@ -444,8 +441,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     title: "Not Guilty",
     subtitle: "Understanding the Scandal of Grace",
     category: "Marketplace Ministry",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/2cbca2a3-slurp-484be223-e8733223-not-guilty-understanding-the-scandal-of-g.webp",
+    cover: SITE_IMAGES.books["not-guilty"],
     description:
       "A theological and practical exploration of grace, conviction, and influence in the life of the marketplace believer.",
     purchaseLinks: [
@@ -463,8 +459,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
     title: "Dominion",
     subtitle: "The Now Technology of the Spirit To Unlock the Power of Heaven Within You",
     category: "Marketplace Ministry",
-    cover:
-      "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/8a87a632-slurp-ed49fccb-1ca9a578-dominion.webp",
+    cover: SITE_IMAGES.books.dominion,
     description:
       "Reclaiming God-given authority in culture, commerce, and public life — for leaders called to shape nations.",
     purchaseLinks: [

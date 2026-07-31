@@ -1,14 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { openEnquiryModal } from "@/lib/enquiry";
+import { SITE_IMAGES } from "@/lib/media/site-images";
+import { getPublicWorkOrgs } from "@/lib/work-orgs/public-orgs";
+import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
 
-const PORTRAIT_URL =
-  "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/75ad6227-slurp-3ed01cc3-akin-akinpelu-burgundy-suit-portrait.webp";
+const PORTRAIT_URL = SITE_IMAGES.portrait;
 
 const STATS = [
   { value: "700,000+", label: "Total reach across platforms, media, and leadership programmes" },
@@ -42,7 +46,7 @@ const RECOGNITIONS = [
   "Advisor to governments, enterprises, and faith institutions",
 ];
 
-const ECOSYSTEM = [
+const ECOSYSTEM_FALLBACK = [
   { label: "AALD", title: "Corporate Transformation", href: "/work/aald", description: "Leadership systems and institutional capability." },
   { label: "Erudio Hub", title: "Educational Reform", href: "/work/erudio-hub", description: "Systemic reform for nations and educators." },
   { label: "PERFORMX", title: "Execution Think Tank", href: "/work/performx", description: "Strategy-to-execution for operating teams." },
@@ -65,6 +69,24 @@ const BOARDS = [
 ];
 
 export function ProfilePage() {
+  const [ecosystem, setEcosystem] = useState(
+    ECOSYSTEM_FALLBACK.map((item) => ({ ...item })),
+  );
+
+  useEffect(() => {
+    getPublicWorkOrgs().then((orgs) => {
+      if (orgs.length === 0) return;
+      setEcosystem(
+        orgs.map((org: PlatformWorkOrg) => ({
+          label: org.brandLabel,
+          title: org.pillarTitle,
+          href: `/work/${org.slug}`,
+          description: org.hubCardDescription,
+        })),
+      );
+    });
+  }, []);
+
   return (
     <PageShell>
       {/* Hero */}
@@ -95,7 +117,14 @@ export function ProfilePage() {
             </Reveal>
           </div>
           <Reveal delay={0.15} className="relative min-h-[28rem] border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
-            <img src={PORTRAIT_URL} alt="Dr. Akin Akinpelu, Ph.D" className="absolute inset-0 size-full object-cover object-top" loading="eager" />
+            <OptimizedImage
+              src={PORTRAIT_URL}
+              alt="Dr. Akin Akinpelu, Ph.D"
+              priority
+              width={960}
+              height={1200}
+              className="absolute inset-0 size-full object-cover object-top"
+            />
             <p className="absolute bottom-6 left-6 text-sm text-[var(--ploy-text-secondary)] md:bottom-8 md:left-8">
               Dr. Akin Akinpelu, Ph.D
             </p>
@@ -179,7 +208,7 @@ export function ProfilePage() {
           <Heading as="h2" size="section">Leadership across the ecosystem</Heading>
         </Reveal>
         <div className="mx-auto max-w-[var(--ploy-canvas-main)] border-t border-[var(--ploy-border-primary)]">
-          {ECOSYSTEM.map((item, i) => (
+          {ecosystem.map((item, i) => (
             <Reveal key={item.href} delay={i * 0.05}>
               <div className="grid gap-4 border-b border-[var(--ploy-border-primary)] py-6 md:grid-cols-[0.2fr_1fr_auto] md:items-center md:gap-8">
                 <p className="font-mono text-xs uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">{item.label}</p>

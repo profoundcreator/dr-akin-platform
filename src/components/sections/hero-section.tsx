@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Reveal } from "@/components/ui/reveal";
 import {
   DEFAULT_PORTRAIT_URL,
@@ -34,10 +35,10 @@ export function HeroSection() {
     <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)]">
       {showBanner && bannerUrl && (
         <Reveal className="relative h-[38vh] min-h-[14rem] max-h-[28rem] w-full overflow-hidden border-b border-[var(--ploy-border-primary)]">
-          <img
+          <OptimizedImage
             src={bannerUrl}
             alt=""
-            loading="eager"
+            priority
             className="size-full object-cover"
           />
           <div
@@ -100,10 +101,12 @@ export function HeroSection() {
             delay={0.15}
             className="relative min-h-[34rem] overflow-x-hidden border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-0 lg:border-l lg:border-t-0"
           >
-            <img
+            <OptimizedImage
               src={portraitUrl}
               alt="Dr. Akin Akinpelu seated in a burgundy suit"
-              loading="eager"
+              priority
+              width={960}
+              height={1200}
               className="absolute inset-0 size-full object-cover object-top"
             />
             <div className="absolute inset-x-5 bottom-5 rounded-xl bg-[var(--ploy-background-primary)]/95 p-5 backdrop-blur-sm md:inset-x-8 md:bottom-8 md:p-7">

@@ -8,6 +8,7 @@ import {
   FileText,
   Plus,
   RefreshCw,
+  Star,
   Trash2,
   X,
 } from "lucide-react";
@@ -44,6 +45,11 @@ import {
   updateInsight,
 } from "@/lib/insights/articles";
 import type { InsightInput, PlatformInsight } from "@/lib/insights/types";
+import type { LiveSiteInsight } from "@/lib/insights/public-insights";
+import {
+  getHomepageFeaturedInsightsLiveOnSite,
+  getInsightsLiveOnSite,
+} from "@/lib/insights/public-insights";
 import type { InsightArticleStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -83,6 +89,8 @@ export function InsightsDashboard() {
   const isApprover = canApproveInsights(profile);
   const canDelete = canPermanentlyDeleteInsights(profile);
   const [insights, setInsights] = useState<PlatformInsight[]>([]);
+  const [liveInsights, setLiveInsights] = useState<LiveSiteInsight[]>([]);
+  const [homepageFeaturedLive, setHomepageFeaturedLive] = useState<LiveSiteInsight[]>([]);
   const [pending, setPending] = useState<PlatformInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,12 +105,16 @@ export function InsightsDashboard() {
     try {
       setError(null);
       setSchemaReady(await isPhase3SchemaReady());
-      const [allInsights, pendingInsights] = await Promise.all([
+      const [allInsights, pendingInsights, liveOnSite, homepageFeatured] = await Promise.all([
         getAdminInsights(),
         isApprover ? getPendingInsights() : Promise.resolve([]),
+        getInsightsLiveOnSite(),
+        getHomepageFeaturedInsightsLiveOnSite(),
       ]);
       setInsights(allInsights);
       setPending(pendingInsights);
+      setLiveInsights(liveOnSite);
+      setHomepageFeaturedLive(homepageFeatured);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load insights");
     } finally {
@@ -142,6 +154,31 @@ export function InsightsDashboard() {
       sortOrder: insight.sortOrder,
     });
   }
+
+  function startFromLiveInsight(insight: LiveSiteInsight) {
+    const cmsInsight = insights.find((item) => item.slug === insight.slug);
+    if (cmsInsight) {
+      startEdit(cmsInsight);
+      return;
+    }
+
+    resetForm();
+    setForm({
+      slug: insight.slug,
+      title: insight.title,
+      category: insight.category,
+      summary: insight.summary,
+      body: insight.body,
+      publishedAt: toDateInputValue(insight.publishedAt),
+      isHomepageFeatured: insight.isHomepageFeatured,
+      sortOrder: insight.sortOrder,
+    });
+  }
+
+  const homepageFeaturedSlugs = useMemo(
+    () => new Set(homepageFeaturedLive.map((insight) => insight.slug)),
+    [homepageFeaturedLive],
+  );
 
   async function buildInput(status?: InsightArticleStatus): Promise<InsightInput> {
     const slug = form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title);
@@ -428,6 +465,122 @@ export function InsightsDashboard() {
         </a>
       </div>
 
+      <div className="ploy-surface-elevated mb-8 space-y-5 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <FileText className="size-4 text-[var(--ploy-accent-primary)]" />
+              <h2 className="text-lg font-semibold">Live on website ({liveInsights.length})</h2>
+            </div>
+            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
+              These articles are what visitors see on{" "}
+              <a href="/insights" target="_blank" rel="noopener noreferrer" className="underline">
+                /insights
+              </a>{" "}
+              and the homepage Insights section.
+            </p>
+          </div>
+          {liveInsights[0]?.source === "static" && (
+            <p className="max-w-sm rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-xs text-[var(--ploy-text-secondary)]">
+              Showing the built-in catalog. Publish articles in CMS below to manage them here.
+            </p>
+          )}
+        </div>
+
+        {loading ? (
+          <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading public catalog…</p>
+        ) : liveInsights.length === 0 ? (
+          <p className="text-sm text-[var(--ploy-text-secondary)]">
+            No articles are live on the site yet.
+          </p>
+        ) : (
+          <>
+            {homepageFeaturedLive.length > 0 && (
+              <div className="space-y-3">
+                <p className="inline-flex items-center gap-1.5 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
+                  <Star className="size-3.5 fill-current" />
+                  Homepage featured ({homepageFeaturedLive.length} of {MAX_HOMEPAGE_FEATURED_INSIGHTS})
+                </p>
+                <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {homepageFeaturedLive.map((insight, index) => (
+                    <li
+                      key={insight.slug}
+                      className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-accent-primary)]/30 bg-[oklch(0.68_0.145_29/0.06)] p-4"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ploy-accent-primary)]">
+                        Slot {index + 1}
+                      </p>
+                      <p className="mt-2 font-medium">{insight.title}</p>
+                      <p className="mt-1 text-xs text-[var(--ploy-text-tertiary)]">
+                        {insight.category} · /insights/{insight.slug}
+                      </p>
+                      <p className="mt-1 text-xs text-[var(--ploy-text-tertiary)]">
+                        {insight.source === "static"
+                          ? liveInsights.some((item) => item.isHomepageFeatured)
+                            ? "Built-in catalog"
+                            : "Latest articles (default homepage slots)"
+                          : "CMS · Published"}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="mt-4"
+                        onClick={() => startFromLiveInsight(insight)}
+                      >
+                        {insight.cmsId ? "Edit in CMS" : "Add to CMS"}
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {liveInsights.map((insight) => (
+                <li
+                  key={insight.slug}
+                  className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium">{insight.title}</p>
+                        {homepageFeaturedSlugs.has(insight.slug) && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.68_0.145_29/0.12)] px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-[var(--ploy-accent-primary)]">
+                            <Star className="size-3 fill-current" />
+                            Homepage
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                        {insight.category} · /insights/{insight.slug}
+                      </p>
+                      <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                        {insight.publishedAt ? formatInsightDate(insight.publishedAt) : "No date"} ·{" "}
+                        {insight.source === "static" ? "Built-in catalog" : "CMS · Published"}
+                      </p>
+                      <p className="line-clamp-2 text-sm text-[var(--ploy-text-secondary)]">
+                        {insight.summary}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => startFromLiveInsight(insight)}
+                    >
+                      {insight.cmsId ? "Edit" : "Add to CMS"}
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+
       {isApprover && pending.length > 0 && (
         <div className="ploy-surface-elevated mb-8 space-y-4 p-6">
           <div className="flex items-center gap-2">
@@ -636,11 +789,19 @@ export function InsightsDashboard() {
         </form>
 
         <div className="ploy-surface-elevated space-y-6 p-6">
-          <h2 className="text-lg font-semibold">All articles</h2>
+          <div>
+            <h2 className="text-lg font-semibold">CMS library</h2>
+            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
+              Drafts, pending approvals, and published records in Supabase.
+            </p>
+          </div>
           {loading ? (
             <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading articles…</p>
           ) : sortedInsights.length === 0 ? (
-            <p className="text-sm text-[var(--ploy-text-secondary)]">No articles yet.</p>
+            <p className="text-sm text-[var(--ploy-text-secondary)]">
+              No CMS records yet. Use &ldquo;Add to CMS&rdquo; on a live article above, or create a
+              new article in the form.
+            </p>
           ) : (
             <ul className="space-y-4">
               {sortedInsights.map((insight) => (

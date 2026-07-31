@@ -28,5 +28,6 @@ export const HOMEPAGE_HERO_MODE_OPTIONS: { value: HomepageHeroMode; label: strin
     },
   ];
 
-export const DEFAULT_PORTRAIT_URL =
-  "https://storage.googleapis.com/ployai/3b0be71c-40e9-45e5-9330-d6975465f3c2/user/75ad6227-slurp-3ed01cc3-akin-akinpelu-burgundy-suit-portrait.webp";
+import { SITE_IMAGES } from "@/lib/media/site-images";
+
+export const DEFAULT_PORTRAIT_URL = SITE_IMAGES.portrait;

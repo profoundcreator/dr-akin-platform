@@ -99,6 +99,14 @@ export function canPermanentlyDeleteInsights(profile: AdminProfile | null): bool
   return canPermanentlyDeleteBooks(profile);
 }
 
+export function canApproveWorkOrgs(profile: AdminProfile | null): boolean {
+  return canApproveEvents(profile);
+}
+
+export function canPermanentlyDeleteWorkOrgs(profile: AdminProfile | null): boolean {
+  return canPermanentlyDeleteBooks(profile);
+}
+
 export function formatAdminRole(role: AdminRole): string {
   return ADMIN_ROLE_LABELS[role] ?? role;
 }

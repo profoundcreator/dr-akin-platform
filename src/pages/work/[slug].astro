@@ -1,0 +1,27 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { WorkOrgBySlug } from "@/components/pages/work-org-by-slug";
+import { fetchAllWorkOrgsForBuild, getWorkOrgHeroUrl } from "@/lib/work-orgs/orgs-build";
+
+export async function getStaticPaths() {
+  const orgs = await fetchAllWorkOrgsForBuild();
+
+  return orgs.map((org) => ({
+    params: { slug: org.slug },
+    props: { org },
+  }));
+}
+
+const { org } = Astro.props;
+const site = Astro.site ?? Astro.url.origin;
+const heroUrl = getWorkOrgHeroUrl(org.heroImagePath);
+const ogImage = heroUrl
+  ? heroUrl.startsWith("http")
+    ? heroUrl
+    : new URL(heroUrl, site).href
+  : undefined;
+---
+
+<Layout title={org.pageTitle} description={org.description} ogImage={ogImage}>
+  <WorkOrgBySlug client:load slug={org.slug} initialOrg={org} />
+</Layout>

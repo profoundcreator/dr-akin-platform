@@ -1,8 +1,31 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { HomePage } from "@/components/pages/home";
+import { SiteHeader } from "@/components/layout/site-header";
+import { Footer } from "@/components/layout/footer";
+import { EnquiryModalHost } from "@/components/layout/enquiry-modal-host";
+import { HeroSection } from "@/components/sections/hero-section";
+import { CorporateTransformationSection } from "@/components/sections/corporate-transformation-section";
+import { AaldSection } from "@/components/sections/aald-section";
+import { EventsFeaturedSection } from "@/components/sections/events-featured-section";
+import { LibraryFeaturedSection } from "@/components/sections/library-featured-section";
+import { SITE_IMAGES } from "@/lib/media/site-images";
 ---
 
-<Layout title="Dr. Akin Akinpelu — Executive Coach & Corporate Transformation Strategist">
-  <HomePage client:load />
+<Layout
+  title="Dr. Akin Akinpelu — Executive Coach & Corporate Transformation Strategist"
+  ogImage={SITE_IMAGES.portrait}
+  preloadImage={SITE_IMAGES.portrait}
+>
+  <div class="flex min-h-screen flex-col bg-[var(--ploy-background-primary)]">
+    <SiteHeader client:load />
+    <main class="flex-1">
+      <HeroSection client:load />
+      <CorporateTransformationSection client:visible />
+      <AaldSection client:visible />
+      <EventsFeaturedSection client:visible />
+      <LibraryFeaturedSection client:visible />
+    </main>
+    <Footer client:visible />
+    <EnquiryModalHost client:idle />
+  </div>
 </Layout>

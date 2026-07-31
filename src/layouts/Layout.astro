@@ -1,11 +1,11 @@
 ---
-import "@fontsource-variable/inter";
 import "@/styles/globals.css";
 
 interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  preloadImage?: string;
   noIndex?: boolean;
 }
 
@@ -13,6 +13,7 @@ const {
   title = "Dr. Akin Akinpelu",
   description = "Executive coach, author, and corporate transformation strategist.",
   ogImage = "/images/dr-akin-portrait.svg",
+  preloadImage,
   noIndex = false,
 } = Astro.props;
 
@@ -30,6 +31,9 @@ const resolvedOgImage = ogImage.startsWith("http")
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {preloadImage && (
+      <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
+    )}
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

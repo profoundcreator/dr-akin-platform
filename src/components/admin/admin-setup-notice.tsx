@@ -1,10 +1,10 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-import { MIGRATION_007_HINT, MIGRATION_009_HINT, MIGRATION_010_HINT } from "@/lib/site-settings/schema-support";
+import { MIGRATION_007_HINT, MIGRATION_009_HINT, MIGRATION_010_HINT, MIGRATION_011_HINT } from "@/lib/site-settings/schema-support";
 
 interface AdminSetupNoticeProps {
-  variant?: "homepage" | "books" | "insights";
+  variant?: "homepage" | "books" | "insights" | "work-orgs";
 }
 
 export function AdminSetupNotice({ variant = "homepage" }: AdminSetupNoticeProps) {
@@ -23,7 +23,14 @@ export function AdminSetupNotice({ variant = "homepage" }: AdminSetupNoticeProps
             detail:
               "The public site keeps showing the existing articles until this is done. Insights admin needs it.",
           }
-        : {
+        : variant === "work-orgs"
+          ? {
+              title: "Work orgs CMS needs one database step",
+              hint: MIGRATION_011_HINT,
+              detail:
+                "The public site keeps showing the existing platforms until this is done. Work admin needs it.",
+            }
+          : {
             title: "Homepage CMS needs one database step",
             hint: MIGRATION_007_HINT,
             detail:
