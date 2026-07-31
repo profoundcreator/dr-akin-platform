@@ -100,19 +100,76 @@ async function findAuthUserByEmail(
   return null;
 }
 
+function isExistingAuthUserError(error: { message?: string; status?: number }): boolean {
+  const message = (error.message ?? "").toLowerCase();
+  return (
+    error.status === 422 ||
+    message.includes("already registered") ||
+    message.includes("already been registered") ||
+    message.includes("user already exists")
+  );
+}
+
+/** Sends a new-user invite, or a password-setup email when Auth already has this address. */
 async function sendInviteEmail(
   adminClient: SupabaseClient,
   email: string,
   fullName?: string,
-): Promise<User> {
-  const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${getSiteUrl()}/admin/login`,
+): Promise<{ user: User; delivery: "invite" | "password_setup" }> {
+  const redirectTo = `${getSiteUrl()}/admin/login`;
+  const inviteOptions = {
+    redirectTo,
     data: fullName ? { full_name: fullName } : undefined,
+  };
+
+  const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, inviteOptions);
+
+  if (!error && data.user) {
+    return { user: data.user, delivery: "invite" };
+  }
+
+  if (error && !isExistingAuthUserError(error)) {
+    throw error;
+  }
+
+  // Auth user already exists (common after a partial invite) — resend a setup link instead.
+  const { error: resetError } = await adminClient.auth.resetPasswordForEmail(email, {
+    redirectTo,
   });
 
-  if (error) throw error;
-  if (!data.user) throw new Error("Invite email could not be sent.");
-  return data.user;
+  if (resetError) {
+    throw resetError;
+  }
+
+  const existing = await findAuthUserByEmail(adminClient, email);
+  if (!existing) {
+    throw new Error("Invite email could not be sent.");
+  }
+
+  return { user: existing, delivery: "password_setup" };
+}
+
+function parseRequestBody(body: unknown): InviteRequestBody {
+  if (typeof body === "string") {
+    try {
+      return JSON.parse(body) as InviteRequestBody;
+    } catch {
+      return {};
+    }
+  }
+  return (body ?? {}) as InviteRequestBody;
+}
+
+function inviteDeliveryMessage(delivery: "invite" | "password_setup", resend: boolean): string {
+  if (delivery === "password_setup") {
+    return resend
+      ? "Setup email resent. They can set their password from the link in their inbox."
+      : "Invite sent. They will receive an email to set their password and sign in.";
+  }
+
+  return resend
+    ? "Invite email resent. They can finish setup from their inbox."
+    : "Invite sent. They will receive an email to set their password and sign in.";
 }
 
 export default async function handler(
@@ -150,10 +207,11 @@ export default async function handler(
     return json(res, 403, { error: verified.error });
   }
 
-  const email = req.body?.email?.trim().toLowerCase() ?? "";
-  const fullName = req.body?.fullName?.trim() ?? "";
-  const role = req.body?.role;
-  const resend = Boolean(req.body?.resend);
+  const body = parseRequestBody(req.body);
+  const email = body.email?.trim().toLowerCase() ?? "";
+  const fullName = body.fullName?.trim() ?? "";
+  const role = body.role;
+  const resend = Boolean(body.resend);
 
   if (!email || !fullName || !role) {
     return json(res, 400, { error: "Email, full name, and role are required." });
@@ -185,11 +243,15 @@ export default async function handler(
     }
 
     const shouldSendInviteEmail = resend || !authUser || !existingProfile;
+    let delivery: "invite" | "password_setup" = "invite";
 
     if (!authUser) {
-      authUser = await sendInviteEmail(adminClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, email, fullName);
+      authUser = sent.user;
+      delivery = sent.delivery;
     } else if (shouldSendInviteEmail) {
-      await sendInviteEmail(adminClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, email, fullName);
+      delivery = sent.delivery;
     }
 
     if (!authUser) {
@@ -201,11 +263,11 @@ export default async function handler(
         p_event_type: "team_member_invite_resent",
         p_target_type: "admin_profile",
         p_target_id: existingProfile.id,
-        p_summary: { email, role, invitedBy: verified.inviter.id },
+        p_summary: { email, role, invitedBy: verified.inviter.id, delivery },
       });
 
       return json(res, 200, {
-        message: "Invite email resent. They can finish setup from their inbox.",
+        message: inviteDeliveryMessage(delivery, true),
         memberId: existingProfile.id,
       });
     }
@@ -221,7 +283,10 @@ export default async function handler(
     });
 
     if (insertError) {
-      return json(res, 400, { error: insertError.message });
+      const message = insertError.message.includes("admin_profiles_email_key")
+        ? "This email is already on the team list. Update their role from the team list instead."
+        : insertError.message;
+      return json(res, 400, { error: message });
     }
 
     await verified.inviterClient.rpc("log_audit_event", {
@@ -232,7 +297,7 @@ export default async function handler(
     });
 
     return json(res, 200, {
-      message: "Invite sent. They will receive an email to set their password and sign in.",
+      message: inviteDeliveryMessage(delivery, false),
       memberId: authUser.id,
     });
   } catch (error) {
