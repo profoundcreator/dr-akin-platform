@@ -10,6 +10,8 @@ import type { PlatformInsight } from "@/lib/insights/types";
 
 interface InsightDetailBySlugProps {
   slug: string;
+  /** Build-time snapshot for fast first paint; refreshed from Supabase on load. */
+  initialInsight?: PlatformInsight | null;
 }
 
 function applyClientSeo(insight: PlatformInsight) {
@@ -23,11 +25,16 @@ function applyClientSeo(insight: PlatformInsight) {
 
   const ogDescription = document.querySelector('meta[property="og:description"]');
   if (ogDescription) ogDescription.setAttribute("content", insight.summary);
+
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage && insight.heroImageUrl) {
+    ogImage.setAttribute("content", insight.heroImageUrl);
+  }
 }
 
-export function InsightDetailBySlug({ slug }: InsightDetailBySlugProps) {
-  const [insight, setInsight] = useState<PlatformInsight | null>(null);
-  const [loading, setLoading] = useState(true);
+export function InsightDetailBySlug({ slug, initialInsight = null }: InsightDetailBySlugProps) {
+  const [insight, setInsight] = useState<PlatformInsight | null>(initialInsight);
+  const [loading, setLoading] = useState(!initialInsight);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -37,18 +44,29 @@ export function InsightDetailBySlug({ slug }: InsightDetailBySlugProps) {
       return;
     }
 
+    let cancelled = false;
+
     getPublicInsightBySlug(slug)
       .then((data) => {
+        if (cancelled) return;
         if (!data) {
-          setNotFound(true);
+          if (!initialInsight) setNotFound(true);
           return;
         }
         setInsight(data);
         applyClientSeo(data);
       })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
-  }, [slug]);
+      .catch(() => {
+        if (!cancelled && !initialInsight) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, initialInsight]);
 
   if (loading) {
     return (

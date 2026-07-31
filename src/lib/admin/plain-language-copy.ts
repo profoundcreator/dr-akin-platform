@@ -83,7 +83,7 @@ export const ADMIN_REBUILD_SEO_COPY = {
   label: "Rebuild site for SEO",
   rebuilding: "Rebuilding…",
   help:
-    "Refreshes the public website after you publish or hide content. This helps Google, search results, and link previews (WhatsApp, LinkedIn, etc.) show the latest titles, descriptions, and pages.",
+    "Refreshes the public website after you publish or hide content. Article pages pick up text and images from the database right away; a rebuild still helps search engines, link previews, and brand-new article URLs.",
 } as const;
 
 export const TEAM_ADMIN_COPY = {
