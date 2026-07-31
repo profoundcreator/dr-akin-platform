@@ -5,6 +5,21 @@ import { plainTextToInsightHtml, sanitizeInsightHtml } from "@/lib/insights/sani
 import type { InsightInput, PlatformInsight } from "@/lib/insights/types";
 import { formatSchemaSetupError } from "@/lib/site-settings/schema-support";
 
+export function getInsightHeroUrl(heroImagePath: string | null): string | null {
+  if (!heroImagePath) return null;
+  if (
+    heroImagePath.startsWith("http://") ||
+    heroImagePath.startsWith("https://") ||
+    heroImagePath.startsWith("/")
+  ) {
+    return heroImagePath;
+  }
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
+  if (!supabaseUrl) return null;
+  return `${supabaseUrl}/storage/v1/object/public/insight-images/${heroImagePath}`;
+}
+
 function mapRow(row: DbInsightArticle): PlatformInsight {
   return {
     id: row.id,
@@ -13,6 +28,10 @@ function mapRow(row: DbInsightArticle): PlatformInsight {
     category: row.category,
     summary: row.summary,
     body: row.body,
+    heroImagePath: row.hero_image_path,
+    heroImageUrl: getInsightHeroUrl(row.hero_image_path),
+    sourceLabel: row.source_label,
+    sourceUrl: row.source_url,
     publishedAt: row.published_at,
     sortOrder: row.sort_order,
     isHomepageFeatured: row.is_homepage_featured ?? false,
@@ -117,6 +136,14 @@ export async function isPhase3SchemaReady(): Promise<boolean> {
   return !error;
 }
 
+export async function isInsightMediaSchemaReady(): Promise<boolean> {
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) return false;
+
+  const { error } = await supabase.from("insights_articles").select("hero_image_path").limit(1);
+  return !error;
+}
+
 function normalizeBody(body: string): string {
   return sanitizeInsightHtml(plainTextToInsightHtml(body));
 }
@@ -136,6 +163,9 @@ function buildInsertPayload(
     category: input.category.trim(),
     summary: input.summary.trim(),
     body: normalizeBody(input.body),
+    hero_image_path: input.heroImagePath ?? null,
+    source_label: input.sourceLabel?.trim() || null,
+    source_url: input.sourceUrl?.trim() || null,
     published_at: input.publishedAt ?? null,
     sort_order: input.sortOrder ?? 0,
     is_homepage_featured: false,
@@ -214,6 +244,9 @@ export async function updateInsight(
   if (input.category !== undefined) payload.category = input.category.trim();
   if (input.summary !== undefined) payload.summary = input.summary.trim();
   if (input.body !== undefined) payload.body = normalizeBody(input.body);
+  if (input.heroImagePath !== undefined) payload.hero_image_path = input.heroImagePath;
+  if (input.sourceLabel !== undefined) payload.source_label = input.sourceLabel?.trim() || null;
+  if (input.sourceUrl !== undefined) payload.source_url = input.sourceUrl?.trim() || null;
   if (input.publishedAt !== undefined) payload.published_at = input.publishedAt;
   if (input.sortOrder !== undefined) payload.sort_order = input.sortOrder;
   if (input.status !== undefined) payload.status = input.status;

@@ -2,6 +2,10 @@
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { InsightArticleBody } from "@/components/insights/insight-article-body";
+import {
+  InsightArticleHero,
+  InsightSourceAttribution,
+} from "@/components/insights/insight-article-hero";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -132,9 +136,20 @@ interface InsightArticlePageProps {
   category: string;
   date: string;
   body: string;
+  heroImageUrl?: string | null;
+  sourceLabel?: string | null;
+  sourceUrl?: string | null;
 }
 
-export function InsightArticlePage({ title, category, date, body }: InsightArticlePageProps) {
+export function InsightArticlePage({
+  title,
+  category,
+  date,
+  body,
+  heroImageUrl,
+  sourceLabel,
+  sourceUrl,
+}: InsightArticlePageProps) {
   const displayDate = date.includes("T") ? formatInsightDate(date) : formatInsightDate(`${date}T12:00:00`);
 
   return (
@@ -150,7 +165,15 @@ export function InsightArticlePage({ title, category, date, body }: InsightArtic
               {displayDate && (
                 <p className="text-sm text-[var(--ploy-text-tertiary)]">{displayDate}</p>
               )}
+              {sourceLabel && (
+                <InsightSourceAttribution sourceLabel={sourceLabel} sourceUrl={sourceUrl} />
+              )}
             </Reveal>
+            {heroImageUrl && (
+              <Reveal delay={0.05}>
+                <InsightArticleHero src={heroImageUrl} alt="" />
+              </Reveal>
+            )}
             <Reveal delay={0.1}>
               <InsightArticleBody html={body} />
             </Reveal>

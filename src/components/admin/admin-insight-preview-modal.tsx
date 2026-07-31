@@ -3,6 +3,10 @@
 import { useEffect, useRef } from "react";
 import { Eye, X } from "lucide-react";
 import { InsightArticleBody } from "@/components/insights/insight-article-body";
+import {
+  InsightArticleHero,
+  InsightSourceAttribution,
+} from "@/components/insights/insight-article-hero";
 import { Heading } from "@/components/ui/heading";
 import { formatInsightDate } from "@/lib/insights/articles";
 import { cn } from "@/lib/utils";
@@ -14,6 +18,9 @@ export interface InsightPreviewData {
   body: string;
   publishedAt: string;
   slug: string;
+  heroImageUrl?: string | null;
+  sourceLabel?: string | null;
+  sourceUrl?: string | null;
 }
 
 interface AdminInsightPreviewModalProps {
@@ -122,7 +129,15 @@ export function AdminInsightPreviewModal({
               {displayDate && (
                 <p className="text-sm text-[var(--ploy-text-tertiary)]">{displayDate}</p>
               )}
+              {article.sourceLabel && (
+                <InsightSourceAttribution
+                  sourceLabel={article.sourceLabel}
+                  sourceUrl={article.sourceUrl}
+                />
+              )}
             </div>
+
+            {article.heroImageUrl && <InsightArticleHero src={article.heroImageUrl} alt="" />}
 
             {article.summary.trim() && (
               <div className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] p-4">

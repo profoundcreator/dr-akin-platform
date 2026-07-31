@@ -15,12 +15,15 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 ---
 
-<Layout title={`${article.title} — Insights`} description={article.summary}>
+<Layout title={`${article.title} — Insights`} description={article.summary} ogImage={article.heroImageUrl ?? undefined}>
   <InsightArticlePage
     client:load
     title={article.title}
     category={article.category}
     date={article.publishedAt ?? article.createdAt}
     body={article.body}
+    heroImageUrl={article.heroImageUrl}
+    sourceLabel={article.sourceLabel}
+    sourceUrl={article.sourceUrl}
   />
 </Layout>

@@ -5,6 +5,10 @@ export interface PlatformInsight {
   category: string;
   summary: string;
   body: string;
+  heroImagePath: string | null;
+  heroImageUrl: string | null;
+  sourceLabel: string | null;
+  sourceUrl: string | null;
   publishedAt: string | null;
   sortOrder: number;
   isHomepageFeatured: boolean;
@@ -21,6 +25,9 @@ export interface InsightInput {
   category: string;
   summary: string;
   body: string;
+  heroImagePath?: string | null;
+  sourceLabel?: string | null;
+  sourceUrl?: string | null;
   publishedAt?: string | null;
   sortOrder?: number;
   status?: PlatformInsight["status"];

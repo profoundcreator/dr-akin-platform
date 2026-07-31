@@ -69,6 +69,12 @@ export const INSIGHTS_ADMIN_COPY = {
   previewHelp:
     "See how this article will look on the public insights page before you publish. The summary box shows the teaser used on cards and the homepage.",
   previewMissingFields: "Add a title and body before previewing.",
+  heroImageLabel: "Header image (optional)",
+  sourceLabel: "Original publication",
+  sourceLabelHelp:
+    "Optional credit when republishing from elsewhere, e.g. Forbes Business Council. Shown on the article page — not for SEO branding.",
+  sourceUrlLabel: "Original article link",
+  sourceUrlHelp: "Link to the first place this was published, if applicable.",
   notConnected:
     "The back office is not connected yet. Public visitors still see articles at /insights.",
 } as const;

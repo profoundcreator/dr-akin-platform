@@ -33,6 +33,11 @@ export function isMissingPhase3SchemaError(message: string): boolean {
   return message.toLowerCase().includes("insights_articles");
 }
 
+export function isMissingPhase3MediaSchemaError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return normalized.includes("hero_image_path") || normalized.includes("source_label");
+}
+
 export function isMissingPhase4SchemaError(message: string): boolean {
   return (
     message.toLowerCase().includes("work_orgs") ||
@@ -70,6 +75,9 @@ export function formatSchemaSetupError(message: string): string {
   }
   if (isMissingPhase3SchemaError(message)) {
     return `${message} ${MIGRATION_010_HINT}`;
+  }
+  if (isMissingPhase3MediaSchemaError(message)) {
+    return `${message} Run supabase/migrations/014_insight_hero_images.sql in the Supabase SQL Editor, then refresh.`;
   }
   if (isMissingPhase4SchemaError(message)) {
     return `${message} ${MIGRATION_011_HINT}`;

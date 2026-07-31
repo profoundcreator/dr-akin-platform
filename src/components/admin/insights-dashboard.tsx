@@ -7,6 +7,7 @@ import {
   Download,
   Eye,
   FileText,
+  ImagePlus,
   Plus,
   Star,
   Trash2,
@@ -18,6 +19,7 @@ import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
+import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -30,6 +32,7 @@ import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
 import { INSIGHTS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import {
   INSIGHT_CATEGORIES,
+  INSIGHT_HERO_IMAGE_HINT,
   INSIGHT_STATUS_LABELS,
   MAX_HOMEPAGE_FEATURED_INSIGHTS,
 } from "@/lib/insights/constants";
@@ -39,8 +42,10 @@ import {
   deleteInsightPermanently,
   formatInsightDate,
   getAdminInsights,
+  getInsightHeroUrl,
   getPendingInsights,
   insightsToCsv,
+  isInsightMediaSchemaReady,
   isPhase3SchemaReady,
   isValidInsightSlug,
   logInsightAudit,
@@ -48,6 +53,7 @@ import {
   slugifyInsightTitle,
   updateInsight,
 } from "@/lib/insights/articles";
+import { uploadInsightHeroImage } from "@/lib/insights/hero-image-upload";
 import type { InsightInput, PlatformInsight } from "@/lib/insights/types";
 import type { LiveSiteInsight } from "@/lib/insights/public-insights";
 import {
@@ -74,6 +80,8 @@ const EMPTY_FORM = {
   publishedAt: new Date().toISOString().slice(0, 10),
   isHomepageFeatured: false,
   sortOrder: 0,
+  sourceLabel: "",
+  sourceUrl: "",
 };
 
 function downloadCsv(filename: string, content: string) {
@@ -112,11 +120,15 @@ export function InsightsDashboard() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
+  const [mediaSchemaReady, setMediaSchemaReady] = useState(true);
   const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
   const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
   const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewArticle, setPreviewArticle] = useState<InsightPreviewData | null>(null);
+  const [heroFile, setHeroFile] = useState<File | null>(null);
+  const [heroPreview, setHeroPreview] = useState<string | null>(null);
+  const [existingHeroPath, setExistingHeroPath] = useState<string | null>(null);
   const editorFormRef = useRef<HTMLElement>(null);
 
   function scrollToEditorForm() {
@@ -129,6 +141,7 @@ export function InsightsDashboard() {
     try {
       setError(null);
       setSchemaReady(await isPhase3SchemaReady());
+      setMediaSchemaReady(await isInsightMediaSchemaReady());
       setPreloadedControlsReady(await isPreloadedContentSchemaReady());
       const [allInsights, pendingInsights, liveOnSite, homepageFeatured] = await Promise.all([
         getAdminInsights(),
@@ -166,6 +179,9 @@ export function InsightsDashboard() {
     setForm(EMPTY_FORM);
     setEditingId(null);
     setLivePrefillTitle(null);
+    setHeroFile(null);
+    setHeroPreview(null);
+    setExistingHeroPath(null);
   }
 
   function startEdit(insight: PlatformInsight) {
@@ -180,7 +196,12 @@ export function InsightsDashboard() {
       publishedAt: toDateInputValue(insight.publishedAt),
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
+      sourceLabel: insight.sourceLabel ?? "",
+      sourceUrl: insight.sourceUrl ?? "",
     });
+    setExistingHeroPath(insight.heroImagePath);
+    setHeroFile(null);
+    setHeroPreview(insight.heroImageUrl);
     scrollToEditorForm();
   }
 
@@ -204,7 +225,12 @@ export function InsightsDashboard() {
       publishedAt: toDateInputValue(insight.publishedAt),
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
+      sourceLabel: "",
+      sourceUrl: "",
     });
+    setExistingHeroPath(null);
+    setHeroFile(null);
+    setHeroPreview(null);
     scrollToEditorForm();
   }
 
@@ -303,6 +329,9 @@ export function InsightsDashboard() {
       body: form.body,
       publishedAt: form.publishedAt,
       slug: form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title),
+      heroImageUrl: heroPreview,
+      sourceLabel: form.sourceLabel.trim() || null,
+      sourceUrl: form.sourceUrl.trim() || null,
     });
     setPreviewOpen(true);
   }
@@ -315,6 +344,9 @@ export function InsightsDashboard() {
       body: insight.body,
       publishedAt: toDateInputValue(insight.publishedAt),
       slug: insight.slug,
+      heroImageUrl: insight.heroImageUrl,
+      sourceLabel: insight.sourceLabel,
+      sourceUrl: insight.sourceUrl,
     });
     setPreviewOpen(true);
   }
@@ -329,16 +361,31 @@ export function InsightsDashboard() {
       throw new Error("Link name must use lowercase letters, numbers, and hyphens only.");
     }
 
+    let heroImagePath = existingHeroPath;
+    if (heroFile && mediaSchemaReady) {
+      heroImagePath = await uploadInsightHeroImage(heroFile, slug);
+    }
+
     return {
       slug,
       title: form.title,
       category: form.category,
       summary: form.summary,
       body: form.body,
+      heroImagePath,
+      sourceLabel: form.sourceLabel.trim() || null,
+      sourceUrl: form.sourceUrl.trim() || null,
       publishedAt: toPublishedAtIso(form.publishedAt),
       sortOrder: form.sortOrder,
       status,
     };
+  }
+
+  function handleHeroChange(file: File | null) {
+    setHeroFile(file);
+    setHeroPreview(
+      file ? URL.createObjectURL(file) : getInsightHeroUrl(existingHeroPath),
+    );
   }
 
   async function saveInsight(mode: "draft" | "submit" | "publish") {
@@ -561,6 +608,12 @@ export function InsightsDashboard() {
         <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
           Run <code className="text-xs">supabase/migrations/013_preloaded_content_controls.sql</code> in Supabase
           to remove or restore pre-loaded articles from the public site.
+        </div>
+      )}
+      {schemaReady && !mediaSchemaReady && (
+        <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Run <code className="text-xs">supabase/migrations/014_insight_hero_images.sql</code> in Supabase to
+          upload header images and add original-publication credits.
         </div>
       )}
       {(error || notice) && (
@@ -988,6 +1041,63 @@ export function InsightsDashboard() {
               className="w-full rounded-[var(--ploy-radius-input)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-3 py-2 text-sm"
               placeholder="Short teaser shown on cards and search results"
             />
+          </div>
+
+          {mediaSchemaReady && (
+            <div className="space-y-2">
+              <Label htmlFor="insight-hero">{INSIGHTS_ADMIN_COPY.heroImageLabel}</Label>
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
+                  <ImagePlus className="size-4" />
+                  Upload header image
+                  <input
+                    id="insight-hero"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={(e) => handleHeroChange(e.target.files?.[0] ?? null)}
+                  />
+                </label>
+                {heroPreview && (
+                  <img
+                    src={heroPreview}
+                    alt=""
+                    className="h-24 w-40 rounded-md border border-[var(--ploy-border-primary)] object-cover"
+                  />
+                )}
+              </div>
+              <ImageUploadHint hint={INSIGHT_HERO_IMAGE_HINT} />
+            </div>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="insight-source-label">{INSIGHTS_ADMIN_COPY.sourceLabel}</Label>
+                <AdminHelpTip text={INSIGHTS_ADMIN_COPY.sourceLabelHelp} />
+              </div>
+              <Input
+                id="insight-source-label"
+                value={form.sourceLabel}
+                onChange={(e) => setForm((prev) => ({ ...prev, sourceLabel: e.target.value }))}
+                placeholder="Forbes Business Council"
+                disabled={!mediaSchemaReady}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="insight-source-url">{INSIGHTS_ADMIN_COPY.sourceUrlLabel}</Label>
+                <AdminHelpTip text={INSIGHTS_ADMIN_COPY.sourceUrlHelp} />
+              </div>
+              <Input
+                id="insight-source-url"
+                type="url"
+                value={form.sourceUrl}
+                onChange={(e) => setForm((prev) => ({ ...prev, sourceUrl: e.target.value }))}
+                placeholder="https://..."
+                disabled={!mediaSchemaReady}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

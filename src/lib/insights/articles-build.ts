@@ -1,5 +1,6 @@
 import type { DbInsightArticle } from "@/lib/supabase/database.types";
 import { INSIGHT_ARTICLES, type InsightArticle } from "@/data/site-content";
+import { getInsightHeroUrl } from "@/lib/insights/articles";
 import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import { fetchPreloadedContentSettingsForBuild } from "@/lib/content/preloaded-content";
 import { plainTextToInsightHtml } from "@/lib/insights/sanitize-html";
@@ -13,6 +14,10 @@ function mapBuildRow(row: DbInsightArticle): PlatformInsight {
     category: row.category,
     summary: row.summary,
     body: row.body,
+    heroImagePath: row.hero_image_path,
+    heroImageUrl: getInsightHeroUrl(row.hero_image_path),
+    sourceLabel: row.source_label,
+    sourceUrl: row.source_url,
     publishedAt: row.published_at,
     sortOrder: row.sort_order,
     isHomepageFeatured: row.is_homepage_featured ?? false,
@@ -32,6 +37,10 @@ function staticInsightToPlatform(article: InsightArticle): PlatformInsight {
     category: article.category,
     summary: article.summary,
     body: plainTextToInsightHtml(article.body),
+    heroImagePath: null,
+    heroImageUrl: null,
+    sourceLabel: null,
+    sourceUrl: null,
     publishedAt: article.date ? new Date(article.date).toISOString() : null,
     sortOrder: 0,
     isHomepageFeatured: false,

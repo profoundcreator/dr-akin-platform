@@ -163,6 +163,9 @@ export interface DbInsightArticle {
   category: string;
   summary: string;
   body: string;
+  hero_image_path: string | null;
+  source_label: string | null;
+  source_url: string | null;
   published_at: string | null;
   sort_order: number;
   is_homepage_featured: boolean;

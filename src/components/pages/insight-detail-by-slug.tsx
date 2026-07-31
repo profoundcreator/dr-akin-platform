@@ -84,6 +84,9 @@ export function InsightDetailBySlug({ slug }: InsightDetailBySlugProps) {
       category={insight.category}
       date={insight.publishedAt ?? insight.createdAt}
       body={insight.body}
+      heroImageUrl={insight.heroImageUrl}
+      sourceLabel={insight.sourceLabel}
+      sourceUrl={insight.sourceUrl}
     />
   );
 }
