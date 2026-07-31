@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
+import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import {
   canPermanentlyDeleteInsights,
 } from "@/lib/auth/permissions";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import { INSIGHTS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import {
   INSIGHT_CATEGORIES,
   INSIGHT_STATUS_LABELS,
@@ -408,7 +410,7 @@ export function InsightsDashboard() {
     return (
       <AdminLayoutShell title="Insights" subtitle="Manage essays and field notes">
         <p className="ploy-surface-elevated p-6 text-sm text-[var(--ploy-text-secondary)]">
-          Connect Supabase to manage insights. Public visitors will see articles at{" "}
+          {INSIGHTS_ADMIN_COPY.notConnected}{" "}
           <a href="/insights" className="underline">/insights</a>.
         </p>
       </AdminLayoutShell>
@@ -470,7 +472,10 @@ export function InsightsDashboard() {
           <div>
             <div className="flex items-center gap-2">
               <FileText className="size-4 text-[var(--ploy-accent-primary)]" />
-              <h2 className="text-lg font-semibold">Live on website ({liveInsights.length})</h2>
+              <h2 className="text-lg font-semibold">
+                {INSIGHTS_ADMIN_COPY.liveSectionTitle} ({liveInsights.length})
+              </h2>
+              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.liveSectionHelp} />
             </div>
             <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
               These articles are what visitors see on{" "}
@@ -482,7 +487,7 @@ export function InsightsDashboard() {
           </div>
           {liveInsights[0]?.source === "static" && (
             <p className="max-w-sm rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-xs text-[var(--ploy-text-secondary)]">
-              Showing the built-in catalog. Publish articles in CMS below to manage them here.
+              {INSIGHTS_ADMIN_COPY.preloadedNotice}
             </p>
           )}
         </div>
@@ -517,19 +522,25 @@ export function InsightsDashboard() {
                       <p className="mt-1 text-xs text-[var(--ploy-text-tertiary)]">
                         {insight.source === "static"
                           ? liveInsights.some((item) => item.isHomepageFeatured)
-                            ? "Built-in catalog"
-                            : "Latest articles (default homepage slots)"
-                          : "CMS · Published"}
+                            ? INSIGHTS_ADMIN_COPY.preloadedLabel
+                            : INSIGHTS_ADMIN_COPY.defaultHomepageSlots
+                          : INSIGHTS_ADMIN_COPY.managedLabel}
                       </p>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="mt-4"
-                        onClick={() => startFromLiveInsight(insight)}
-                      >
-                        {insight.cmsId ? "Edit in CMS" : "Add to CMS"}
-                      </Button>
+                      <div className="mt-4 flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => startFromLiveInsight(insight)}
+                        >
+                          {insight.cmsId
+                            ? INSIGHTS_ADMIN_COPY.edit
+                            : INSIGHTS_ADMIN_COPY.startManaging}
+                        </Button>
+                        {!insight.cmsId && (
+                          <AdminHelpTip text={INSIGHTS_ADMIN_COPY.startManagingHelp} />
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -558,21 +569,30 @@ export function InsightsDashboard() {
                       </p>
                       <p className="text-xs text-[var(--ploy-text-tertiary)]">
                         {insight.publishedAt ? formatInsightDate(insight.publishedAt) : "No date"} ·{" "}
-                        {insight.source === "static" ? "Built-in catalog" : "CMS · Published"}
+                        {insight.source === "static"
+                          ? INSIGHTS_ADMIN_COPY.preloadedLabel
+                          : INSIGHTS_ADMIN_COPY.managedLabel}
                       </p>
                       <p className="line-clamp-2 text-sm text-[var(--ploy-text-secondary)]">
                         {insight.summary}
                       </p>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="shrink-0"
-                      onClick={() => startFromLiveInsight(insight)}
-                    >
-                      {insight.cmsId ? "Edit" : "Add to CMS"}
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="shrink-0"
+                        onClick={() => startFromLiveInsight(insight)}
+                      >
+                        {insight.cmsId
+                          ? INSIGHTS_ADMIN_COPY.edit
+                          : INSIGHTS_ADMIN_COPY.startManaging}
+                      </Button>
+                      {!insight.cmsId && (
+                        <AdminHelpTip text={INSIGHTS_ADMIN_COPY.startManagingHelp} />
+                      )}
+                    </div>
                   </div>
                 </li>
               ))}
@@ -790,17 +810,16 @@ export function InsightsDashboard() {
 
         <div className="ploy-surface-elevated space-y-6 p-6">
           <div>
-            <h2 className="text-lg font-semibold">CMS library</h2>
-            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
-              Drafts, pending approvals, and published records in Supabase.
-            </p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">{INSIGHTS_ADMIN_COPY.managedSectionTitle}</h2>
+              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.managedSectionHelp} />
+            </div>
           </div>
           {loading ? (
             <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading articles…</p>
           ) : sortedInsights.length === 0 ? (
             <p className="text-sm text-[var(--ploy-text-secondary)]">
-              No CMS records yet. Use &ldquo;Add to CMS&rdquo; on a live article above, or create a
-              new article in the form.
+              {INSIGHTS_ADMIN_COPY.noManagedYet}
             </p>
           ) : (
             <ul className="space-y-4">

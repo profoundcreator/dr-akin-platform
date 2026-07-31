@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
+import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { ImageUploadHint } from "@/components/ui/image-upload-hint";
@@ -53,6 +54,7 @@ import {
 } from "@/lib/library/public-books";
 import type { PurchaseLink } from "@/lib/library/purchase-links";
 import { triggerSiteRebuild } from "@/lib/events/trigger-rebuild";
+import { BOOKS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import type { LibraryBookStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -435,7 +437,7 @@ export function BooksDashboard() {
     return (
       <AdminLayoutShell title="Books" subtitle="Manage the public library">
         <p className="ploy-surface-elevated p-6 text-sm text-[var(--ploy-text-secondary)]">
-          Connect Supabase to manage books. Public visitors will see titles at{" "}
+          {BOOKS_ADMIN_COPY.notConnected}{" "}
           <a href="/resources" className="underline">/resources</a>.
         </p>
       </AdminLayoutShell>
@@ -494,7 +496,10 @@ export function BooksDashboard() {
           <div>
             <div className="flex items-center gap-2">
               <BookOpen className="size-4 text-[var(--ploy-accent-primary)]" />
-              <h2 className="text-lg font-semibold">Live on website ({liveBooks.length})</h2>
+              <h2 className="text-lg font-semibold">
+                {BOOKS_ADMIN_COPY.liveSectionTitle} ({liveBooks.length})
+              </h2>
+              <AdminHelpTip text={BOOKS_ADMIN_COPY.liveSectionHelp} />
             </div>
             <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
               These titles are what visitors see on{" "}
@@ -506,7 +511,7 @@ export function BooksDashboard() {
           </div>
           {liveBooks[0]?.source === "static" && (
             <p className="max-w-sm rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-xs text-[var(--ploy-text-secondary)]">
-              Showing the built-in catalog. Publish books in CMS below to manage them here.
+              {BOOKS_ADMIN_COPY.preloadedNotice}
             </p>
           )}
         </div>
@@ -538,17 +543,24 @@ export function BooksDashboard() {
                     )}
                     <p className="text-xs text-[var(--ploy-text-tertiary)]">
                       /library/{featuredLiveBook.slug}
-                      {featuredLiveBook.source === "static" ? " · Built-in catalog" : " · CMS"}
+                      {featuredLiveBook.source === "static"
+                        ? ` · ${BOOKS_ADMIN_COPY.preloadedLabel}`
+                        : " · You manage this"}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => startFromLiveBook(featuredLiveBook)}
-                  >
-                    {featuredLiveBook.cmsId ? "Edit in CMS" : "Add to CMS"}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => startFromLiveBook(featuredLiveBook)}
+                    >
+                      {featuredLiveBook.cmsId ? BOOKS_ADMIN_COPY.edit : BOOKS_ADMIN_COPY.startManaging}
+                    </Button>
+                    {!featuredLiveBook.cmsId && (
+                      <AdminHelpTip text={BOOKS_ADMIN_COPY.startManagingHelp} />
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -578,18 +590,23 @@ export function BooksDashboard() {
                       {book.category} · /library/{book.slug}
                     </p>
                     <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                      {book.source === "static" ? "Built-in catalog" : "CMS · Published"}
+                      {book.source === "static"
+                        ? BOOKS_ADMIN_COPY.preloadedLabel
+                        : BOOKS_ADMIN_COPY.managedLabel}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="shrink-0"
-                    onClick={() => startFromLiveBook(book)}
-                  >
-                    {book.cmsId ? "Edit" : "Add to CMS"}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => startFromLiveBook(book)}
+                    >
+                      {book.cmsId ? BOOKS_ADMIN_COPY.edit : BOOKS_ADMIN_COPY.startManaging}
+                    </Button>
+                    {!book.cmsId && <AdminHelpTip text={BOOKS_ADMIN_COPY.startManagingHelp} />}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -858,18 +875,15 @@ export function BooksDashboard() {
 
         <div className="ploy-surface-elevated space-y-6 p-6">
           <div>
-            <h2 className="text-lg font-semibold">CMS library</h2>
-            <p className="mt-1 text-sm text-[var(--ploy-text-secondary)]">
-              Drafts, pending approvals, and published records in Supabase.
-            </p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">{BOOKS_ADMIN_COPY.managedSectionTitle}</h2>
+              <AdminHelpTip text={BOOKS_ADMIN_COPY.managedSectionHelp} />
+            </div>
           </div>
           {loading ? (
             <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading books…</p>
           ) : sortedBooks.length === 0 ? (
-            <p className="text-sm text-[var(--ploy-text-secondary)]">
-              No CMS records yet. Use &ldquo;Add to CMS&rdquo; on a live title above, or create a new
-              book in the form.
-            </p>
+            <p className="text-sm text-[var(--ploy-text-secondary)]">{BOOKS_ADMIN_COPY.noManagedYet}</p>
           ) : (
             <ul className="space-y-4">
               {sortedBooks.map((book) => (

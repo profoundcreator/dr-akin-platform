@@ -80,11 +80,6 @@ export function AdminLayoutShell({ children, title, subtitle }: AdminLayoutShell
               </a>
             ))}
           </nav>
-          {!isDemoMode && (
-            <p className="mt-6 rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.14_145/0.12)] px-3 py-2 text-xs font-medium text-[var(--ploy-status-success)]">
-              Supabase Connected
-            </p>
-          )}
         </aside>
 
         <main className="min-w-0 flex-1">{children}</main>

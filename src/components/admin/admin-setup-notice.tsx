@@ -11,14 +11,14 @@ export function AdminSetupNotice({ variant = "homepage" }: AdminSetupNoticeProps
   const copy =
     variant === "books"
       ? {
-          title: "Books CMS needs one database step",
+          title: "Books admin needs one setup step",
           hint: MIGRATION_009_HINT,
           detail:
             "The public site keeps showing the existing library until this is done. Books admin needs it.",
         }
       : variant === "insights"
         ? {
-            title: "Insights CMS needs one database step",
+            title: "Insights admin needs one setup step",
             hint: MIGRATION_010_HINT,
             detail:
               "The public site keeps showing the existing articles until this is done. Insights admin needs it.",

@@ -1,0 +1,44 @@
+export const BOOKS_ADMIN_COPY = {
+  liveSectionTitle: "Live on website",
+  liveSectionHelp:
+    "These are the books visitors see today on the public library and homepage.",
+  preloadedNotice:
+    "These books are on the site from the original setup. Publish them in the form below to edit them yourself going forward.",
+  preloadedLabel: "Pre-loaded on site",
+  managedLabel: "You manage this · Published",
+  featuredBook: "Featured book",
+  startManaging: "Start managing",
+  startManagingHelp:
+    "This book is already on the public website. Use this to copy it into the admin so you can edit the description, cover, purchase links, and featured status yourself.",
+  edit: "Edit",
+  managedSectionTitle: "Books you manage",
+  managedSectionHelp:
+    "Drafts, items waiting for approval, and books you have published from this admin.",
+  noManagedYet:
+    "No managed books yet. Tap Start managing on a live title above, or create a new book in the form.",
+  notConnected:
+    "The back office is not connected yet. Public visitors still see books at /resources.",
+} as const;
+
+export const INSIGHTS_ADMIN_COPY = {
+  liveSectionTitle: "Live on website",
+  liveSectionHelp:
+    "These are the articles visitors see today on the insights page and homepage.",
+  preloadedNotice:
+    "These articles are on the site from the original setup. Publish them in the form below to edit them yourself going forward.",
+  preloadedLabel: "Pre-loaded on site",
+  managedLabel: "You manage this · Published",
+  homepageFeatured: "Homepage featured",
+  defaultHomepageSlots: "Latest articles (default homepage slots)",
+  startManaging: "Start managing",
+  startManagingHelp:
+    "This article is already on the public website. Use this to copy it into the admin so you can edit the text, summary, and homepage placement yourself.",
+  edit: "Edit",
+  managedSectionTitle: "Articles you manage",
+  managedSectionHelp:
+    "Drafts, items waiting for approval, and articles you have published from this admin.",
+  noManagedYet:
+    "No managed articles yet. Tap Start managing on a live article above, or create a new article in the form.",
+  notConnected:
+    "The back office is not connected yet. Public visitors still see articles at /insights.",
+} as const;
