@@ -64,6 +64,6 @@ export const TEAM_ADMIN_COPY = {
   markFounderHelp:
     "Designate one protected Super Admin account. Do this once for the primary account owner. Co–Super Admins cannot change or remove the founder.",
   noFounderYet: "No founder account is designated yet. Mark the primary Super Admin as founder for extra protection.",
-  serviceRoleMissing:
-    "Email invites need SUPABASE_SERVICE_ROLE_KEY in Vercel. Until then, add users manually in Supabase Auth and run the profile SQL snippet.",
+  inviteHint:
+    "They will receive an email to set a password, then sign in at the admin login page. Use “Resend invite” on the team list if they need a fresh link.",
 } as const;

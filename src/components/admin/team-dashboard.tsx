@@ -216,7 +216,7 @@ export function TeamDashboard() {
             <AdminHelpTip text={TEAM_ADMIN_COPY.inviteHelp} />
           </div>
 
-          <p className="text-sm text-[var(--ploy-text-secondary)]">{TEAM_ADMIN_COPY.serviceRoleMissing}</p>
+          <p className="text-sm text-[var(--ploy-text-secondary)]">{TEAM_ADMIN_COPY.inviteHint}</p>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
