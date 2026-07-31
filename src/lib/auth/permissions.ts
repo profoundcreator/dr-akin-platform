@@ -82,6 +82,15 @@ export function canManageHomepage(profile: AdminProfile | null): boolean {
   return canApproveEvents(profile);
 }
 
+export function canApproveBooks(profile: AdminProfile | null): boolean {
+  return canApproveEvents(profile);
+}
+
+export function canPermanentlyDeleteBooks(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return profile!.role === "super_admin" || profile!.role === "admin_manager";
+}
+
 export function formatAdminRole(role: AdminRole): string {
   return ADMIN_ROLE_LABELS[role] ?? role;
 }

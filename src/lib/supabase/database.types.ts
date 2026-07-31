@@ -20,6 +20,8 @@ export type EventBrand =
 
 export type EventStatus = "draft" | "pending_approval" | "published" | "hidden";
 
+export type LibraryBookStatus = "draft" | "pending_approval" | "published" | "hidden";
+
 export type HomepageHeroMode = "portrait" | "banner" | "minimal";
 
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
@@ -126,6 +128,29 @@ export interface DbEvent {
   updated_at: string;
 }
 
+export interface DbLibraryBook {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  year: string | null;
+  category: string;
+  description: string;
+  cover_image_path: string | null;
+  purchase_links: unknown;
+  is_featured: boolean;
+  sort_order: number;
+  status: LibraryBookStatus;
+  manually_hidden: boolean;
+  submitted_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  rejection_note: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbSiteSettings {
   id: boolean;
   homepage_events_enabled: boolean;
@@ -200,6 +225,11 @@ export interface Database {
         Row: DbSiteSettings;
         Insert: Partial<DbSiteSettings> & Pick<DbSiteSettings, "id">;
         Update: Partial<DbSiteSettings>;
+      };
+      library_books: {
+        Row: DbLibraryBook;
+        Insert: Partial<DbLibraryBook> & Pick<DbLibraryBook, "slug" | "title" | "category" | "description">;
+        Update: Partial<DbLibraryBook>;
       };
     };
     Functions: {

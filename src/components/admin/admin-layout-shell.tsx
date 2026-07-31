@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut } from "lucide-react";
+import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { formatAdminRole } from "@/lib/auth/permissions";
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: "Inbox", href: "/admin/inbox", icon: Inbox },
   { label: "Homepage", href: "/admin/homepage", icon: Home },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
+  { label: "Books", href: "/admin/books", icon: BookOpen },
   { label: "Featured Episodes", href: "/admin/audio", icon: Headphones },
 ];
 

@@ -4,6 +4,10 @@
     {
       "source": "/events/:slug((?!view$)[a-z0-9-]+)",
       "destination": "/events/view?slug=:slug"
+    },
+    {
+      "source": "/library/:slug((?!view$)[a-z0-9-]+)",
+      "destination": "/library/view?slug=:slug"
     }
   ]
 }
