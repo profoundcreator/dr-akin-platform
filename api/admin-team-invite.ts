@@ -36,9 +36,13 @@ interface InviteRequestBody {
   resend?: boolean;
 }
 
+function readEnv(name: string): string {
+  return (process.env[name] ?? "").trim();
+}
+
 function createAuthenticatedServerClient(accessToken: string): SupabaseClient | null {
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
-  const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
+  const supabaseUrl = readEnv("PUBLIC_SUPABASE_URL");
+  const anonKey = readEnv("PUBLIC_SUPABASE_ANON_KEY");
   if (!supabaseUrl || !anonKey || !accessToken) return null;
 
   return createClient(supabaseUrl, anonKey, {
@@ -129,6 +133,7 @@ function isExistingAuthUserError(error: { message?: string; status?: number }): 
 
 async function sendInviteEmail(
   adminClient: SupabaseClient,
+  publicClient: SupabaseClient,
   email: string,
   fullName?: string,
 ): Promise<{ user: User; delivery: "invite" | "password_setup" }> {
@@ -148,7 +153,8 @@ async function sendInviteEmail(
     throw error;
   }
 
-  const { error: resetError } = await adminClient.auth.resetPasswordForEmail(email, {
+  // Password reset emails must use the anon key — service role returns "Invalid API key".
+  const { error: resetError } = await publicClient.auth.resetPasswordForEmail(email, {
     redirectTo,
   });
 
@@ -184,9 +190,17 @@ function errorMessage(error: unknown): string {
   return "Invite failed.";
 }
 
+function isInvalidApiKeyError(error: unknown): boolean {
+  return errorMessage(error).toLowerCase().includes("invalid api key");
+}
+
+const SERVICE_ROLE_SETUP_ERROR =
+  "Supabase service role key is invalid. In Vercel → Project → Settings → Environment Variables, set SUPABASE_SERVICE_ROLE_KEY to the service_role secret from Supabase → Settings → API (not the anon public key). Redeploy after saving.";
+
 export async function POST(request: Request): Promise<Response> {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
+  const serviceRoleKey = readEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const supabaseUrl = readEnv("PUBLIC_SUPABASE_URL");
+  const anonKey = readEnv("PUBLIC_SUPABASE_ANON_KEY");
 
   if (!serviceRoleKey || !supabaseUrl) {
     return jsonResponse(503, {
@@ -200,7 +214,6 @@ export async function POST(request: Request): Promise<Response> {
     return jsonResponse(401, { error: "Missing authorization token." });
   }
 
-  const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
   if (!anonKey) {
     return jsonResponse(503, { error: "Supabase is not configured on the server." });
   }
@@ -236,7 +249,22 @@ export async function POST(request: Request): Promise<Response> {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
+  const publicClient = createClient(supabaseUrl, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
   try {
+    const { error: serviceProbeError } = await adminClient.auth.admin.listUsers({
+      page: 1,
+      perPage: 1,
+    });
+    if (serviceProbeError) {
+      if (isInvalidApiKeyError(serviceProbeError)) {
+        return jsonResponse(503, { error: SERVICE_ROLE_SETUP_ERROR });
+      }
+      throw serviceProbeError;
+    }
+
     let authUser = await findAuthUserByEmail(adminClient, email);
 
     const { data: existingProfile } = authUser
@@ -258,11 +286,11 @@ export async function POST(request: Request): Promise<Response> {
     let delivery: "invite" | "password_setup" = "invite";
 
     if (!authUser) {
-      const sent = await sendInviteEmail(adminClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName);
       authUser = sent.user;
       delivery = sent.delivery;
     } else if (shouldSendInviteEmail) {
-      const sent = await sendInviteEmail(adminClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName);
       delivery = sent.delivery;
     }
 
@@ -313,6 +341,9 @@ export async function POST(request: Request): Promise<Response> {
       memberId: authUser.id,
     });
   } catch (error) {
+    if (isInvalidApiKeyError(error)) {
+      return jsonResponse(503, { error: SERVICE_ROLE_SETUP_ERROR });
+    }
     return jsonResponse(500, { error: errorMessage(error) });
   }
 }
