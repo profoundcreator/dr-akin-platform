@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { createAuthenticatedServerClient } from "../src/lib/supabase/authenticated-server-client";
 import type { AdminAccountState, AdminRole } from "../src/lib/supabase/database.types";
 
 const PRIVILEGED_ROLES = new Set<AdminRole>(["super_admin", "technical_admin"]);
@@ -33,8 +34,13 @@ function json(
   return res.status(status).json(body);
 }
 
-async function verifyInviter(token: string, supabaseAnon: SupabaseClient) {
-  const { data: userData, error: userError } = await supabaseAnon.auth.getUser(token);
+async function verifyInviter(token: string) {
+  const supabaseAnon = createAuthenticatedServerClient(token);
+  if (!supabaseAnon) {
+    return { error: "Supabase is not configured on the server." as const };
+  }
+
+  const { data: userData, error: userError } = await supabaseAnon.auth.getUser();
   if (userError || !userData.user) {
     return { error: "Invalid session." as const };
   }
@@ -123,8 +129,7 @@ export default async function handler(
   }
 
   const token = authHeader.slice("Bearer ".length);
-  const anonClient = createClient(supabaseUrl, anonKey);
-  const verified = await verifyInviter(token, anonClient);
+  const verified = await verifyInviter(token);
 
   if ("error" in verified) {
     return json(res, 403, { error: verified.error });

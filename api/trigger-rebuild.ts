@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createAuthenticatedServerClient } from "../src/lib/supabase/authenticated-server-client";
 
 const APPROVER_ROLES = new Set(["super_admin", "executive_assistant", "admin_manager"]);
 
@@ -32,8 +32,13 @@ export default async function handler(
   }
 
   const token = authHeader.slice("Bearer ".length);
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const { data: userData, error: userError } = await supabase.auth.getUser(token);
+  const supabase = createAuthenticatedServerClient(token);
+
+  if (!supabase) {
+    return res.status(503).json({ error: "Supabase is not configured on the server." });
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser();
 
   if (userError || !userData.user) {
     return res.status(401).json({ error: "Invalid session." });
