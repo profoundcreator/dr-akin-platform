@@ -5,46 +5,42 @@ const APPROVER_ROLES = new Set(["super_admin", "executive_assistant", "admin_man
 const REBUILD_STARTED_MESSAGE =
   "Site rebuild started. Search engines and link previews will catch up in a few minutes.";
 
-export default async function handler(
-  req: { method?: string; headers: { authorization?: string } },
-  res: {
-    status: (code: number) => { json: (body: unknown) => void };
-  },
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+function jsonResponse(status: number, body: unknown): Response {
+  return Response.json(body, { status });
+}
 
+async function handleRebuild(request: Request): Promise<Response> {
   const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
   if (!deployHookUrl) {
-    return res.status(503).json({
-      error: "Deploy hook is not configured. Add VERCEL_DEPLOY_HOOK_URL in Vercel environment variables.",
+    return jsonResponse(503, {
+      error:
+        "Deploy hook is not configured. Add VERCEL_DEPLOY_HOOK_URL in Vercel environment variables.",
     });
   }
 
-  const authHeader = req.headers.authorization;
+  const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing authorization token." });
+    return jsonResponse(401, { error: "Missing authorization token." });
   }
 
   const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
   const supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(503).json({ error: "Supabase is not configured on the server." });
+    return jsonResponse(503, { error: "Supabase is not configured on the server." });
   }
 
   const token = authHeader.slice("Bearer ".length);
   const supabase = createAuthenticatedServerClient(token);
 
   if (!supabase) {
-    return res.status(503).json({ error: "Supabase is not configured on the server." });
+    return jsonResponse(503, { error: "Supabase is not configured on the server." });
   }
 
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
   if (userError || !userData.user) {
-    return res.status(401).json({ error: "Invalid session." });
+    return jsonResponse(401, { error: "Invalid session." });
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -54,20 +50,29 @@ export default async function handler(
     .maybeSingle();
 
   if (profileError || !profile || profile.account_state !== "active") {
-    return res.status(403).json({ error: "Active admin access required." });
+    return jsonResponse(403, { error: "Active admin access required." });
   }
 
   if (!APPROVER_ROLES.has(profile.role)) {
-    return res.status(403).json({ error: "Only approvers can trigger a site rebuild." });
+    return jsonResponse(403, { error: "Only approvers can trigger a site rebuild." });
   }
 
   const hookResponse = await fetch(deployHookUrl, { method: "POST" });
 
   if (!hookResponse.ok) {
-    return res.status(502).json({ error: "Vercel deploy hook failed." });
+    return jsonResponse(502, { error: "Vercel deploy hook failed." });
   }
 
-  return res.status(200).json({
+  return jsonResponse(200, {
     message: REBUILD_STARTED_MESSAGE,
   });
 }
+
+export default {
+  async fetch(request: Request): Promise<Response> {
+    if (request.method !== "POST") {
+      return jsonResponse(405, { error: "Method not allowed." });
+    }
+    return handleRebuild(request);
+  },
+};

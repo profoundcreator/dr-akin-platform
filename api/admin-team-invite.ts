@@ -26,12 +26,8 @@ interface InviteRequestBody {
   resend?: boolean;
 }
 
-function json(
-  res: { status: (code: number) => { json: (body: unknown) => void } },
-  status: number,
-  body: unknown,
-) {
-  return res.status(status).json(body);
+function jsonResponse(status: number, body: unknown): Response {
+  return Response.json(body, { status });
 }
 
 async function verifyInviter(token: string) {
@@ -132,7 +128,6 @@ async function sendInviteEmail(
     throw error;
   }
 
-  // Auth user already exists (common after a partial invite) — resend a setup link instead.
   const { error: resetError } = await adminClient.auth.resetPasswordForEmail(email, {
     redirectTo,
   });
@@ -147,17 +142,6 @@ async function sendInviteEmail(
   }
 
   return { user: existing, delivery: "password_setup" };
-}
-
-function parseRequestBody(body: unknown): InviteRequestBody {
-  if (typeof body === "string") {
-    try {
-      return JSON.parse(body) as InviteRequestBody;
-    } catch {
-      return {};
-    }
-  }
-  return (body ?? {}) as InviteRequestBody;
 }
 
 function inviteDeliveryMessage(delivery: "invite" | "password_setup", resend: boolean): string {
@@ -180,53 +164,52 @@ function errorMessage(error: unknown): string {
   return "Invite failed.";
 }
 
-export default async function handler(
-  req: { method?: string; headers: { authorization?: string }; body?: InviteRequestBody },
-  res: { status: (code: number) => { json: (body: unknown) => void } },
-) {
-  if (req.method !== "POST") {
-    return json(res, 405, { error: "Method not allowed." });
-  }
-
+async function handleInvite(request: Request): Promise<Response> {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? "";
 
   if (!serviceRoleKey || !supabaseUrl) {
-    return json(res, 503, {
+    return jsonResponse(503, {
       error:
         "Team invites are not configured yet. Add SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables.",
     });
   }
 
-  const authHeader = req.headers.authorization;
+  const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    return json(res, 401, { error: "Missing authorization token." });
+    return jsonResponse(401, { error: "Missing authorization token." });
   }
 
   const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? "";
   if (!anonKey) {
-    return json(res, 503, { error: "Supabase is not configured on the server." });
+    return jsonResponse(503, { error: "Supabase is not configured on the server." });
+  }
+
+  let body: InviteRequestBody;
+  try {
+    body = (await request.json()) as InviteRequestBody;
+  } catch {
+    return jsonResponse(400, { error: "Invalid JSON body." });
   }
 
   const token = authHeader.slice("Bearer ".length);
   const verified = await verifyInviter(token);
 
   if ("error" in verified) {
-    return json(res, 403, { error: verified.error });
+    return jsonResponse(403, { error: verified.error });
   }
 
-  const body = parseRequestBody(req.body);
   const email = body.email?.trim().toLowerCase() ?? "";
   const fullName = body.fullName?.trim() ?? "";
   const role = body.role;
   const resend = Boolean(body.resend);
 
   if (!email || !fullName || !role) {
-    return json(res, 400, { error: "Email, full name, and role are required." });
+    return jsonResponse(400, { error: "Email, full name, and role are required." });
   }
 
   if (!canAssignRole(verified.inviter, role)) {
-    return json(res, 403, { error: "You cannot assign that role." });
+    return jsonResponse(403, { error: "You cannot assign that role." });
   }
 
   const adminClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -245,8 +228,9 @@ export default async function handler(
       : { data: null };
 
     if (existingProfile && !resend) {
-      return json(res, 409, {
-        error: "This person already has a team profile. Update their role from the team list instead.",
+      return jsonResponse(409, {
+        error:
+          "This person already has a team profile. Update their role from the team list instead.",
       });
     }
 
@@ -263,7 +247,7 @@ export default async function handler(
     }
 
     if (!authUser) {
-      return json(res, 500, { error: "Could not create or find the invited user." });
+      return jsonResponse(500, { error: "Could not create or find the invited user." });
     }
 
     if (existingProfile && resend) {
@@ -274,7 +258,7 @@ export default async function handler(
         p_summary: { email, role, invitedBy: verified.inviter.id, delivery },
       });
 
-      return json(res, 200, {
+      return jsonResponse(200, {
         message: inviteDeliveryMessage(delivery, true),
         memberId: existingProfile.id,
       });
@@ -294,7 +278,7 @@ export default async function handler(
       const message = insertError.message.includes("admin_profiles_email_key")
         ? "This email is already on the team list. Update their role from the team list instead."
         : insertError.message;
-      return json(res, 400, { error: message });
+      return jsonResponse(400, { error: message });
     }
 
     await verified.inviterClient.rpc("log_audit_event", {
@@ -304,11 +288,20 @@ export default async function handler(
       p_summary: { email, role, invitedBy: verified.inviter.id },
     });
 
-    return json(res, 200, {
+    return jsonResponse(200, {
       message: inviteDeliveryMessage(delivery, false),
       memberId: authUser.id,
     });
   } catch (error) {
-    return json(res, 500, { error: errorMessage(error) });
+    return jsonResponse(500, { error: errorMessage(error) });
   }
 }
+
+export default {
+  async fetch(request: Request): Promise<Response> {
+    if (request.method !== "POST") {
+      return jsonResponse(405, { error: "Method not allowed." });
+    }
+    return handleInvite(request);
+  },
+};
