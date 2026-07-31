@@ -7,6 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { getPublicBookBySlug } from "@/lib/library/public-books";
 import type { PlatformBook } from "@/lib/library/types";
 import { LibraryBookPage } from "@/components/pages/library-book-page";
+import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface LibraryBookBySlugProps {
   slug: string;
@@ -40,13 +41,14 @@ export function LibraryBookBySlug({ slug }: LibraryBookBySlugProps) {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!slug.trim()) {
+    const effectiveSlug = resolveContentSlug(slug, "library");
+    if (!effectiveSlug) {
       setNotFound(true);
       setLoading(false);
       return;
     }
 
-    getPublicBookBySlug(slug)
+    getPublicBookBySlug(effectiveSlug)
       .then((data) => {
         if (!data) {
           setNotFound(true);

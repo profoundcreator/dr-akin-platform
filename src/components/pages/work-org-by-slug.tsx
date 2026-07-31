@@ -9,6 +9,7 @@ import { workOrgToPageContent } from "@/lib/work-orgs/mappers";
 import { getPublicWorkOrgBySlug } from "@/lib/work-orgs/public-orgs";
 import { getWorkOrgHeroUrl } from "@/lib/work-orgs/orgs";
 import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
+import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface WorkOrgBySlugProps {
   slug: string;
@@ -26,13 +27,19 @@ export function WorkOrgBySlug({ slug, initialOrg = null }: WorkOrgBySlugProps) {
   const [loading, setLoading] = useState(!initialOrg);
 
   useEffect(() => {
-    if (initialOrg) {
+    const effectiveSlug = resolveContentSlug(slug, "work", initialOrg?.slug);
+
+    if (initialOrg && effectiveSlug && initialOrg.slug === effectiveSlug) {
       setOrg(initialOrg);
+      setLoading(false);
+    }
+
+    if (!effectiveSlug) {
       setLoading(false);
       return;
     }
 
-    getPublicWorkOrgBySlug(slug)
+    getPublicWorkOrgBySlug(effectiveSlug)
       .then((data) => {
         setOrg(data);
         if (data) applyClientSeo(data);

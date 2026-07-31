@@ -7,6 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { InsightArticlePage } from "@/components/pages/marketing-page";
 import { getPublicInsightBySlug } from "@/lib/insights/public-insights";
 import type { PlatformInsight } from "@/lib/insights/types";
+import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface InsightDetailBySlugProps {
   slug: string;
@@ -38,7 +39,8 @@ export function InsightDetailBySlug({ slug, initialInsight = null }: InsightDeta
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!slug.trim()) {
+    const effectiveSlug = resolveContentSlug(slug, "insights", initialInsight?.slug);
+    if (!effectiveSlug) {
       setNotFound(true);
       setLoading(false);
       return;
@@ -46,7 +48,7 @@ export function InsightDetailBySlug({ slug, initialInsight = null }: InsightDeta
 
     let cancelled = false;
 
-    getPublicInsightBySlug(slug)
+    getPublicInsightBySlug(effectiveSlug)
       .then((data) => {
         if (cancelled) return;
         if (!data) {

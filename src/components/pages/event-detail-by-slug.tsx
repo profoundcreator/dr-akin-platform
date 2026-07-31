@@ -10,6 +10,7 @@ import {
   getEventCoverUrl,
   type PlatformEvent,
 } from "@/lib/events/events";
+import { resolveContentSlug } from "@/lib/routing/resolve-content-slug";
 
 interface EventDetailBySlugProps {
   slug: string;
@@ -42,13 +43,14 @@ export function EventDetailBySlug({ slug }: EventDetailBySlugProps) {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!slug.trim()) {
+    const effectiveSlug = resolveContentSlug(slug, "events");
+    if (!effectiveSlug) {
       setNotFound(true);
       setLoading(false);
       return;
     }
 
-    getEventBySlug(slug)
+    getEventBySlug(effectiveSlug)
       .then((data) => {
         if (!data) {
           setNotFound(true);
