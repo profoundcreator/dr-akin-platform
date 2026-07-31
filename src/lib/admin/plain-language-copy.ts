@@ -3,7 +3,7 @@ export const BOOKS_ADMIN_COPY = {
   liveSectionHelp:
     "These are the books visitors see today on the public library and homepage.",
   preloadedNotice:
-    "These books are on the site from the original setup. Publish them in the form below to edit them yourself going forward.",
+    "These books are on the site from the original setup. Start managing one to edit it in the admin — other titles stay visible until you publish them too.",
   preloadedLabel: "Pre-loaded on site",
   managedLabel: "You manage this · Published",
   featuredBook: "Featured book",
@@ -27,7 +27,7 @@ export const INSIGHTS_ADMIN_COPY = {
   liveSectionHelp:
     "These are the articles visitors see today on the insights page and homepage.",
   preloadedNotice:
-    "These articles are on the site from the original setup. Publish them in the form below to edit them yourself going forward.",
+    "These articles are on the site from the original setup. Start managing one to edit it in the admin — other articles stay visible until you publish them too.",
   preloadedLabel: "Pre-loaded on site",
   managedLabel: "You manage this · Published",
   homepageFeatured: "Homepage featured",

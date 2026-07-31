@@ -1,5 +1,6 @@
 import type { DbInsightArticle } from "@/lib/supabase/database.types";
 import { INSIGHT_ARTICLES, type InsightArticle } from "@/data/site-content";
+import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import { plainTextToInsightHtml } from "@/lib/insights/sanitize-html";
 import type { PlatformInsight } from "@/lib/insights/types";
 
@@ -72,6 +73,10 @@ export function getStaticInsightPaths(): PlatformInsight[] {
 
 export async function fetchAllInsightsForBuild(): Promise<PlatformInsight[]> {
   const fromDb = await fetchPublishedInsightsForBuild();
-  if (fromDb.length > 0) return fromDb;
-  return getStaticInsightPaths();
+  const staticInsights = getStaticInsightPaths();
+  return mergePublishedWithStatic(fromDb, staticInsights).sort((a, b) => {
+    const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return bTime - aTime || a.title.localeCompare(b.title);
+  });
 }

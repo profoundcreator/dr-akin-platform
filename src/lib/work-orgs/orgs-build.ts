@@ -1,4 +1,5 @@
 import type { DbWorkOrg } from "@/lib/supabase/database.types";
+import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import { STATIC_WORK_ORG_META } from "@/lib/work-orgs/constants";
 import { getWorkOrgHeroUrl } from "@/lib/work-orgs/orgs";
 import type { PlatformWorkOrg, WorkOrgLink, WorkOrgSection } from "@/lib/work-orgs/types";
@@ -98,8 +99,8 @@ export function getStaticWorkOrgPaths(): PlatformWorkOrg[] {
 
 export async function fetchAllWorkOrgsForBuild(): Promise<PlatformWorkOrg[]> {
   const fromDb = await fetchPublishedWorkOrgsForBuild();
-  if (fromDb.length > 0) return fromDb;
-  return getStaticWorkOrgPaths();
+  const merged = mergePublishedWithStatic(fromDb, getStaticWorkOrgPaths());
+  return merged.sort((a, b) => a.sortOrder - b.sortOrder || a.pillarTitle.localeCompare(b.pillarTitle));
 }
 
 export { getWorkOrgHeroUrl };

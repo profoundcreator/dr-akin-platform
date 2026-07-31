@@ -14,17 +14,18 @@ import type { PlatformBook } from "@/lib/library/types";
 export function LibraryFeaturedSection() {
   const [featuredBook, setFeaturedBook] = useState<PlatformBook | null>(null);
   const [catalog, setCatalog] = useState<PlatformBook[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    Promise.all([getPublicFeaturedBook(), getPublicCatalogBooks()]).then(
-      ([featured, catalogBooks]) => {
+    Promise.all([getPublicFeaturedBook(), getPublicCatalogBooks()])
+      .then(([featured, catalogBooks]) => {
         setFeaturedBook(featured);
         setCatalog(catalogBooks);
-      },
-    );
+      })
+      .finally(() => setLoaded(true));
   }, []);
 
-  if (!featuredBook) return null;
+  if (!loaded || !featuredBook) return null;
 
   return (
     <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">

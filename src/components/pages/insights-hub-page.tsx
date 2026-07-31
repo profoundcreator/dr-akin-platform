@@ -17,13 +17,8 @@ export function InsightsHubPage({ initialArticles = [] }: InsightsHubPageProps) 
   const [articles, setArticles] = useState<PlatformInsight[]>(initialArticles);
 
   useEffect(() => {
-    if (initialArticles.length > 0) {
-      setArticles(initialArticles);
-      return;
-    }
-
     getPublicInsights().then(setArticles);
-  }, [initialArticles]);
+  }, []);
 
   return (
     <PageShell>

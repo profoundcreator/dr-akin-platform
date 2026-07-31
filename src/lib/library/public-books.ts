@@ -1,4 +1,5 @@
 import { LIBRARY_BOOKS, RESOURCE_SECTIONS, type LibraryBook } from "@/data/site-content";
+import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import {
   getBookBySlugFromDb,
   getPublishedBooksFromDb,
@@ -47,13 +48,16 @@ function withLiveMetadata(
   };
 }
 
-/** Books visitors see on /resources and the homepage — DB wins when any are published. */
+/** Books visitors see on /resources and the homepage — CMS overrides static by slug. */
 export async function getBooksLiveOnSite(): Promise<LiveSiteBook[]> {
   const fromDb = await getPublishedBooksFromDb();
-  if (fromDb.length > 0) {
-    return fromDb.map((book) => withLiveMetadata(book, "database"));
-  }
-  return STATIC_BOOKS.map((book) => withLiveMetadata(book, "static"));
+  const merged = mergePublishedWithStatic(fromDb, STATIC_BOOKS);
+  return merged.map((book) =>
+    withLiveMetadata(
+      book,
+      fromDb.some((item) => item.slug === book.slug) ? "database" : "static",
+    ),
+  );
 }
 
 export async function getFeaturedBookLiveOnSite(): Promise<LiveSiteBook | null> {
@@ -63,8 +67,7 @@ export async function getFeaturedBookLiveOnSite(): Promise<LiveSiteBook | null> 
 
 export async function getPublicBooks(): Promise<PlatformBook[]> {
   const fromDb = await getPublishedBooksFromDb();
-  if (fromDb.length > 0) return fromDb;
-  return STATIC_BOOKS;
+  return mergePublishedWithStatic(fromDb, STATIC_BOOKS);
 }
 
 export async function getPublicFeaturedBook(): Promise<PlatformBook | null> {

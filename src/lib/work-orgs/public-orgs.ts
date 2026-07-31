@@ -1,4 +1,5 @@
 import { SITE_PAGES } from "@/data/site-content";
+import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import { STATIC_WORK_ORG_META } from "@/lib/work-orgs/constants";
 import {
   getPublishedWorkOrgsFromDb,
@@ -42,8 +43,8 @@ const STATIC_ORGS = STATIC_WORK_ORG_META.map(staticOrgToPlatform);
 
 export async function getPublicWorkOrgs(): Promise<PlatformWorkOrg[]> {
   const fromDb = await getPublishedWorkOrgsFromDb();
-  if (fromDb.length > 0) return fromDb;
-  return STATIC_ORGS;
+  const merged = mergePublishedWithStatic(fromDb, STATIC_ORGS);
+  return merged.sort((a, b) => a.sortOrder - b.sortOrder || a.pillarTitle.localeCompare(b.pillarTitle));
 }
 
 export async function getPublicWorkOrgBySlug(slug: string): Promise<PlatformWorkOrg | null> {

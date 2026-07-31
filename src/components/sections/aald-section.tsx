@@ -14,15 +14,18 @@ const SYSTEM_VISUAL_URL = SITE_IMAGES.ecosystemVisual;
 export function AaldSection() {
   const [ecosystemArms, setEcosystemArms] = useState<PlatformWorkOrg[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    getPublicWorkOrgs().then((orgs) => {
-      setEcosystemArms(orgs);
-      setActiveIndex(0);
-    });
+    getPublicWorkOrgs()
+      .then((orgs) => {
+        setEcosystemArms(orgs);
+        setActiveIndex(0);
+      })
+      .finally(() => setLoaded(true));
   }, []);
 
-  if (ecosystemArms.length === 0) return null;
+  if (!loaded || ecosystemArms.length === 0) return null;
 
   const activeItem = ecosystemArms[activeIndex] ?? ecosystemArms[0];
 

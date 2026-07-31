@@ -9,12 +9,15 @@ import type { PlatformInsight } from "@/lib/insights/types";
 
 export function CorporateTransformationSection() {
   const [insights, setInsights] = useState<PlatformInsight[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    getPublicHomepageInsights().then(setInsights);
+    getPublicHomepageInsights()
+      .then(setInsights)
+      .finally(() => setLoaded(true));
   }, []);
 
-  if (insights.length === 0) return null;
+  if (!loaded || insights.length === 0) return null;
 
   return (
     <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">

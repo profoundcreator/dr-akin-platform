@@ -1,4 +1,5 @@
 import { INSIGHT_ARTICLES, type InsightArticle } from "@/data/site-content";
+import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import {
   getInsightBySlugFromDb,
   getPublishedInsightsFromDb,
@@ -55,16 +56,15 @@ function withLiveMetadata(
   };
 }
 
-/** Articles visitors see on /insights — DB wins when any are published. */
+/** Articles visitors see on /insights — CMS overrides static by slug. */
 export async function getInsightsLiveOnSite(): Promise<LiveSiteInsight[]> {
   const fromDb = await getPublishedInsightsFromDb();
-  if (fromDb.length > 0) {
-    return sortByPublishedDesc(fromDb).map((insight) =>
-      withLiveMetadata(insight, "database"),
-    );
-  }
-  return sortByPublishedDesc(STATIC_INSIGHTS).map((insight) =>
-    withLiveMetadata(insight, "static"),
+  const merged = sortByPublishedDesc(mergePublishedWithStatic(fromDb, STATIC_INSIGHTS));
+  return merged.map((insight) =>
+    withLiveMetadata(
+      insight,
+      fromDb.some((item) => item.slug === insight.slug) ? "database" : "static",
+    ),
   );
 }
 
@@ -89,8 +89,7 @@ export async function getHomepageFeaturedInsightsLiveOnSite(): Promise<LiveSiteI
 
 export async function getPublicInsights(): Promise<PlatformInsight[]> {
   const fromDb = await getPublishedInsightsFromDb();
-  if (fromDb.length > 0) return sortByPublishedDesc(fromDb);
-  return sortByPublishedDesc(STATIC_INSIGHTS);
+  return sortByPublishedDesc(mergePublishedWithStatic(fromDb, STATIC_INSIGHTS));
 }
 
 export async function getPublicInsightBySlug(slug: string): Promise<PlatformInsight | null> {
