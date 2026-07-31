@@ -7,12 +7,11 @@ import {
   type ReactNode,
 } from "react";
 import {
-  fetchAdminProfile,
   getCurrentAdmin,
+  resolveAdminProfileForSession,
   signInAdmin,
   signOutAdmin,
 } from "@/lib/auth/admin-auth";
-import { canAccessAdmin } from "@/lib/auth/permissions";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { AdminProfile } from "@/lib/supabase/database.types";
 import type { Session } from "@supabase/supabase-js";
@@ -55,8 +54,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       setSession(newSession);
       if (newSession?.user) {
-        const p = await fetchAdminProfile(newSession.user.id);
-        setProfile(canAccessAdmin(p) ? p : null);
+        const p = await resolveAdminProfileForSession(newSession);
+        setProfile(p);
       } else {
         setProfile(null);
       }

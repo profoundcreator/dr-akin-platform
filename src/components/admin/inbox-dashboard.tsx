@@ -6,11 +6,15 @@ import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getEnquiries, updateEnquiryStatus, type EnquiryRecord } from "@/lib/booking/api";
+import { useAdminAuth } from "@/context/admin-auth-provider";
+import { canWriteBookings } from "@/lib/auth/permissions";
 import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = ["all", "New", "Open", "Awaiting Reply", "Resolved"] as const;
 
 export function InboxDashboard() {
+  const { profile } = useAdminAuth();
+  const canEdit = canWriteBookings(profile);
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +49,7 @@ export function InboxDashboard() {
   }, [enquiries, filter, search]);
 
   const handleStatusChange = async (id: string, status: string) => {
+    if (!canEdit) return;
     try {
       await updateEnquiryStatus(id, status);
       setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
@@ -58,6 +63,13 @@ export function InboxDashboard() {
       {error && (
         <p className="mb-4 rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-4 py-3 text-sm text-[var(--ploy-status-error)]">
           {error}
+        </p>
+      )}
+
+      {!canEdit && (
+        <p className="mb-4 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Your role is read-only for the inbox. You can review enquiries but cannot change their
+          status.
         </p>
       )}
 
@@ -134,7 +146,8 @@ export function InboxDashboard() {
                       <select
                         value={enquiry.status}
                         onChange={(e) => handleStatusChange(enquiry.id, e.target.value)}
-                        className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-2 py-1 text-xs"
+                        disabled={!canEdit}
+                        className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-2 py-1 text-xs disabled:opacity-60"
                       >
                         {["New", "Open", "Awaiting Reply", "Resolved", "Spam", "Archived"].map(
                           (s) => (

@@ -1,6 +1,96 @@
 import { getSupabaseClient, tryGetSupabaseClient } from "@/lib/supabase/client";
 import type { AdminProfile } from "@/lib/supabase/database.types";
 import { logAuditEvent } from "@/lib/booking/api";
+import type { Session, User } from "@supabase/supabase-js";
+
+function getSessionIssuedAtMs(session: Session): number {
+  try {
+    const segment = session.access_token.split(".")[1];
+    if (!segment) return Date.now();
+    const payload = JSON.parse(atob(segment)) as { iat?: number };
+    if (typeof payload.iat === "number") return payload.iat * 1000;
+  } catch {
+    // Fall through to now — treat as fresh if JWT cannot be decoded.
+  }
+  return Date.now();
+}
+
+function isSessionRevoked(session: Session, sessionRevokedAt: string | null): boolean {
+  if (!sessionRevokedAt) return false;
+  return getSessionIssuedAtMs(session) <= new Date(sessionRevokedAt).getTime();
+}
+
+function isEmailConfirmed(user: User): boolean {
+  return Boolean(user.email_confirmed_at ?? user.confirmed_at);
+}
+
+async function activateInvitedAdminIfReady(
+  user: User,
+  profile: AdminProfile,
+): Promise<AdminProfile> {
+  if (profile.account_state !== "invited" || !isEmailConfirmed(user)) {
+    return profile;
+  }
+
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) return profile;
+
+  const { data, error } = await supabase.rpc("activate_invited_admin");
+  if (error || !data) return profile;
+  return data as AdminProfile;
+}
+
+type AdminSessionResult =
+  | { ok: true; profile: AdminProfile }
+  | { ok: false; message: string; signOut: boolean };
+
+async function resolveAdminSession(
+  session: Session,
+  user: User,
+): Promise<AdminSessionResult> {
+  let profile = await fetchAdminProfile(user.id);
+
+  if (!profile) {
+    return { ok: false, message: "This account is not authorized for admin access.", signOut: true };
+  }
+
+  if (profile.account_state === "suspended") {
+    return {
+      ok: false,
+      message: "This account has been suspended. Contact a Super Admin.",
+      signOut: true,
+    };
+  }
+
+  if (profile.account_state === "revoked") {
+    return { ok: false, message: "This account has been revoked.", signOut: true };
+  }
+
+  if (profile.account_state === "invited") {
+    if (!isEmailConfirmed(user)) {
+      return {
+        ok: false,
+        message: "Please confirm your email from the invite link before signing in.",
+        signOut: true,
+      };
+    }
+    profile = await activateInvitedAdminIfReady(user, profile);
+  }
+
+  if (profile.account_state !== "active") {
+    return { ok: false, message: "This account is not active yet.", signOut: true };
+  }
+
+  if (isSessionRevoked(session, profile.session_revoked_at)) {
+    return {
+      ok: false,
+      message: "Your session has been revoked. Please sign in again.",
+      signOut: true,
+    };
+  }
+
+  return { ok: true, profile };
+}
 
 export async function fetchAdminProfile(userId: string): Promise<AdminProfile | null> {
   const supabase = tryGetSupabaseClient();
@@ -25,58 +115,19 @@ export async function signInAdmin(email: string, password: string) {
   });
 
   if (error) throw error;
-  if (!data.user) throw new Error("Sign in failed");
+  if (!data.user || !data.session) throw new Error("Sign in failed");
 
-  let profile = await fetchAdminProfile(data.user.id);
-
-  if (!profile) {
+  const resolved = await resolveAdminSession(data.session, data.user);
+  if (!resolved.ok) {
     await supabase.auth.signOut();
-    throw new Error("This account is not authorized for admin access.");
+    throw new Error(resolved.message);
   }
 
-  if (profile.account_state === "suspended") {
-    await supabase.auth.signOut();
-    throw new Error("This account has been suspended. Contact a Super Admin.");
-  }
-
-  if (profile.account_state === "revoked") {
-    await supabase.auth.signOut();
-    throw new Error("This account has been revoked.");
-  }
-
-  if (profile.account_state === "invited") {
-    const emailConfirmed = Boolean(data.user.email_confirmed_at ?? data.user.confirmed_at);
-    if (emailConfirmed) {
-      const supabase = tryGetSupabaseClient();
-      if (supabase) {
-        await supabase
-          .from("admin_profiles")
-          .update({ account_state: "active" })
-          .eq("id", profile.id);
-      }
-      profile = { ...profile, account_state: "active" };
-    } else {
-      await supabase.auth.signOut();
-      throw new Error("Please confirm your email from the invite link before signing in.");
-    }
-  }
-
-  if (profile.session_revoked_at) {
-    const revokedAt = new Date(profile.session_revoked_at).getTime();
-    const sessionAt = data.session?.expires_at
-      ? data.session.expires_at * 1000
-      : Date.now();
-    if (sessionAt <= revokedAt) {
-      await supabase.auth.signOut();
-      throw new Error("Your session has been revoked. Please sign in again.");
-    }
-  }
-
-  await logAuditEvent("admin.sign_in.success", "admin_profile", profile.id, {
-    email: profile.email,
+  await logAuditEvent("admin.sign_in.success", "admin_profile", resolved.profile.id, {
+    email: resolved.profile.email,
   }).catch(() => {});
 
-  return { user: data.user, session: data.session, profile };
+  return { user: data.user, session: data.session, profile: resolved.profile };
 }
 
 export async function signOutAdmin(profile: AdminProfile | null) {
@@ -101,7 +152,7 @@ export async function getSession() {
 }
 
 export async function getCurrentAdmin(): Promise<{
-  session: NonNullable<Awaited<ReturnType<typeof getSession>>>;
+  session: Session;
   profile: AdminProfile;
 } | null> {
   const supabase = tryGetSupabaseClient();
@@ -110,8 +161,27 @@ export async function getCurrentAdmin(): Promise<{
   const { data } = await supabase.auth.getSession();
   if (!data.session?.user) return null;
 
-  const profile = await fetchAdminProfile(data.session.user.id);
-  if (!profile || profile.account_state !== "active") return null;
+  const resolved = await resolveAdminSession(data.session, data.session.user);
+  if (!resolved.ok) {
+    if (resolved.signOut) await supabase.auth.signOut();
+    return null;
+  }
 
-  return { session: data.session, profile };
+  return { session: data.session, profile: resolved.profile };
+}
+
+/** Validates an existing auth session for admin routes and auth state listeners. */
+export async function resolveAdminProfileForSession(
+  session: Session | null,
+): Promise<AdminProfile | null> {
+  if (!session?.user) return null;
+
+  const resolved = await resolveAdminSession(session, session.user);
+  if (!resolved.ok) {
+    const supabase = tryGetSupabaseClient();
+    if (resolved.signOut && supabase) await supabase.auth.signOut();
+    return null;
+  }
+
+  return resolved.profile;
 }

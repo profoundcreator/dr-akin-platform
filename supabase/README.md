@@ -29,6 +29,9 @@ In the Supabase **SQL Editor**, run in order:
 8. `migrations/010_insights_articles.sql`
 9. `migrations/011_work_orgs.sql`
 10. `migrations/012_team_admin.sql`
+11. `migrations/013_preloaded_content_controls.sql`
+12. `migrations/014_insight_hero_images.sql`
+13. `migrations/015_admin_reliability.sql`
 
 ## 4. Configure Auth
 
@@ -96,4 +99,4 @@ When admins publish or hide content, the site can trigger a fresh Vercel deploy 
 
 Without the hook, content still goes live immediately on article/book/event pages (they read from Supabase), but **Rebuild site for SEO** in admin will show a setup message until the hook is added.
 
-Also run migrations **013** (`013_preloaded_content_controls.sql`) and **014** (`014_insight_hero_images.sql`) if not already applied.
+Also run migrations **013** (`013_preloaded_content_controls.sql`) and **014** (`014_insight_hero_images.sql`) and **015** (`015_admin_reliability.sql`) if not already applied.

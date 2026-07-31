@@ -41,7 +41,7 @@ export default async function handler(
     return res.status(503).json({ error: "Supabase is not configured on the server." });
   }
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
   if (userError || !userData.user) {
     return res.status(401).json({ error: "Invalid session." });

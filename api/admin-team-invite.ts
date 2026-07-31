@@ -40,7 +40,7 @@ async function verifyInviter(token: string) {
     return { error: "Supabase is not configured on the server." as const };
   }
 
-  const { data: userData, error: userError } = await supabaseAnon.auth.getUser();
+  const { data: userData, error: userError } = await supabaseAnon.auth.getUser(token);
   if (userError || !userData.user) {
     return { error: "Invalid session." as const };
   }
@@ -63,7 +63,7 @@ async function verifyInviter(token: string) {
     return { error: "You do not have permission to invite team members." as const };
   }
 
-  return { inviter };
+  return { inviter, inviterClient: supabaseAnon };
 }
 
 function canAssignRole(inviter: InviterProfile, role: AdminRole): boolean {
@@ -98,6 +98,21 @@ async function findAuthUserByEmail(
   }
 
   return null;
+}
+
+async function sendInviteEmail(
+  adminClient: SupabaseClient,
+  email: string,
+  fullName?: string,
+): Promise<User> {
+  const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${getSiteUrl()}/admin/login`,
+    data: fullName ? { full_name: fullName } : undefined,
+  });
+
+  if (error) throw error;
+  if (!data.user) throw new Error("Invite email could not be sent.");
+  return data.user;
 }
 
 export default async function handler(
@@ -155,47 +170,43 @@ export default async function handler(
   try {
     let authUser = await findAuthUserByEmail(adminClient, email);
 
+    const { data: existingProfile } = authUser
+      ? await adminClient
+          .from("admin_profiles")
+          .select("id, account_state")
+          .eq("id", authUser.id)
+          .maybeSingle()
+      : { data: null };
+
+    if (existingProfile && !resend) {
+      return json(res, 409, {
+        error: "This person already has a team profile. Update their role from the team list instead.",
+      });
+    }
+
+    const shouldSendInviteEmail = resend || !authUser || !existingProfile;
+
     if (!authUser) {
-      const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
-        redirectTo: `${getSiteUrl()}/admin/login`,
-        data: { full_name: fullName },
-      });
-
-      if (error) {
-        return json(res, 400, { error: error.message });
-      }
-
-      authUser = data.user;
-    } else if (resend) {
-      const { error } = await adminClient.auth.admin.inviteUserByEmail(email, {
-        redirectTo: `${getSiteUrl()}/admin/login`,
-      });
-
-      if (error) {
-        return json(res, 400, { error: error.message });
-      }
+      authUser = await sendInviteEmail(adminClient, email, fullName);
+    } else if (shouldSendInviteEmail) {
+      await sendInviteEmail(adminClient, email, fullName);
     }
 
     if (!authUser) {
       return json(res, 500, { error: "Could not create or find the invited user." });
     }
 
-    const { data: existingProfile } = await adminClient
-      .from("admin_profiles")
-      .select("id, account_state")
-      .eq("id", authUser.id)
-      .maybeSingle();
+    if (existingProfile && resend) {
+      await verified.inviterClient.rpc("log_audit_event", {
+        p_event_type: "team_member_invite_resent",
+        p_target_type: "admin_profile",
+        p_target_id: existingProfile.id,
+        p_summary: { email, role, invitedBy: verified.inviter.id },
+      });
 
-    if (existingProfile) {
-      if (resend) {
-        return json(res, 200, {
-          message: "Invite email resent. They can finish setup from their inbox.",
-          memberId: existingProfile.id,
-        });
-      }
-
-      return json(res, 409, {
-        error: "This person already has a team profile. Update their role from the team list instead.",
+      return json(res, 200, {
+        message: "Invite email resent. They can finish setup from their inbox.",
+        memberId: existingProfile.id,
       });
     }
 
@@ -213,7 +224,7 @@ export default async function handler(
       return json(res, 400, { error: insertError.message });
     }
 
-    await adminClient.rpc("log_audit_event", {
+    await verified.inviterClient.rpc("log_audit_event", {
       p_event_type: "team_member_invited",
       p_target_type: "admin_profile",
       p_target_id: authUser.id,
@@ -221,9 +232,7 @@ export default async function handler(
     });
 
     return json(res, 200, {
-      message: resend
-        ? "Invite email resent."
-        : "Invite sent. They will receive an email to set their password and sign in.",
+      message: "Invite sent. They will receive an email to set their password and sign in.",
       memberId: authUser.id,
     });
   } catch (error) {

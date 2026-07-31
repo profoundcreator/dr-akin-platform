@@ -13,6 +13,7 @@ import {
 import type { BookingRequest, InternalStatus, OrganizerStatus } from "@/lib/booking/types";
 import { ORGANIZER_STATUSES, INTERNAL_STATUSES } from "@/lib/booking/types";
 import { useAdminAuth } from "@/context/admin-auth-provider";
+import { canWriteBookings } from "@/lib/auth/permissions";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -20,6 +21,7 @@ interface RequestDetailPageProps {
 
 export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
   const { profile } = useAdminAuth();
+  const canEdit = canWriteBookings(profile);
   const [request, setRequest] = useState<BookingRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
   }, [requestId]);
 
   const handleSave = async () => {
-    if (!request) return;
+    if (!request || !canEdit) return;
     setSaving(true);
     setError(null);
     try {
@@ -149,13 +151,20 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
           <Heading as="h2" size="card">
             Status workflow
           </Heading>
+          {!canEdit && (
+            <p className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+              Your role is read-only for booking requests. You can review details but cannot change
+              status.
+            </p>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2 text-sm">
               <span className="font-medium">Organizer status</span>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as OrganizerStatus)}
-                className="w-full rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-3 py-2"
+                disabled={!canEdit}
+                className="w-full rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-3 py-2 disabled:opacity-60"
               >
                 {ORGANIZER_STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -169,7 +178,8 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               <select
                 value={internalStatus}
                 onChange={(e) => setInternalStatus(e.target.value as InternalStatus)}
-                className="w-full rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-3 py-2"
+                disabled={!canEdit}
+                className="w-full rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] bg-[var(--ploy-background-primary)] px-3 py-2 disabled:opacity-60"
               >
                 {INTERNAL_STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -186,6 +196,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               onChange={(e) => setOrganizerMessage(e.target.value)}
               placeholder="Visible on the organizer tracker..."
               rows={3}
+              disabled={!canEdit}
             />
           </label>
           <label className="block space-y-2 text-sm">
@@ -195,11 +206,14 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               onChange={(e) => setInternalNote(e.target.value)}
               placeholder="Internal team note..."
               rows={2}
+              disabled={!canEdit}
             />
           </label>
-          <Button variant="primary" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Update status"}
-          </Button>
+          {canEdit && (
+            <Button variant="primary" onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Update status"}
+            </Button>
+          )}
         </div>
 
         <div className="ploy-surface-elevated space-y-4 p-6">
