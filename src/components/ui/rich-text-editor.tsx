@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Bold, Heading2, Heading3, Link2, Pilcrow } from "lucide-react";
+import { Bold, Heading2, Heading3, Link2, List, ListOrdered, Pilcrow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +66,14 @@ export function RichTextEditor({
           <Pilcrow className="size-4" />
           Paragraph
         </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={() => runCommand("insertUnorderedList")}>
+          <List className="size-4" />
+          Bullets
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={() => runCommand("insertOrderedList")}>
+          <ListOrdered className="size-4" />
+          Numbers
+        </Button>
         <Button type="button" variant="ghost" size="sm" onClick={handleLink}>
           <Link2 className="size-4" />
           Link
@@ -96,6 +104,9 @@ export function RichTextEditor({
           "[&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-semibold",
           "[&_h3]:mt-5 [&_h3]:text-lg [&_h3]:font-semibold",
           "[&_p]:mt-4 [&_p:first-child]:mt-0",
+          "[&_ul]:mt-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6",
+          "[&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6",
+          "[&_li]:leading-relaxed",
           "[&_a]:underline [&_a]:underline-offset-4",
         )}
       />

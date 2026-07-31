@@ -21,6 +21,9 @@ export function InsightArticleBody({ html, className }: InsightArticleBodyProps)
         "[&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-[var(--ploy-text-primary)]",
         "[&_a]:underline [&_a]:underline-offset-4 [&_a]:text-[var(--ploy-text-primary)]",
         "[&_p]:leading-relaxed",
+        "[&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6",
+        "[&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6",
+        "[&_li]:leading-relaxed [&_li]:pl-1",
         className,
       )}
       dangerouslySetInnerHTML={{ __html: safeHtml }}

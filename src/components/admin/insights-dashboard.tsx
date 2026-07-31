@@ -1110,7 +1110,8 @@ export function InsightsDashboard() {
               onChange={(body) => setForm((prev) => ({ ...prev, body }))}
             />
             <p className="text-xs text-[var(--ploy-text-tertiary)]">
-              Use bold, headings, and links. Content is sanitized before publishing.
+              Use bold, headings, bullet lists, numbered lists, and links. Select lines first, then
+              click Bullets or Numbers. Content is sanitized before publishing.
             </p>
           </div>
 
