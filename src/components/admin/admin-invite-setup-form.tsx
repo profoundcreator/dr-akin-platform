@@ -9,6 +9,20 @@ import { Label } from "@/components/ui/label";
 import { clearAuthHashFromUrl } from "@/lib/auth/invite-callback";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
+function formatSetupError(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === "object" && error && "message" in error) {
+    const message = String((error as { message: unknown }).message);
+    if (message) return message;
+  }
+  return "Could not finish account setup.";
+}
+
+function isMissingActivateRpcError(error: unknown): boolean {
+  const message = formatSetupError(error).toLowerCase();
+  return message.includes("activate_invited_admin") || message.includes("schema cache");
+}
+
 interface AdminInviteSetupFormProps {
   email: string;
   flowType: "invite" | "recovery";
@@ -51,13 +65,18 @@ export function AdminInviteSetupForm({ email, flowType }: AdminInviteSetupFormPr
 
       const { error: activateError } = await supabase.rpc("activate_invited_admin");
       if (activateError && !activateError.message.includes("cannot be activated")) {
+        if (isMissingActivateRpcError(activateError)) {
+          throw new Error(
+            "Database setup is incomplete (missing activate_invited_admin). Your Super Admin must run supabase/migrations/015_admin_reliability.sql in Supabase SQL Editor, then try again or sign in with the password you just saved.",
+          );
+        }
         throw activateError;
       }
 
       clearAuthHashFromUrl();
       window.location.href = "/admin/requests";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not finish account setup.");
+      setError(formatSetupError(err));
     } finally {
       setLoading(false);
     }

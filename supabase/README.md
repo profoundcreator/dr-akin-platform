@@ -31,7 +31,13 @@ In the Supabase **SQL Editor**, run in order:
 10. `migrations/012_team_admin.sql`
 11. `migrations/013_preloaded_content_controls.sql`
 12. `migrations/014_insight_hero_images.sql`
-13. `migrations/015_admin_reliability.sql`
+13. `migrations/015_admin_reliability.sql` — invited self-activation + auditor read-only on bookings/inbox
+
+Verify migration 015 after running:
+
+```bash
+npm run verify:migration:015
+```
 
 ## 4. Configure Auth
 

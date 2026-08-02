@@ -10,12 +10,14 @@
     "astro": "astro",
     "verify:supabase": "node scripts/verify-supabase.mjs",
     "verify:supabase:keys": "node scripts/verify-supabase-keys.mjs",
+    "verify:migration:015": "node scripts/verify-migration-015.mjs",
     "verify:vercel:keys": "vercel env pull .env.vercel.production --environment=production --yes && node scripts/verify-supabase-keys.mjs .env.vercel.production",
     "setup:env": "node scripts/setup-env.mjs",
     "setup:service-role": "node scripts/setup-service-role.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",
+    "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/inter": "^5.2.5",
     "@supabase/supabase-js": "^2.110.8",
     "astro": "^6.1.8",
