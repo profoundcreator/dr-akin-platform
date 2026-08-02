@@ -40,6 +40,25 @@ In **Authentication → Providers → Email**:
 - Disable **Enable sign ups**
 - Enable **Confirm email**
 
+### Auth URL configuration (required for team invites)
+
+In **Authentication → URL Configuration**, set:
+
+| Field | Value |
+|--------|--------|
+| **Site URL** | `https://dr-akin-platform.vercel.app` (or your custom domain) |
+| **Redirect URLs** | Add each of these (one per line): |
+
+```
+https://dr-akin-platform.vercel.app/admin/login
+http://localhost:4321/admin/login
+http://localhost:4322/admin/login
+```
+
+If Site URL is still `http://localhost:3000`, invite emails will send people to localhost and fail. Update Site URL and redirect URLs **before** sending invites.
+
+When you connect a custom domain later, add `https://your-domain.com/admin/login` to Redirect URLs and update Site URL.
+
 ## 5. Create the Super Admin
 
 1. Add user in **Authentication → Users**
@@ -62,7 +81,16 @@ Optionally set `is_founder = true` on the primary Super Admin (see `seed-admin.s
 ## 6. Team invites (optional)
 
 1. Add `SUPABASE_SERVICE_ROLE_KEY` and `PUBLIC_SITE_URL` in Vercel environment variables
-2. Open **Admin → Team** to invite colleagues by email
+2. Validate keys before redeploying:
+
+```bash
+npm run verify:supabase:keys          # local .env
+npm run verify:vercel:keys            # pull + check Vercel production env
+npm run setup:service-role            # paste service_role; syncs to .env + Vercel
+```
+
+3. Redeploy on Vercel after changing env vars
+4. Open **Admin → Team** to invite colleagues by email
 
 ## 7. Verify
 

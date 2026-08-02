@@ -103,5 +103,5 @@ export const TEAM_ADMIN_COPY = {
     "Designate one protected Super Admin account. Do this once for the primary account owner. Co–Super Admins cannot change or remove the founder.",
   noFounderYet: "No founder account is designated yet. Mark the primary Super Admin as founder for extra protection.",
   inviteHint:
-    "They will receive an email to set a password, then sign in at the admin login page. Use “Resend invite” on the team list if they need a fresh link.",
+    "They will receive an email to set a password on the admin login page. If the link opens localhost, fix Supabase → Authentication → URL Configuration (see supabase/README.md), then use “Resend invite”.",
 } as const;

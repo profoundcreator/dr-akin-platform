@@ -9,7 +9,10 @@
     "preview": "astro preview",
     "astro": "astro",
     "verify:supabase": "node scripts/verify-supabase.mjs",
-    "setup:env": "node scripts/setup-env.mjs"
+    "verify:supabase:keys": "node scripts/verify-supabase-keys.mjs",
+    "verify:vercel:keys": "vercel env pull .env.vercel.production --environment=production --yes && node scripts/verify-supabase-keys.mjs .env.vercel.production",
+    "setup:env": "node scripts/setup-env.mjs",
+    "setup:service-role": "node scripts/setup-service-role.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",

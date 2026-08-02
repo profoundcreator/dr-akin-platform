@@ -93,10 +93,20 @@ function canAssignRole(inviter: InviterProfile, role: AdminRole): boolean {
   return false;
 }
 
-function getSiteUrl(): string {
-  if (process.env.PUBLIC_SITE_URL) return process.env.PUBLIC_SITE_URL.replace(/\/$/, "");
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:4321";
+function getInviteRedirectUrl(): string {
+  const site = readEnv("PUBLIC_SITE_URL");
+  if (site) return `${site.replace(/\/$/, "")}/admin/login`;
+
+  const vercel = readEnv("VERCEL_URL");
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//, "")}/admin/login`;
+
+  if (readEnv("VERCEL_ENV") === "production") {
+    throw new Error(
+      "PUBLIC_SITE_URL is not set in Vercel. Add it (e.g. https://dr-akin-platform.vercel.app) before sending team invites.",
+    );
+  }
+
+  return "http://localhost:4321/admin/login";
 }
 
 async function findAuthUserByEmail(
@@ -137,7 +147,7 @@ async function sendInviteEmail(
   email: string,
   fullName?: string,
 ): Promise<{ user: User; delivery: "invite" | "password_setup" }> {
-  const redirectTo = `${getSiteUrl()}/admin/login`;
+  const redirectTo = getInviteRedirectUrl();
   const inviteOptions = {
     redirectTo,
     data: fullName ? { full_name: fullName } : undefined,

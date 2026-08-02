@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
+import { AdminInviteSetupForm } from "@/components/admin/admin-invite-setup-form";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
-import { getSupabaseClient } from "@/lib/supabase/client";
+import {
+  clearAuthHashFromUrl,
+  parseAuthHashType,
+  type InviteCallbackType,
+} from "@/lib/auth/invite-callback";
+import { getSupabaseClient, tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export function AdminLoginForm() {
   const { signIn, configured } = useAdminAuth();
@@ -15,6 +21,11 @@ export function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkingInvite, setCheckingInvite] = useState(true);
+  const [inviteFlow, setInviteFlow] = useState<{
+    email: string;
+    flowType: InviteCallbackType;
+  } | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -24,6 +35,52 @@ export function AdminLoginForm() {
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (!configured) {
+      setCheckingInvite(false);
+      return;
+    }
+
+    const supabase = tryGetSupabaseClient();
+    if (!supabase) {
+      setCheckingInvite(false);
+      return;
+    }
+
+    const hashType = parseAuthHashType();
+
+    async function resolveInviteSession() {
+      if (!hashType) {
+        setCheckingInvite(false);
+        return;
+      }
+
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        setError(sessionError.message);
+        setCheckingInvite(false);
+        return;
+      }
+
+      const sessionEmail = data.session?.user.email;
+      if (data.session && sessionEmail) {
+        clearAuthHashFromUrl();
+        setInviteFlow({ email: sessionEmail, flowType: hashType });
+      } else {
+        setError("Invite link expired or invalid. Ask your admin to resend the invite.");
+      }
+
+      setCheckingInvite(false);
+    }
+
+    if (hashType) {
+      resolveInviteSession();
+      return;
+    }
+
+    setCheckingInvite(false);
+  }, [configured]);
 
   if (!configured) {
     return (
@@ -39,6 +96,19 @@ export function AdminLoginForm() {
         </p>
       </div>
     );
+  }
+
+  if (checkingInvite) {
+    return (
+      <div className="mx-auto flex max-w-md items-center justify-center gap-2 py-16 text-sm text-[var(--ploy-text-secondary)]">
+        <Loader2 className="size-4 animate-spin" />
+        Checking invite link…
+      </div>
+    );
+  }
+
+  if (inviteFlow) {
+    return <AdminInviteSetupForm email={inviteFlow.email} flowType={inviteFlow.flowType} />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
