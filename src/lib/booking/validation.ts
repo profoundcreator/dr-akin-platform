@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { validateStepForFormat } from "@/lib/booking/format-rules";
+import type { BookingFormData } from "@/lib/booking/types";
 
 export const step1Schema = z.object({
   name: z.string().min(2, "Full name is required"),
@@ -42,18 +44,6 @@ export type Step2Data = z.infer<typeof step2Schema>;
 export type Step3Data = z.infer<typeof step3Schema>;
 export type Step4Data = z.infer<typeof step4Schema>;
 
-export function validateStep(step: number, data: Record<string, unknown>) {
-  const schemas = [step1Schema, step2Schema, step3Schema, step4Schema];
-  const schema = schemas[step - 1];
-  if (!schema) return { success: true as const, errors: {} };
-
-  const result = schema.safeParse(data);
-  if (result.success) return { success: true as const, errors: {} };
-
-  const errors: Record<string, string> = {};
-  for (const issue of result.error.issues) {
-    const key = issue.path[0];
-    if (typeof key === "string") errors[key] = issue.message;
-  }
-  return { success: false as const, errors };
+export function validateStep(step: number, data: BookingFormData | Record<string, unknown>) {
+  return validateStepForFormat(step, data as BookingFormData);
 }

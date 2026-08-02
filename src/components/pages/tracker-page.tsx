@@ -14,6 +14,7 @@ import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
 import { STATUS_DESCRIPTIONS } from "@/lib/booking/constants";
 import { getBookingByReference, getStoredAccessToken, isSupabaseConfigured } from "@/lib/booking/api";
+import { formatEventLocation } from "@/lib/booking/format-rules";
 import { seedDemoRequests } from "@/lib/booking/storage";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
@@ -171,9 +172,7 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
                       <MapPin className="size-4 shrink-0 text-[var(--ploy-text-tertiary)]" />
                       <div>
                         <dt className="text-[var(--ploy-text-tertiary)]">Location</dt>
-                        <dd className="font-medium">
-                          {request.form.city}, {request.form.country}
-                        </dd>
+                        <dd className="font-medium">{formatEventLocation(request.form)}</dd>
                       </div>
                     </div>
                     <div>

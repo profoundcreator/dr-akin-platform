@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Calendar, MapPin, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { formatEventLocation } from "@/lib/booking/format-rules";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
 
@@ -124,9 +125,7 @@ export function EaReviewModal({ request, open, onClose }: EaReviewModalProps) {
                 </div>
                 <div className="flex gap-2">
                   <MapPin className="size-4 shrink-0 text-[var(--ploy-text-tertiary)]" />
-                  <span>
-                    {request.form.city}, {request.form.country}
-                  </span>
+                  <span>{formatEventLocation(request.form)}</span>
                 </div>
               </div>
             </div>
@@ -153,9 +152,9 @@ export function EaReviewModal({ request, open, onClose }: EaReviewModalProps) {
             </div>
           </dl>
 
-          {request.form.vipProtocol && (
+          {request.form.vipProtocol.trim() && (
             <div className="rounded-[var(--ploy-radius-lg)] bg-[var(--ploy-background-secondary)] p-4 text-sm">
-              <p className="font-medium">VIP / Protocol</p>
+              <p className="font-medium">Event security & reception</p>
               <p className="mt-1 text-[var(--ploy-text-secondary)]">{request.form.vipProtocol}</p>
             </div>
           )}

@@ -22,6 +22,20 @@ import { createBookingRequest, isSupabaseConfigured } from "@/lib/booking/api";
 import type { BookingFormData, BookingFormStep } from "@/lib/booking/types";
 import { EMPTY_BOOKING_FORM } from "@/lib/booking/types";
 import { validateStep } from "@/lib/booking/validation";
+import {
+  applyFormatChange,
+  cityLabelForFormat,
+  countryLabelForFormat,
+  fieldsForFormat,
+  isHybridFormat,
+  LOGISTICS_PLACEHOLDER,
+  logisticsHelperForFormat,
+  logisticsLabelForFormat,
+  PROTOCOL_HELPER,
+  PROTOCOL_PLACEHOLDER,
+  stepDescriptionForFormat,
+  VOIDED_FIELDS_ON_VIRTUAL,
+} from "@/lib/booking/format-rules";
 import { cn } from "@/lib/utils";
 
 const SESSION_KEY = "daa_booking_form_draft";
@@ -75,6 +89,19 @@ export function BookingForm({
 
   const updateField = useCallback(
     <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
+      if (key === "format" && typeof value === "string") {
+        setForm((prev) => applyFormatChange(prev, value));
+        setErrors((prev) => {
+          const next = { ...prev };
+          delete next.format;
+          for (const field of VOIDED_FIELDS_ON_VIRTUAL) {
+            if (value === "Virtual") delete next[field];
+          }
+          return next;
+        });
+        return;
+      }
+
       setForm((prev) => ({ ...prev, [key]: value }));
       setErrors((prev) => {
         const next = { ...prev };
@@ -226,7 +253,7 @@ export function BookingForm({
           ))}
         </div>
         <p className="text-sm text-[var(--ploy-text-secondary)]">
-          Step {step} of 4 — {BOOKING_STEPS[step - 1].description}
+          Step {step} of 4 — {stepDescriptionForFormat(step, form.format)}
         </p>
       </div>
 
@@ -401,7 +428,9 @@ export function BookingForm({
           </div>
         )}
 
-        {step === 3 && (
+        {step === 3 && (() => {
+          const { showLocation, showLogistics } = fieldsForFormat(form.format);
+          return (
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="preferredDate" required>
@@ -428,45 +457,55 @@ export function BookingForm({
                 onChange={(e) => updateField("alternativeDate", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="city" required>
-                City
-              </Label>
-              <Input
-                id="city"
-                value={form.city}
-                onChange={(e) => updateField("city", e.target.value)}
-                placeholder="Event city"
-              />
-              {errors.city && (
-                <p className="text-xs text-[var(--ploy-status-error)]">{errors.city}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country" required>
-                Country
-              </Label>
-              <Input
-                id="country"
-                value={form.country}
-                onChange={(e) => updateField("country", e.target.value)}
-                placeholder="Event country"
-              />
-              {errors.country && (
-                <p className="text-xs text-[var(--ploy-status-error)]">{errors.country}</p>
-              )}
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="travelDetails">Travel details</Label>
-              <Textarea
-                id="travelDetails"
-                value={form.travelDetails}
-                onChange={(e) => updateField("travelDetails", e.target.value)}
-                placeholder="International travel required? Accommodation provided? Local transport?"
-              />
-            </div>
+            {showLocation && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="city" required>
+                    {cityLabelForFormat(form.format)}
+                  </Label>
+                  <Input
+                    id="city"
+                    value={form.city}
+                    onChange={(e) => updateField("city", e.target.value)}
+                    placeholder={isHybridFormat(form.format) ? "In-person venue city" : "Event city"}
+                  />
+                  {errors.city && (
+                    <p className="text-xs text-[var(--ploy-status-error)]">{errors.city}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country" required>
+                    {countryLabelForFormat(form.format)}
+                  </Label>
+                  <Input
+                    id="country"
+                    value={form.country}
+                    onChange={(e) => updateField("country", e.target.value)}
+                    placeholder={isHybridFormat(form.format) ? "In-person venue country" : "Event country"}
+                  />
+                  {errors.country && (
+                    <p className="text-xs text-[var(--ploy-status-error)]">{errors.country}</p>
+                  )}
+                </div>
+              </>
+            )}
+            {showLogistics && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="travelDetails">{logisticsLabelForFormat(form.format)}</Label>
+                <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                  {logisticsHelperForFormat(form.format)}
+                </p>
+                <Textarea
+                  id="travelDetails"
+                  value={form.travelDetails}
+                  onChange={(e) => updateField("travelDetails", e.target.value)}
+                  placeholder={LOGISTICS_PLACEHOLDER}
+                />
+              </div>
+            )}
           </div>
-        )}
+          );
+        })()}
 
         {step === 4 && submitError && (
           <p className="rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-3 py-2 text-sm text-[var(--ploy-status-error)]">
@@ -522,15 +561,18 @@ export function BookingForm({
                 )}
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="vipProtocol">VIP / protocol requirements</Label>
-              <Textarea
-                id="vipProtocol"
-                value={form.vipProtocol}
-                onChange={(e) => updateField("vipProtocol", e.target.value)}
-                placeholder="Security, reception protocol, special accommodations..."
-              />
-            </div>
+            {fieldsForFormat(form.format).showProtocol && (
+              <div className="space-y-2">
+                <Label htmlFor="vipProtocol">Event security & reception</Label>
+                <p className="text-xs text-[var(--ploy-text-tertiary)]">{PROTOCOL_HELPER}</p>
+                <Textarea
+                  id="vipProtocol"
+                  value={form.vipProtocol}
+                  onChange={(e) => updateField("vipProtocol", e.target.value)}
+                  placeholder={PROTOCOL_PLACEHOLDER}
+                />
+              </div>
+            )}
             <div className="rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-4">
               <Checkbox
                 id="termsAgreed"

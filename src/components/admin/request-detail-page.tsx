@@ -6,6 +6,7 @@ import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Textarea } from "@/components/ui/textarea";
+import { formatEventLocation } from "@/lib/booking/format-rules";
 import {
   getBookingRequestById,
   updateBookingStatus,
@@ -136,13 +137,21 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               </div>
               <div className="flex gap-2">
                 <MapPin className="size-4 shrink-0 text-[var(--ploy-text-tertiary)]" />
-                <span>
-                  {request.form.city}, {request.form.country}
-                </span>
+                <span>{formatEventLocation(request.form)}</span>
               </div>
               <p>
                 {request.form.engagementType} · {request.form.format} · {request.form.audienceSize}
               </p>
+              {request.form.travelDetails.trim() && (
+                <p className="text-[var(--ploy-text-secondary)]">
+                  Logistics: {request.form.travelDetails}
+                </p>
+              )}
+              {request.form.vipProtocol.trim() && (
+                <p className="text-[var(--ploy-text-secondary)]">
+                  Event security & reception: {request.form.vipProtocol}
+                </p>
+              )}
             </div>
           </div>
         </div>
