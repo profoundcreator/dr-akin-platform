@@ -30,7 +30,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Work overview", href: "/work" },
       ...ECOSYSTEM_PILLARS.flatMap((pillar) =>
         pillar.platforms.map((platform) => ({
-          label: platform.name,
+          label: platform.id === "african-union" ? "African Union" : platform.name,
           href: platform.href,
           group: pillar.name,
         })),
