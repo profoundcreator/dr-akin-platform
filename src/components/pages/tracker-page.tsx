@@ -20,6 +20,7 @@ import { formatEventLocation } from "@/lib/booking/format-rules";
 import { seedDemoRequests } from "@/lib/booking/storage";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
+import { getBookingLookupStrategy } from "@/lib/booking/tracker-access";
 import {
   getOrganizerGrantedResources,
   requestOrganizerResourceDownload,
@@ -58,6 +59,7 @@ function StatusBadge({ status }: { status: string }) {
 export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
   const [reference, setReference] = useState(initialRef);
   const [request, setRequest] = useState<BookingRequest | null>(null);
+  const [secureLinkRequired, setSecureLinkRequired] = useState(false);
   const [approvedMaterials, setApprovedMaterials] = useState<OrganizerGrantedResource[]>([]);
   const [materialsError, setMaterialsError] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -76,6 +78,8 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
       }
 
       const token = tokenFromUrl ?? getStoredAccessToken(resolved);
+      const lookupStrategy = getBookingLookupStrategy(isSupabaseConfigured, Boolean(token));
+      setSecureLinkRequired(lookupStrategy === "unavailable");
 
       try {
         const found = await getBookingByReference(resolved, token);
@@ -116,15 +120,34 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
       <PageShell>
         <div className="ploy-container py-24">
           <div className="mx-auto max-w-lg space-y-4 text-center">
-            <AlertCircle className="mx-auto size-12 text-[var(--ploy-status-warning)]" />
-            <Heading as="h1" size="card">
-              Booking not found
-            </Heading>
-            <p className="text-sm text-[var(--ploy-text-secondary)]">
-              We could not find a booking with reference{" "}
-              <strong>{reference}</strong>. Please check the reference number in
-              your confirmation email or submit a new request.
-            </p>
+            {secureLinkRequired ? (
+              <>
+                <LockKeyhole className="mx-auto size-12 text-[var(--ploy-status-warning)]" />
+                <Heading as="h1" size="card">
+                  Secure link required
+                </Heading>
+                <p className="text-sm text-[var(--ploy-text-secondary)]">
+                  Open the booking tracker from the secure link in your confirmation email, or use
+                  the same browser where you submitted reference{" "}
+                  <strong>{reference}</strong>.
+                </p>
+                <p className="text-sm text-[var(--ploy-text-tertiary)]">
+                  For privacy, booking details are not shown without your personal access token.
+                </p>
+              </>
+            ) : (
+              <>
+                <AlertCircle className="mx-auto size-12 text-[var(--ploy-status-warning)]" />
+                <Heading as="h1" size="card">
+                  Booking not found
+                </Heading>
+                <p className="text-sm text-[var(--ploy-text-secondary)]">
+                  We could not find a booking with reference{" "}
+                  <strong>{reference}</strong>. Please check the reference number in your
+                  confirmation email or submit a new request.
+                </p>
+              </>
+            )}
             <a
               href="/book-dr-akin"
               className="inline-block text-sm font-medium text-[var(--ploy-text-link)] hover:underline"

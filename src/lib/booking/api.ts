@@ -11,6 +11,7 @@ import {
   getBookingByReference as getLocalBooking,
 } from "@/lib/booking/storage";
 import { getMockBookingRequests } from "@/lib/booking/mock-demo-data";
+import { getBookingLookupStrategy } from "@/lib/booking/tracker-access";
 import { tryGetSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { DbBookingRequest } from "@/lib/supabase/database.types";
 
@@ -112,8 +113,9 @@ export async function getBookingByReference(
 ): Promise<BookingRequest | null> {
   const supabase = tryGetSupabaseClient();
   const token = accessToken ?? getStoredAccessToken(reference);
+  const strategy = getBookingLookupStrategy(isSupabaseConfigured, Boolean(token));
 
-  if (supabase && token) {
+  if (strategy === "remote" && supabase && token) {
     const { data, error } = await supabase.rpc("get_booking_for_organizer", {
       p_reference: reference,
       p_access_token: token,
@@ -125,9 +127,17 @@ export async function getBookingByReference(
     return mapOrganizerPayload(data as Record<string, unknown>);
   }
 
-  return getLocalBooking(reference) ?? getMockBookingRequests().find(
-    (r) => r.reference.toUpperCase() === reference.toUpperCase(),
-  ) ?? null;
+  if (strategy === "unavailable") {
+    return null;
+  }
+
+  return (
+    getLocalBooking(reference) ??
+    getMockBookingRequests().find(
+      (r) => r.reference.toUpperCase() === reference.toUpperCase(),
+    ) ??
+    null
+  );
 }
 
 export async function getBookingRequests(): Promise<BookingRequest[]> {

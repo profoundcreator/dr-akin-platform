@@ -1,20 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Filter,
-  Search,
-  UserCheck,
-} from "lucide-react";
+import { CheckCircle2, Clock, Filter, Search } from "lucide-react";
+import { AdminDemoModeBanner } from "@/components/admin/admin-demo-mode-banner";
 import { EaReviewModal } from "@/components/admin/ea-review-modal";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ADMIN_FILTER_STATUSES } from "@/lib/booking/constants";
-import { getBookingRequests, isSupabaseConfigured } from "@/lib/booking/api";
+import { getBookingRequests } from "@/lib/booking/api";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +51,6 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export function RequestsDashboard() {
-  const isDemoMode = !isSupabaseConfigured;
   const [requests, setRequests] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,15 +99,7 @@ export function RequestsDashboard() {
 
   return (
     <AdminLayoutShell title="Executive Assistant — Requests">
-      {isDemoMode && (
-        <div className="mb-6 flex items-center gap-3 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3">
-          <AlertTriangle className="size-4 shrink-0 text-[var(--ploy-status-warning)]" />
-          <p className="text-sm text-[var(--ploy-text-secondary)]">
-            <span className="font-medium text-[var(--ploy-text-primary)]">Demo Mode</span> — Showing{" "}
-            {requests.length} sample requests. Configure Supabase in <code>.env</code> for live data.
-          </p>
-        </div>
-      )}
+      <AdminDemoModeBanner itemLabel="requests" count={requests.length} />
 
       {error && (
         <p className="mb-4 rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-4 py-3 text-sm text-[var(--ploy-status-error)]">
@@ -249,10 +234,6 @@ export function RequestsDashboard() {
                               onClick={() => setReviewRequest(request)}
                             >
                               Screen
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <UserCheck className="size-3.5" />
-                              Assign
                             </Button>
                           </div>
                         </td>

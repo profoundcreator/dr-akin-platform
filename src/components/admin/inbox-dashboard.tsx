@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Mail, Search } from "lucide-react";
+import { AdminDemoModeBanner } from "@/components/admin/admin-demo-mode-banner";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,8 @@ export function InboxDashboard() {
 
   return (
     <AdminLayoutShell title="Unified Inbox" subtitle="Enquiries from all channels">
+      <AdminDemoModeBanner itemLabel="enquiries" count={enquiries.length} />
+
       {error && (
         <p className="mb-4 rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-4 py-3 text-sm text-[var(--ploy-status-error)]">
           {error}
