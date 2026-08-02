@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { AdminInviteSetupForm } from "@/components/admin/admin-invite-setup-form";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -125,7 +126,11 @@ export function AdminLoginForm() {
 
   return (
     <div className="mx-auto w-full max-w-md space-y-8">
-      <div className="space-y-2 text-center">
+      <div className="flex flex-col items-center gap-6 text-center">
+        <a href="/" aria-label="Return to public site">
+          <BrandLogo variant="footer" />
+        </a>
+        <div className="space-y-2">
         <p className="ploy-kicker">Private Workspace</p>
         <Heading as="h1" size="section">
           Admin sign in
@@ -133,6 +138,7 @@ export function AdminLoginForm() {
         <p className="text-sm text-[var(--ploy-text-secondary)]">
           Approved administrators only. Public self-registration is disabled.
         </p>
+        </div>
       </div>
 
       <form

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { NAV_GROUPS, TOP_LEVEL_LINKS } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { cn } from "@/lib/utils";
-import { PUBLIC_NAME } from "@/data/person-identity";
+import { BrandLogo } from "@/components/brand/brand-logo";
+import { PERSON_IDENTITY } from "@/data/person-identity";
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,9 +43,10 @@ export function SiteHeader() {
       <div className="mx-auto flex h-20 max-w-[var(--ploy-canvas-wide)] items-center justify-between gap-6 px-6 md:px-10 lg:px-14 xl:px-20">
         <a
           href="/"
-          className="max-w-[13rem] text-sm font-semibold leading-tight tracking-[-0.025em] text-[var(--ploy-text-primary)] sm:max-w-none sm:text-lg sm:tracking-[-0.035em]"
+          aria-label={`${PERSON_IDENTITY.publicName} — Home`}
+          className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
         >
-          {PUBLIC_NAME}
+          <BrandLogo variant="header" priority />
         </a>
 
         <nav className="hidden items-stretch gap-1 lg:flex" aria-label="Primary">

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { PERSON_IDENTITY } from "@/data/person-identity";
 import { APPROVED_SOCIAL_LINKS, SITE_CONTACT } from "@/data/site-contact";
 import { FOOTER_COLUMNS } from "@/lib/navigation";
@@ -37,10 +38,14 @@ export function Footer() {
           <div>
             <a
               href="/"
-              className="text-xl font-semibold tracking-[-0.03em] text-[var(--ploy-text-primary)]"
+              aria-label={`${PERSON_IDENTITY.publicName} — Home`}
+              className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
             >
-              {PERSON_IDENTITY.publicName}
+              <BrandLogo variant="footer" />
             </a>
+            <p className="mt-4 text-sm font-medium text-[var(--ploy-text-primary)]">
+              {PERSON_IDENTITY.publicName}
+            </p>
             <p className="mt-5 max-w-sm leading-relaxed text-[var(--ploy-text-secondary)]">
               Leadership scholar, governance strategist, diplomat, and institution builder
               working across Governance, Enterprise, and Education.
