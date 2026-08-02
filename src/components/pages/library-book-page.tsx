@@ -20,8 +20,8 @@ function applyClientSeo(book: PlatformBook) {
   document.title = `${book.title} — Library`;
 
   const description = book.year
-    ? `${book.title} by Dr. Akin Akinpelu (${book.year})`
-    : `${book.title} by Dr. Akin Akinpelu`;
+    ? `${book.title} by Akin Akinpelu, Ph.D., Amb., FLPi (${book.year})`
+    : `${book.title} by Akin Akinpelu, Ph.D., Amb., FLPi`;
 
   const descriptionMeta = document.querySelector('meta[name="description"]');
   if (descriptionMeta) descriptionMeta.setAttribute("content", description);

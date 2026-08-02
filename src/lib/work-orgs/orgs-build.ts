@@ -5,6 +5,7 @@ import { getWorkOrgHeroUrl } from "@/lib/work-orgs/orgs";
 import type { PlatformWorkOrg, WorkOrgLink, WorkOrgSection } from "@/lib/work-orgs/types";
 import { SITE_PAGES } from "@/data/site-content";
 import type { EventBrand } from "@/lib/supabase/database.types";
+import { PUBLIC_WORK_SLUGS } from "@/data/ecosystem";
 import {
   isSupabaseBuildEnvConfigured,
   warnIfSupabaseBuildEnvMissing,
@@ -106,7 +107,9 @@ export function getStaticWorkOrgPaths(): PlatformWorkOrg[] {
 
 export async function fetchAllWorkOrgsForBuild(): Promise<PlatformWorkOrg[]> {
   const fromDb = await fetchPublishedWorkOrgsForBuild();
-  const merged = mergePublishedWithStatic(fromDb, getStaticWorkOrgPaths());
+  const publicSlugs = new Set<string>(PUBLIC_WORK_SLUGS);
+  const publicRows = fromDb.filter((org) => publicSlugs.has(org.slug));
+  const merged = mergePublishedWithStatic(publicRows, getStaticWorkOrgPaths());
   return merged.sort((a, b) => a.sortOrder - b.sortOrder || a.pillarTitle.localeCompare(b.pillarTitle));
 }
 

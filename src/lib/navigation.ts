@@ -1,7 +1,11 @@
+import { ECOSYSTEM_PILLARS } from "@/data/ecosystem";
+
 export interface NavLink {
   label: string;
   href: string;
   description?: string;
+  group?: string;
+  disabled?: boolean;
 }
 
 export interface NavGroup {
@@ -23,20 +27,29 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Work",
     href: "/work",
     links: [
-      { label: "Work overview", href: "/work", description: "The four operating arms" },
-      { label: "Corporate Transformation", href: "/work/aald", description: "AALD" },
-      { label: "Educational Reform", href: "/work/erudio-hub", description: "Erudio Hub" },
-      { label: "Execution Think Tank", href: "/work/performx", description: "PERFORMX" },
-      { label: "Tech Alliances", href: "/work/tc-resource-technology", description: "TC Resource Tech" },
+      {
+        label: "Work overview",
+        href: "/work",
+        description: "Three pillars · Six platforms",
+      },
+      ...ECOSYSTEM_PILLARS.flatMap((pillar) =>
+        pillar.platforms.map((platform) => ({
+          label: platform.name,
+          href: platform.href,
+          description: platform.summary,
+          group: pillar.name,
+          disabled: platform.isNavigable === false,
+        })),
+      ),
     ],
   },
   {
-    label: "Meet Dr. Akin",
+    label: "Meet Akin",
     href: "/meet-akin",
     links: [
-      { label: "Meet overview", href: "/meet-akin", description: "Leadership across four spheres" },
+      { label: "Meet overview", href: "/meet-akin", description: "Governance · Enterprise · Education" },
       { label: "Profile", href: "/meet-akin/profile", description: "Biography & credentials" },
-      { label: "Continental Mandate", href: "/meet-akin/au-ambassador", description: "AU Agenda 2063" },
+      { label: "Continental Mandate", href: "/meet-akin/au-ambassador", description: "Special Emissary, African Union" },
       { label: "Board Governance", href: "/meet-akin/edu-governance", description: "Boards & advisory" },
       { label: "Keynote Speaking", href: "/meet-akin/speaking", description: "Stages & engagements" },
     ],
@@ -57,19 +70,20 @@ export const NAV_GROUPS: NavGroup[] = [
 
 export const FOOTER_COLUMNS = [
   {
-    title: "Work",
+    title: "Pillars",
     links: [
-      { label: "Corporate Transformation", href: "/work/aald" },
-      { label: "Educational Reform", href: "/work/erudio-hub" },
-      { label: "Execution Think Tank", href: "/work/performx" },
-      { label: "Tech Alliances", href: "/work/tc-resource-technology" },
+      { label: "Governance", href: "/work#governance" },
+      { label: "Enterprise", href: "/work#enterprise" },
+      { label: "Education", href: "/work#education" },
+      { label: "Future Africa", href: "/work/future-africa" },
+      { label: "Auctus Africa", href: "/work/auctus-africa" },
     ],
   },
   {
-    title: "Meet Dr. Akin",
+    title: "Meet Akin",
     links: [
       { label: "Profile", href: "/meet-akin/profile" },
-      { label: "AU Ambassador", href: "/meet-akin/au-ambassador" },
+      { label: "Continental Mandate", href: "/meet-akin/au-ambassador" },
       { label: "Board Governance", href: "/meet-akin/edu-governance" },
       { label: "Keynote Speaking", href: "/meet-akin/speaking" },
     ],
@@ -87,9 +101,11 @@ export const FOOTER_COLUMNS = [
     title: "Connect",
     links: [
       { label: "Events", href: "/events" },
-      { label: "Book Dr. Akin", href: "/book-dr-akin" },
+      { label: "Invite Akin Akinpelu", href: "/book-dr-akin" },
       { label: "Track a Booking", href: "/track-booking" },
       { label: "Organizer Resources", href: "/organizer-resources" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/privacy" },
     ],
   },
 ];

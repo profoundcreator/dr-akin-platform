@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
 import { openEnquiryModal } from "@/lib/enquiry";
+import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
 
 const STATS = [
   { value: "2", label: "Board chairmanships" },
@@ -22,7 +23,7 @@ const APPROACH = [
 const BOARDS = [
   { role: "Board Chair", org: "Reflop Homes" },
   { role: "Board Chair", org: "Recycling Research and Education Center (RREC)" },
-  { role: "Ambassador, Political Affairs", org: "African Union Agenda 2063 Ambassadors Assembly" },
+  { role: AU_TITLE, org: "African Union" },
   { role: "Board Member", org: "GOTNI Leadership University" },
   { role: "Board Member", org: "J. Nissi Schools" },
   { role: "Board Member", org: "Myles Leadership University" },
@@ -44,8 +45,8 @@ export function BoardGovernancePage() {
                 Governance leadership across enterprise, education, and the public sector.
               </Heading>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-                Dr. Akin serves on boards and advisory bodies spanning housing, research,
-                education, and continental policy — bringing strategic clarity and long-term
+                {PUBLIC_NAME} serves on boards and advisory bodies spanning housing, research,
+                education and continental policy—bringing strategic clarity and long-term
                 stewardship to every institution.
               </p>
               <div className="flex flex-wrap items-center gap-4">
@@ -103,7 +104,7 @@ export function BoardGovernancePage() {
             </Heading>
             <p className="text-lg leading-relaxed text-[var(--ploy-text-inverse)]/75">
               Boards exist to ensure accountability, strategic clarity, and long-term institutional
-              health — not merely compliance. Dr. Akin brings this lens to every governance role.
+              health—not merely compliance. {PUBLIC_NAME} brings this lens to every governance role.
             </p>
           </Reveal>
           <Reveal delay={0.1} className="space-y-8">

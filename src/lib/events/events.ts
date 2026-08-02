@@ -144,7 +144,7 @@ export function getEventMetaDescription(event: PlatformEvent): string {
     const trimmed = event.description.trim();
     return trimmed.length > 160 ? `${trimmed.slice(0, 157)}…` : trimmed;
   }
-  return `${event.title} — register for this event with Dr. Akin Akinpelu.`;
+  return `${event.title} — register for this event with Akin Akinpelu, Ph.D., Amb., FLPi.`;
 }
 
 export function slugifyEventTitle(title: string): string {

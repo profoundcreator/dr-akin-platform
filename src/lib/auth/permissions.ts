@@ -123,6 +123,29 @@ export function canManageResources(profile: AdminProfile | null): boolean {
   );
 }
 
+export function canUploadResources(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "admin_manager" ||
+    profile!.role === "resource_manager"
+  );
+}
+
+export function canAssignResources(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "admin_manager" ||
+    profile!.role === "executive_assistant"
+  );
+}
+
+export function canOverrideResourceGrants(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return profile!.role === "super_admin" || profile!.role === "admin_manager";
+}
+
 export function canManageHomepage(profile: AdminProfile | null): boolean {
   return canApproveEvents(profile);
 }

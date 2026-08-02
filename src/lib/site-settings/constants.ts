@@ -14,7 +14,7 @@ export const HOMEPAGE_HERO_MODE_OPTIONS: { value: HomepageHeroMode; label: strin
     {
       value: "portrait",
       label: "Portrait",
-      description: "Headline with Dr. Akin portrait on the right (current default).",
+      description: "Headline with Akin Akinpelu’s portrait on the right (current default).",
     },
     {
       value: "banner",

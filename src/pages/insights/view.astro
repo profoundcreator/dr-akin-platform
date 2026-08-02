@@ -5,6 +5,6 @@ import { InsightDetailBySlug } from "@/components/pages/insight-detail-by-slug";
 const slug = Astro.url.searchParams.get("slug") ?? "";
 ---
 
-<Layout title="Insights — Dr. Akin Akinpelu" description="Essays and field notes on leadership and transformation">
+<Layout title="Insights — Akin Akinpelu, Ph.D., Amb., FLPi" description="Essays and field notes on African governance, enterprise development, education, and leadership">
   <InsightDetailBySlug client:load slug={slug} />
 </Layout>

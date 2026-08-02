@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label: ReactNode;
 }
 
 export function Checkbox({ className, label, id, ...props }: CheckboxProps) {

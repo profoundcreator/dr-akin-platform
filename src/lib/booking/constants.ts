@@ -82,5 +82,5 @@ export const STATUS_DESCRIPTIONS: Record<string, string> = {
   Declined:
     "Unfortunately, we are unable to accept this invitation at this time.",
   Cancelled: "This engagement has been cancelled.",
-  Completed: "This engagement has taken place. Thank you for partnering with Dr. Akin.",
+  Completed: "This engagement has taken place. Thank you for partnering with Akin and his team.",
 };

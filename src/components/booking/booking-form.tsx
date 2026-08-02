@@ -579,7 +579,15 @@ export function BookingForm({
                 name="termsAgreed"
                 checked={form.termsAgreed}
                 onChange={(e) => updateField("termsAgreed", e.target.checked)}
-                label="I confirm the information provided is accurate, acknowledge the privacy policy, and understand that submission does not constitute acceptance of the engagement."
+                label={
+                  <>
+                    I confirm the information provided is accurate, acknowledge the{" "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">
+                      privacy notice
+                    </a>
+                    , and understand that submission does not constitute acceptance of the engagement.
+                  </>
+                }
               />
               {errors.termsAgreed && (
                 <p className="mt-2 text-xs text-[var(--ploy-status-error)]">

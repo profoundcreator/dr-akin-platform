@@ -8,39 +8,34 @@ import { Reveal } from "@/components/ui/reveal";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { SITE_IMAGES } from "@/lib/media/site-images";
+import { PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
 
 const PORTRAIT_URL = SITE_IMAGES.portrait;
 
 const STATS = [
-  { value: "700,000+", label: "People reached through keynotes, media, and leadership platforms" },
-  { value: "15+", label: "Countries and counting — global stages and executive rooms" },
-  { value: "Global", label: "Keynotes delivered for governments, enterprises, and faith communities" },
+  { value: PERSON_IDENTITY.metrics.peopleReached, label: "People reached through talks, training and coaching" },
+  { value: PERSON_IDENTITY.metrics.countries, label: "Countries and counting—across global stages and executive rooms" },
+  { value: "3", label: "Connected themes shaping leaders and institutions" },
 ];
 
 const THEMES = [
   {
     letter: "a",
-    title: "Leadership & Nation-Building",
+    title: "Governance & Leadership",
     description:
-      "Why leadership is the ultimate infrastructure — and how nations and organisations build it deliberately.",
+      "Ethical leadership, institutional capacity, public purpose and the decisions required to build societies that work.",
   },
   {
     letter: "b",
-    title: "High Performance & Execution",
+    title: "Enterprise Development",
     description:
-      "The operating discipline that separates ambitious strategy from durable competitive advantage.",
+      "Building productive organisations, resilient systems and leadership cultures that turn ambition into sustainable value.",
   },
   {
     letter: "c",
     title: "Education & Youth Empowerment",
     description:
-      "Reforming how a continent teaches, governs schools, and develops the next generation of builders.",
-  },
-  {
-    letter: "d",
-    title: "Faith, Influence & the Marketplace",
-    description:
-      "Integrating conviction, competence, and influence in the rooms where culture and commerce meet.",
+      "Preparing educators, institutions and young Africans with the capacity, confidence and opportunity to shape the continent’s future.",
   },
 ];
 
@@ -67,7 +62,7 @@ export function SpeakingPage() {
           <div className="flex flex-col justify-center px-6 py-14 md:px-10 md:py-20 lg:px-14 lg:py-24 xl:px-20">
             <Reveal className="max-w-4xl space-y-8">
               <p className="ploy-eyebrow">
-                Dr. Akin Akinpelu · Keynote Speaker · Consultant · Author · Strategist
+                {PUBLIC_NAME} · Keynote Speaker
               </p>
               <Heading as="h1" size="display" className="ploy-text-balance">
                 A speaker who moves rooms
@@ -76,15 +71,15 @@ export function SpeakingPage() {
                 </span>
               </Heading>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-                Dr. Akin delivers keynotes, panel contributions, workshops, and fireside
+                {PUBLIC_NAME} delivers keynotes, panel contributions, workshops and fireside
                 conversations for conferences, corporate retreats, and leadership summits worldwide.
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Button variant="primary" showArrow href="/book-dr-akin">
-                  Book Dr. Akin
+                  Invite Akin Akinpelu
                 </Button>
                 <a href="/meet-akin/profile" className="ploy-text-link-underline inline-flex items-center gap-2">
-                  About Dr. Akin
+                  About Akin
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </a>
               </div>
@@ -93,7 +88,7 @@ export function SpeakingPage() {
           <Reveal delay={0.15} className="relative min-h-[28rem] border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
             <OptimizedImage
               src={PORTRAIT_URL}
-              alt="Dr. Akin Akinpelu — Keynote speaker"
+              alt={`${PUBLIC_NAME} — keynote speaker`}
               priority
               width={960}
               height={1200}
@@ -136,6 +131,13 @@ export function SpeakingPage() {
               </Reveal>
             ))}
           </div>
+          <Reveal className="mt-8">
+            <p className="max-w-3xl text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+              Faith and church engagements remain supported through the booking flow and the
+              dedicated Christian organiser profile; they are not presented as a fourth strategic
+              pillar.
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -161,7 +163,7 @@ export function SpeakingPage() {
       <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">
         <Reveal className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-10 lg:grid-cols-2 lg:items-center">
           <div className="space-y-4">
-            <Heading as="h2" size="section">Request Dr. Akin for your engagement</Heading>
+            <Heading as="h2" size="section">Invite Akin Akinpelu to your engagement</Heading>
             <p className="text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
               For keynotes, executive workshops, or corporate retreats — submit a structured
               invitation and our team will respond within 3–5 business days.

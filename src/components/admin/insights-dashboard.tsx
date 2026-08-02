@@ -50,6 +50,7 @@ import {
   getPendingInsights,
   insightsToCsv,
   isInsightMediaSchemaReady,
+  isInsightSeoSchemaReady,
   isPhase3SchemaReady,
   isValidInsightSlug,
   logInsightAudit,
@@ -80,7 +81,9 @@ const EMPTY_FORM = {
   title: "",
   category: INSIGHT_CATEGORIES[0],
   summary: "",
+  seoDescription: "",
   body: "",
+  socialImageAlt: "",
   publishedAt: new Date().toISOString().slice(0, 10),
   isHomepageFeatured: false,
   sortOrder: 0,
@@ -125,6 +128,7 @@ export function InsightsDashboard() {
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
   const [mediaSchemaReady, setMediaSchemaReady] = useState(true);
+  const [seoSchemaReady, setSeoSchemaReady] = useState(true);
   const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
   const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
   const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
@@ -146,6 +150,7 @@ export function InsightsDashboard() {
       setError(null);
       setSchemaReady(await isPhase3SchemaReady());
       setMediaSchemaReady(await isInsightMediaSchemaReady());
+      setSeoSchemaReady(await isInsightSeoSchemaReady());
       setPreloadedControlsReady(await isPreloadedContentSchemaReady());
       const [allInsights, pendingInsights, liveOnSite, homepageFeatured] = await Promise.all([
         getAdminInsights(),
@@ -196,7 +201,9 @@ export function InsightsDashboard() {
       title: insight.title,
       category: insight.category,
       summary: insight.summary,
+      seoDescription: insight.seoDescription ?? "",
       body: insight.body,
+      socialImageAlt: insight.socialImageAlt ?? "",
       publishedAt: toDateInputValue(insight.publishedAt),
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
@@ -225,7 +232,9 @@ export function InsightsDashboard() {
       title: insight.title,
       category: insight.category,
       summary: insight.summary,
+      seoDescription: insight.seoDescription ?? "",
       body: insight.body,
+      socialImageAlt: insight.socialImageAlt ?? "",
       publishedAt: toDateInputValue(insight.publishedAt),
       isHomepageFeatured: insight.isHomepageFeatured,
       sortOrder: insight.sortOrder,
@@ -385,6 +394,12 @@ export function InsightsDashboard() {
       summary: form.summary,
       body: form.body,
       heroImagePath,
+      ...(seoSchemaReady
+        ? {
+            seoDescription: form.seoDescription.trim() || null,
+            socialImageAlt: form.socialImageAlt.trim() || null,
+          }
+        : {}),
       sourceLabel: form.sourceLabel.trim() || null,
       sourceUrl: form.sourceUrl.trim() || null,
       publishedAt: toPublishedAtIso(form.publishedAt),
@@ -624,6 +639,12 @@ export function InsightsDashboard() {
         <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
           Run <code className="text-xs">supabase/migrations/014_insight_hero_images.sql</code> in Supabase to
           upload header images and add original-publication credits.
+        </div>
+      )}
+      {schemaReady && !seoSchemaReady && (
+        <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Run <code className="text-xs">supabase/migrations/019_contact_geo_foundation.sql</code> to
+          manage search descriptions and accessible social previews.
         </div>
       )}
       {(error || notice) && (
@@ -1053,6 +1074,20 @@ export function InsightsDashboard() {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="insight-seo-description">Search description</Label>
+            <textarea
+              id="insight-seo-description"
+              value={form.seoDescription}
+              onChange={(e) => setForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
+              rows={2}
+              maxLength={320}
+              disabled={!seoSchemaReady}
+              className="w-full rounded-[var(--ploy-radius-input)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-3 py-2 text-sm"
+              placeholder="Optional search and social description; summary is used when blank"
+            />
+          </div>
+
           {mediaSchemaReady && (
             <div className="space-y-2">
               <Label htmlFor="insight-hero">{INSIGHTS_ADMIN_COPY.heroImageLabel}</Label>
@@ -1077,8 +1112,28 @@ export function InsightsDashboard() {
                 )}
               </div>
               <ImageUploadHint hint={INSIGHT_HERO_IMAGE_HINT} />
+              <Label htmlFor="insight-social-image-alt">Social image description</Label>
+              <Input
+                id="insight-social-image-alt"
+                value={form.socialImageAlt}
+                onChange={(e) => setForm((prev) => ({ ...prev, socialImageAlt: e.target.value }))}
+                maxLength={300}
+                disabled={!seoSchemaReady}
+                placeholder="Describe the image for accessible social previews"
+              />
             </div>
           )}
+
+          <div className="overflow-hidden rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)]">
+            {heroPreview && <img src={heroPreview} alt="" className="aspect-[1.91/1] w-full object-cover" />}
+            <div className="space-y-1 p-4">
+              <p className="text-xs uppercase tracking-wide text-[var(--ploy-text-tertiary)]">Social preview</p>
+              <p className="font-semibold">{form.title || "Article title"}</p>
+              <p className="line-clamp-2 text-sm text-[var(--ploy-text-secondary)]">
+                {form.seoDescription || form.summary || "Article description"}
+              </p>
+            </div>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">

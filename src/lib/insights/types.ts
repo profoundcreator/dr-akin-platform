@@ -4,9 +4,11 @@ export interface PlatformInsight {
   title: string;
   category: string;
   summary: string;
+  seoDescription: string | null;
   body: string;
   heroImagePath: string | null;
   heroImageUrl: string | null;
+  socialImageAlt: string | null;
   sourceLabel: string | null;
   sourceUrl: string | null;
   publishedAt: string | null;
@@ -24,8 +26,10 @@ export interface InsightInput {
   title: string;
   category: string;
   summary: string;
+  seoDescription?: string | null;
   body: string;
   heroImagePath?: string | null;
+  socialImageAlt?: string | null;
   sourceLabel?: string | null;
   sourceUrl?: string | null;
   publishedAt?: string | null;

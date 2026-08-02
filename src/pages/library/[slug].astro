@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { LibraryBookBySlug } from "@/components/pages/library-book-by-slug";
 import { fetchAllBooksForBuild } from "@/lib/library/books-build";
+import { bookSchema, breadcrumbSchema } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
   const books = await fetchAllBooksForBuild();
@@ -14,18 +15,26 @@ export async function getStaticPaths() {
 
 const { book } = Astro.props;
 const description = book.year
-  ? `${book.title} by Dr. Akin Akinpelu (${book.year})`
-  : `${book.title} by Dr. Akin Akinpelu`;
+  ? `${book.title} by Akin Akinpelu, Ph.D., Amb., FLPi (${book.year})`
+  : `${book.title} by Akin Akinpelu, Ph.D., Amb., FLPi`;
 const site = Astro.site ?? Astro.url.origin;
-const ogImage = book.coverUrl.startsWith("http")
-  ? book.coverUrl
-  : new URL(book.coverUrl, site).href;
+const schemas = [
+  bookSchema({ ...book, image: book.coverUrl }, site),
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Library", path: "/library" },
+    { name: book.title, path: `/library/${book.slug}` },
+  ], site),
+];
 ---
 
 <Layout
   title={`${book.title} — Library`}
   description={description}
-  ogImage={ogImage}
+  ogImage={book.coverUrl}
+  ogImageAlt={`Cover of ${book.title}`}
+  ogType="book"
+  jsonLd={schemas}
 >
   <LibraryBookBySlug client:load slug={book.slug} initialBook={book} />
 </Layout>

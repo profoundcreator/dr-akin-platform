@@ -15,9 +15,10 @@ const siteUrl = (process.env.PUBLIC_SITE_URL ?? "https://dr-akin-platform.vercel
 
 /** @param {string} page */
 function includeInSitemap(page) {
-  const pathname = new URL(page).pathname;
+  const pathname = new URL(page).pathname.replace(/\/+$/, "") || "/";
   if (pathname.startsWith("/admin")) return false;
   if (pathname.startsWith("/booking")) return false;
+  if (pathname === "/book-dr-akin" || pathname === "/track-booking") return false;
   if (pathname === "/404") return false;
   // Vercel rewrite shells — public URLs use /insights/{slug} etc.
   if (pathname.endsWith("/view")) return false;

@@ -1,27 +1,42 @@
 ---
 import "@/styles/globals.css";
+import { PERSON_IDENTITY } from "@/data/person-identity";
+import { SITE_CONTACT } from "@/data/site-contact";
+import { BRAND_ASSETS } from "@/lib/brand/assets";
+import type { JsonLdValue } from "@/lib/seo/json-ld";
 
 interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: "website" | "article" | "book" | "profile";
+  canonicalPath?: string;
   preloadImage?: string;
   noIndex?: boolean;
+  jsonLd?: JsonLdValue | JsonLdValue[];
 }
 
 const {
-  title = "Dr. Akin Akinpelu",
-  description = "Executive coach, author, and corporate transformation strategist.",
-  ogImage = "/images/dr-akin-portrait.svg",
+  title = PERSON_IDENTITY.publicName,
+  description = "Leadership scholar, governance strategist, diplomat, and institution builder working across Governance, Enterprise, and Education.",
+  ogImage = BRAND_ASSETS.defaultSocialImage,
+  ogImageAlt = PERSON_IDENTITY.publicName,
+  ogType = "website",
+  canonicalPath,
   preloadImage,
   noIndex = false,
+  jsonLd,
 } = Astro.props;
 
 const siteBase = Astro.site ?? Astro.url;
-const canonical = new URL(`${Astro.url.pathname}${Astro.url.search}`, siteBase).href;
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, siteBase).href;
 const resolvedOgImage = ogImage.startsWith("http")
   ? ogImage
   : new URL(ogImage, Astro.site ?? Astro.url.origin).href;
+const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : []).map((item) =>
+  JSON.stringify(item).replace(/</g, "\\u003c"),
+);
 ---
 
 <!doctype html>
@@ -31,18 +46,25 @@ const resolvedOgImage = ogImage.startsWith("http")
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.favicon} />
     {preloadImage && (
       <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
     )}
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={`${PERSON_IDENTITY.publicName} — Insights`} href="/rss.xml" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={resolvedOgImage} />
-    <meta property="og:type" content="website" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE_CONTACT.organizationName} />
+    <meta property="og:type" content={ogType} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+    {structuredData.map((data) => <script type="application/ld+json" set:html={data} />)}
     <title>{title}</title>
   </head>
   <body>

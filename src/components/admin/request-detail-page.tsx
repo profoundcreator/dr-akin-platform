@@ -15,6 +15,7 @@ import type { BookingRequest, InternalStatus, OrganizerStatus } from "@/lib/book
 import { ORGANIZER_STATUSES, INTERNAL_STATUSES } from "@/lib/booking/types";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { canWriteBookings } from "@/lib/auth/permissions";
+import { BookingResourceGrants } from "@/components/admin/booking-resource-grants";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -224,6 +225,8 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
             </Button>
           )}
         </div>
+
+        <BookingResourceGrants bookingRequestId={request.id} />
 
         <div className="ploy-surface-elevated space-y-4 p-6">
           <Heading as="h2" size="card">

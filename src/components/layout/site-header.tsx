@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { NAV_GROUPS, TOP_LEVEL_LINKS } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { cn } from "@/lib/utils";
+import { PUBLIC_NAME } from "@/data/person-identity";
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,12 +42,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-20 max-w-[var(--ploy-canvas-wide)] items-center justify-between gap-6 px-6 md:px-10 lg:px-14 xl:px-20">
         <a
           href="/"
-          className="shrink-0 text-lg font-semibold tracking-[-0.035em] text-[var(--ploy-text-primary)]"
+          className="max-w-[13rem] text-sm font-semibold leading-tight tracking-[-0.025em] text-[var(--ploy-text-primary)] sm:max-w-none sm:text-lg sm:tracking-[-0.035em]"
         >
-          Dr. Akin Akinpelu{" "}
-          <span className="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
-            Ph.D
-          </span>
+          {PUBLIC_NAME}
         </a>
 
         <nav className="hidden items-stretch gap-1 lg:flex" aria-label="Primary">
@@ -68,22 +66,41 @@ export function SiteHeader() {
               </a>
 
               {openDropdown === group.label && (
-                <div className="absolute left-0 top-full z-50 min-w-[16rem] animate-ploy-slide-down rounded-lg border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] p-2 shadow-[var(--ploy-shadow-md)]">
-                  {group.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      className="block rounded-md px-3 py-2.5 transition-colors hover:bg-[var(--ploy-background-secondary)]"
-                    >
-                      <span className="block text-sm font-medium text-[var(--ploy-text-primary)]">
-                        {link.label}
-                      </span>
-                      {link.description && (
-                        <span className="block text-xs text-[var(--ploy-text-secondary)]">
-                          {link.description}
-                        </span>
+                <div className="absolute left-0 top-full z-50 min-w-[20rem] animate-ploy-slide-down rounded-lg border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] p-2 shadow-[var(--ploy-shadow-md)]">
+                  {group.links.map((link, index) => (
+                    <div key={link.href}>
+                      {link.group && link.group !== group.links[index - 1]?.group && (
+                        <p className="px-3 pb-1 pt-3 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
+                          {link.group}
+                        </p>
                       )}
-                    </a>
+                      {link.disabled ? (
+                        <div className="block rounded-md px-3 py-2.5 opacity-65" aria-disabled="true">
+                          <span className="block text-sm font-medium text-[var(--ploy-text-primary)]">
+                            {link.label}
+                          </span>
+                          {link.description && (
+                            <span className="block text-xs text-[var(--ploy-text-secondary)]">
+                              {link.description}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="block rounded-md px-3 py-2.5 transition-colors hover:bg-[var(--ploy-background-secondary)]"
+                        >
+                          <span className="block text-sm font-medium text-[var(--ploy-text-primary)]">
+                            {link.label}
+                          </span>
+                          {link.description && (
+                            <span className="block text-xs text-[var(--ploy-text-secondary)]">
+                              {link.description}
+                            </span>
+                          )}
+                        </a>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -144,15 +161,26 @@ export function SiteHeader() {
                 {group.label}
               </a>
               <ul className="space-y-1">
-                {group.links.map((link) => (
+                {group.links.map((link, index) => (
                   <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="block rounded-md px-3 py-2.5 text-base font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-background-secondary)]"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {link.label}
-                    </a>
+                    {link.group && link.group !== group.links[index - 1]?.group && (
+                      <p className="px-3 pb-1 pt-3 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
+                        {link.group}
+                      </p>
+                    )}
+                    {link.disabled ? (
+                      <span className="block rounded-md px-3 py-2.5 text-base font-medium text-[var(--ploy-text-secondary)]" aria-disabled="true">
+                        {link.label}
+                      </span>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="block rounded-md px-3 py-2.5 text-base font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-background-secondary)]"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

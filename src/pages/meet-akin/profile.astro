@@ -2,10 +2,12 @@
 import Layout from "@/layouts/Layout.astro";
 import { ProfilePage } from "@/components/pages/profile-page";
 import { SITE_PAGES } from "@/data/site-content";
+import { personSchema } from "@/lib/seo/json-ld";
 
 const content = SITE_PAGES["meet-profile"];
+const site = Astro.site ?? Astro.url.origin;
 ---
 
-<Layout title={content.title} description={content.description}>
+<Layout title={content.title} description={content.description} ogType="profile" jsonLd={personSchema(site)}>
   <ProfilePage client:load />
 </Layout>

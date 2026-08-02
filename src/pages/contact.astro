@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ContactPage } from "@/components/pages/contact-page";
+import { PERSON_IDENTITY } from "@/data/person-identity";
+---
+
+<Layout
+  title={`Contact ${PERSON_IDENTITY.publicName}`}
+  description={`Contact ${PERSON_IDENTITY.shortName}'s team about partnerships, media, programmes, governance, and general enquiries.`}
+>
+  <ContactPage client:load />
+</Layout>

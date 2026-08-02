@@ -34,6 +34,9 @@ In the Supabase **SQL Editor**, run in order:
 13. `migrations/015_admin_reliability.sql` — invited self-activation + auditor read-only on bookings/inbox
 14. `migrations/016_phase_e_security.sql` — audit log access, publish/delete RLS, `/admin/audit-log` RPC
 15. `migrations/017_enquiry_conversion.sql` — admin RPC to convert inbox enquiries into booking requests
+16. `migrations/018_organizer_resources.sql` — private organizer materials, booking grants, roles and audited access
+17. `migrations/019_contact_geo_foundation.sql` — rate-limited contact enquiries and insight SEO metadata
+18. `migrations/020_continental_ecosystem.sql` — retires TC Resource, keeps PERFORMX destination-free, and publishes Future Africa/Auctus Africa CMS entries
 
 Verify migration 015 after running:
 

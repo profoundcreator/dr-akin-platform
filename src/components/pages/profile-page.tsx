@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -9,29 +8,29 @@ import { Reveal } from "@/components/ui/reveal";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { SITE_IMAGES } from "@/lib/media/site-images";
-import { getPublicWorkOrgs } from "@/lib/work-orgs/public-orgs";
-import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
+import { ECOSYSTEM_PLATFORMS } from "@/data/ecosystem";
+import { AU_TITLE, PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
 
 const PORTRAIT_URL = SITE_IMAGES.portrait;
 
 const STATS = [
-  { value: "700,000+", label: "Total reach across platforms, media, and leadership programmes" },
-  { value: "15+", label: "Years of experience in leadership, education, and transformation" },
-  { value: "First", label: "Position in several industry-standard rankings and recognitions" },
+  { value: PERSON_IDENTITY.metrics.peopleReached, label: "People reached through talks, training and coaching" },
+  { value: PERSON_IDENTITY.metrics.yearsExperience, label: "Years developing leaders, institutions and human potential" },
+  { value: PERSON_IDENTITY.metrics.countries, label: "Countries across a growing international footprint" },
 ];
 
 const CREDENTIALS = [
   {
-    title: "Ph.D., Performance Leadership",
-    description: "Doctoral qualification in performance leadership and institutional development.",
+    title: "Ph.D. in Educational Leadership",
+    description: "Doctoral scholarship focused on educational leadership and institutional development.",
   },
   {
     title: "Honorary Doctorate",
     description: "Recognised for contributions to leadership education and public impact.",
   },
   {
-    title: "Professor of Educational Leadership",
-    description: "Academic leadership across executive education and governance reform.",
+    title: "Professor of Practice in Educational Leadership",
+    description: "Academic leadership across executive education, human capital and governance reform.",
   },
   {
     title: "Forbes Thought Leader",
@@ -42,16 +41,17 @@ const CREDENTIALS = [
 const RECOGNITIONS = [
   "Member of the Nigerian Institute of Management",
   "Fellow of the Institute of Brand Management",
-  "African Union Agenda 2063 Ambassador",
+  AU_TITLE,
   "Advisor to governments, enterprises, and faith institutions",
 ];
 
-const ECOSYSTEM_FALLBACK = [
-  { label: "AALD", title: "Corporate Transformation", href: "/work/aald", description: "Leadership systems and institutional capability." },
-  { label: "Erudio Hub", title: "Educational Reform", href: "/work/erudio-hub", description: "Systemic reform for nations and educators." },
-  { label: "PERFORMX", title: "Execution Think Tank", href: "/work/performx", description: "Strategy-to-execution for operating teams." },
-  { label: "TC Resource Tech", title: "Tech Alliances", href: "/work/tc-resource-technology", description: "Technology partnerships for scale." },
-];
+const ECOSYSTEM = ECOSYSTEM_PLATFORMS.map((platform) => ({
+  label: platform.name,
+  title: platform.pillar,
+  href: platform.href,
+  isNavigable: platform.isNavigable !== false,
+  description: platform.summary,
+}));
 
 const GLOBAL_PLATFORMS = [
   "Paris", "Lagos", "London", "Johannesburg", "Nairobi", "Berlin", "Geneva", "Accra",
@@ -61,7 +61,7 @@ const GLOBAL_PLATFORMS = [
 const BOARDS = [
   { role: "Board Chair", org: "Reflop Homes" },
   { role: "Board Chair", org: "Recycling Research and Education Center (RREC)" },
-  { role: "Ambassador, Political Affairs", org: "African Union Agenda 2063 Ambassadors Assembly" },
+  { role: AU_TITLE, org: "African Union" },
   { role: "Board Member", org: "GOTNI Leadership University" },
   { role: "Board Member", org: "J. Nissi Schools" },
   { role: "Board Member", org: "Myles Leadership University" },
@@ -69,24 +69,6 @@ const BOARDS = [
 ];
 
 export function ProfilePage() {
-  const [ecosystem, setEcosystem] = useState(
-    ECOSYSTEM_FALLBACK.map((item) => ({ ...item })),
-  );
-
-  useEffect(() => {
-    getPublicWorkOrgs().then((orgs) => {
-      if (orgs.length === 0) return;
-      setEcosystem(
-        orgs.map((org: PlatformWorkOrg) => ({
-          label: org.brandLabel,
-          title: org.pillarTitle,
-          href: `/work/${org.slug}`,
-          description: org.hubCardDescription,
-        })),
-      );
-    });
-  }, []);
-
   return (
     <PageShell>
       {/* Hero */}
@@ -95,22 +77,21 @@ export function ProfilePage() {
           <div className="flex flex-col justify-center px-6 py-14 md:px-10 md:py-20 lg:px-14 lg:py-24 xl:px-20">
             <Reveal className="max-w-4xl space-y-8">
               <p className="ploy-eyebrow">
-                Leadership Education & Professional Profile · Biography
+                Leadership Scholar · Governance Strategist · Diplomat · Institution Builder
               </p>
               <Heading as="h1" size="display" className="ploy-text-balance">
-                A globally recognized authority in leadership, education, and transformation.
+                Building institutions and leadership for Africa’s long-term transformation.
               </Heading>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-                Dr. Akin Akinpelu Ph.D is an executive coach, author, and corporate transformation
-                strategist working at the intersection of business, education, public policy, and
-                marketplace ministry.
+                {PUBLIC_NAME} works across governance, enterprise and education—strengthening
+                institutions, developing leaders and building strategic partnerships.
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Button variant="primary" showArrow onClick={openEnquiryModal}>
-                  Connect with Dr. Akin
+                  Connect with Akin Akinpelu
                 </Button>
                 <a href="/book-dr-akin" className="ploy-text-link-underline inline-flex items-center gap-2">
-                  Download full profile
+                  Request full profile
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </a>
               </div>
@@ -119,14 +100,14 @@ export function ProfilePage() {
           <Reveal delay={0.15} className="relative min-h-[28rem] border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
             <OptimizedImage
               src={PORTRAIT_URL}
-              alt="Dr. Akin Akinpelu, Ph.D"
+              alt={PUBLIC_NAME}
               priority
               width={960}
               height={1200}
               className="absolute inset-0 size-full object-cover object-top"
             />
             <p className="absolute bottom-6 left-6 text-sm text-[var(--ploy-text-secondary)] md:bottom-8 md:left-8">
-              Dr. Akin Akinpelu, Ph.D
+              {PUBLIC_NAME}
             </p>
             <div className="absolute right-0 top-0 h-24 w-3 bg-[var(--ploy-accent-primary)]" aria-hidden="true" />
           </Reveal>
@@ -153,19 +134,25 @@ export function ProfilePage() {
           </Reveal>
           <Reveal delay={0.05} className="space-y-6 text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
             <p>
-              Dr. Akin Akinpelu is a leadership strategist, educator, and author whose work spans
-              corporate boardrooms, classrooms, policy chambers, and faith-driven marketplace
-              leadership — with a single through-line: building institutions that outlast their
-              founders.
+              {PUBLIC_NAME} is a globally engaged leadership scholar, governance practitioner,
+              diplomat and institution builder whose work advances Africa’s long-term
+              transformation through governance, enterprise and education.
             </p>
             <p>
-              As founder of the African Academy of Leadership Development (AALD) ecosystem, he
-              partners with executives and enterprises to unlock human potential, drive cultural
-              change, and deliver measurable business impact across Africa and beyond.
+              As {AU_TITLE}, he contributes to continental engagement around governance,
+              institutional capacity, leadership and strategic partnerships. His work connects
+              governments, development institutions, business, academia and citizens with the
+              ideas and systems required to translate continental ambition into practical progress.
             </p>
             <p>
-              A sought-after advisor to C-suite leaders, boards, and institutions, Dr. Akin has
-              authored multiple books on leadership, execution, and institutional transformation.
+              A Professor of Practice in Educational Leadership and an experienced board
+              executive, he advises public, private, educational and multilateral institutions
+              across multiple jurisdictions. His approach is systems-oriented and evidence-informed.
+            </p>
+            <p>
+              He has spoken to more than one million people across over 20 countries and remains
+              committed to strengthening institutions, developing transformational leaders and
+              advancing Africa’s influence on the global stage.
             </p>
           </Reveal>
         </div>
@@ -187,8 +174,9 @@ export function ProfilePage() {
           </Reveal>
           <Reveal delay={0.1} className="space-y-6">
             <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              In addition to his academic background, Dr. Akin is recognised for professional
-              leadership across corporate, public, and faith sectors.
+              In addition to his academic background, Akin is recognised for professional
+              leadership across corporate, public and educational sectors. Faith and church
+              engagements remain supported without forming a separate strategic pillar.
             </p>
             <ul className="space-y-4">
               {RECOGNITIONS.map((item) => (
@@ -208,7 +196,7 @@ export function ProfilePage() {
           <Heading as="h2" size="section">Leadership across the ecosystem</Heading>
         </Reveal>
         <div className="mx-auto max-w-[var(--ploy-canvas-main)] border-t border-[var(--ploy-border-primary)]">
-          {ecosystem.map((item, i) => (
+          {ECOSYSTEM.map((item, i) => (
             <Reveal key={item.href} delay={i * 0.05}>
               <div className="grid gap-4 border-b border-[var(--ploy-border-primary)] py-6 md:grid-cols-[0.2fr_1fr_auto] md:items-center md:gap-8">
                 <p className="font-mono text-xs uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">{item.label}</p>
@@ -216,10 +204,16 @@ export function ProfilePage() {
                   <p className="font-semibold">{item.title}</p>
                   <p className="text-sm text-[var(--ploy-text-secondary)]">{item.description}</p>
                 </div>
-                <a href={item.href} className="inline-flex items-center gap-2 text-sm font-semibold underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]">
-                  View work
-                  <ArrowUpRight className="size-4" aria-hidden="true" />
-                </a>
+                {item.isNavigable ? (
+                  <a href={item.href} className="inline-flex items-center gap-2 text-sm font-semibold underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]">
+                    View work
+                    <ArrowUpRight className="size-4" aria-hidden="true" />
+                  </a>
+                ) : (
+                  <span className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--ploy-text-secondary)]">
+                    Event & community
+                  </span>
+                )}
               </div>
             </Reveal>
           ))}
@@ -232,8 +226,8 @@ export function ProfilePage() {
           <div className="max-w-3xl space-y-4">
             <Heading as="h2" size="section">A global platform</Heading>
             <p className="text-lg leading-relaxed text-[var(--ploy-text-secondary)]">
-              Dr. Akin&apos;s work reaches leaders across continents — from executive boardrooms to
-              public policy forums and faith communities worldwide.
+              {PUBLIC_NAME}’s work reaches leaders across continents — from executive
+              boardrooms to public policy forums, education systems and supported faith engagements.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

@@ -13,6 +13,11 @@ const EVENT_LABELS: Record<string, string> = {
   "work_org_published": "Work platform published",
   "team_member_invited": "Team member invited",
   "team_member_invite_resent": "Team invite resent",
+  "organizer_resource.uploaded": "Organizer material uploaded",
+  "organizer_resource.retired": "Organizer material retired",
+  "organizer_resource.granted": "Organizer material granted",
+  "organizer_resource.revoked": "Organizer material revoked",
+  "organizer_resource.downloaded": "Organizer material downloaded",
 };
 
 export function formatAuditEventType(eventType: string): string {

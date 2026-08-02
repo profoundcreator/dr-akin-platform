@@ -32,7 +32,7 @@ function formatEventDate(startsAt: string, timezone: string): string {
 
 const FILTER_OPTIONS: { value: FilterValue; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "hosted_by_dr_akin", label: "Dr. Akin" },
+  { value: "hosted_by_dr_akin", label: "Akin Akinpelu" },
   { value: "featured_appearance", label: "Speaking" },
   { value: "aald", label: "AALD" },
   { value: "erudio", label: "Erudio" },
@@ -83,7 +83,7 @@ export function EventsHubPage() {
                 <span className="block text-[var(--ploy-text-secondary)]">and brand moments</span>
               </Heading>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-                Register for upcoming events hosted by Dr. Akin, featuring his appearances, and
+                Register for upcoming events hosted by Akin Akinpelu, featuring his appearances, and
                 programmes from the operating brands.
               </p>
             </Reveal>

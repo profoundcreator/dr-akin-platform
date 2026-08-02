@@ -27,9 +27,11 @@ function mapRow(row: DbInsightArticle): PlatformInsight {
     title: row.title,
     category: row.category,
     summary: row.summary,
+    seoDescription: row.seo_description ?? null,
     body: row.body,
     heroImagePath: row.hero_image_path,
     heroImageUrl: getInsightHeroUrl(row.hero_image_path),
+    socialImageAlt: row.social_image_alt ?? null,
     sourceLabel: row.source_label,
     sourceUrl: row.source_url,
     publishedAt: row.published_at,
@@ -144,6 +146,17 @@ export async function isInsightMediaSchemaReady(): Promise<boolean> {
   return !error;
 }
 
+export async function isInsightSeoSchemaReady(): Promise<boolean> {
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) return false;
+
+  const { error } = await supabase
+    .from("insights_articles")
+    .select("seo_description, social_image_alt")
+    .limit(1);
+  return !error;
+}
+
 function normalizeBody(body: string): string {
   return sanitizeInsightHtml(plainTextToInsightHtml(body));
 }
@@ -164,6 +177,12 @@ function buildInsertPayload(
     summary: input.summary.trim(),
     body: normalizeBody(input.body),
     hero_image_path: input.heroImagePath ?? null,
+    ...("seoDescription" in input
+      ? { seo_description: input.seoDescription?.trim() || null }
+      : {}),
+    ...("socialImageAlt" in input
+      ? { social_image_alt: input.socialImageAlt?.trim() || null }
+      : {}),
     source_label: input.sourceLabel?.trim() || null,
     source_url: input.sourceUrl?.trim() || null,
     published_at: input.publishedAt ?? null,
@@ -243,8 +262,14 @@ export async function updateInsight(
   if (input.title !== undefined) payload.title = input.title.trim();
   if (input.category !== undefined) payload.category = input.category.trim();
   if (input.summary !== undefined) payload.summary = input.summary.trim();
+  if (input.seoDescription !== undefined) {
+    payload.seo_description = input.seoDescription?.trim() || null;
+  }
   if (input.body !== undefined) payload.body = normalizeBody(input.body);
   if (input.heroImagePath !== undefined) payload.hero_image_path = input.heroImagePath;
+  if (input.socialImageAlt !== undefined) {
+    payload.social_image_alt = input.socialImageAlt?.trim() || null;
+  }
   if (input.sourceLabel !== undefined) payload.source_label = input.sourceLabel?.trim() || null;
   if (input.sourceUrl !== undefined) payload.source_url = input.sourceUrl?.trim() || null;
   if (input.publishedAt !== undefined) payload.published_at = input.publishedAt;

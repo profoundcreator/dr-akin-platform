@@ -110,7 +110,7 @@ export function EnquiryModal({ open, onClose, triggerRef }: EnquiryModalProps) {
       >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-elevated)] px-6 py-5">
           <div className="space-y-1">
-            <p className="ploy-kicker">Book Dr. Akin</p>
+            <p className="ploy-kicker">Invite Akin Akinpelu</p>
             <Heading as="h2" id="enquiry-modal-title" size="card">
               Submit an engagement invitation
             </Heading>

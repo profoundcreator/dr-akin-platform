@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { InsightDetailBySlug } from "@/components/pages/insight-detail-by-slug";
 import { fetchAllInsightsForBuild } from "@/lib/insights/articles-build";
+import { articleSchema, breadcrumbSchema } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
   const articles = await fetchAllInsightsForBuild();
@@ -13,8 +14,32 @@ export async function getStaticPaths() {
 }
 
 const { article } = Astro.props;
+const site = Astro.site ?? Astro.url.origin;
+const description = article.seoDescription || article.summary;
+const schemas = [
+  articleSchema({
+    title: article.title,
+    slug: article.slug,
+    summary: description,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    image: article.heroImageUrl,
+  }, site),
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Insights", path: "/insights" },
+    { name: article.title, path: `/insights/${article.slug}` },
+  ], site),
+];
 ---
 
-<Layout title={`${article.title} — Insights`} description={article.summary} ogImage={article.heroImageUrl ?? undefined}>
+<Layout
+  title={`${article.title} — Insights`}
+  description={description}
+  ogImage={article.heroImageUrl ?? undefined}
+  ogImageAlt={article.socialImageAlt || article.title}
+  ogType="article"
+  jsonLd={schemas}
+>
   <InsightDetailBySlug client:load slug={article.slug} initialInsight={article} />
 </Layout>

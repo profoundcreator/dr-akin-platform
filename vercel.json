@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/work/tc-resource-technology",
+      "destination": "/work",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/booking/:ref", "destination": "/booking/DAA-8492" },
     {

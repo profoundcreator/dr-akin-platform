@@ -10,10 +10,11 @@ const root = resolve(import.meta.dirname, "..");
 
 const pages = [
   { path: "src/pages/work/index.astro", key: "work", component: "WorkHubPage", importFrom: "marketing-page" },
+  { path: "src/pages/work/future-africa.astro", key: "work-future-africa" },
   { path: "src/pages/work/aald.astro", key: "work-aald" },
   { path: "src/pages/work/erudio-hub.astro", key: "work-erudio-hub" },
   { path: "src/pages/work/performx.astro", key: "work-performx" },
-  { path: "src/pages/work/tc-resource-technology.astro", key: "work-tc" },
+  { path: "src/pages/work/auctus-africa.astro", key: "work-auctus-africa" },
   { path: "src/pages/meet-akin/index.astro", key: "meet-akin" },
   { path: "src/pages/meet-akin/profile.astro", key: "meet-profile" },
   { path: "src/pages/meet-akin/au-ambassador.astro", key: "meet-au" },

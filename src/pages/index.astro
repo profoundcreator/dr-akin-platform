@@ -9,12 +9,16 @@ import { AaldSection } from "@/components/sections/aald-section";
 import { EventsFeaturedSection } from "@/components/sections/events-featured-section";
 import { LibraryFeaturedSection } from "@/components/sections/library-featured-section";
 import { SITE_IMAGES } from "@/lib/media/site-images";
+import { personSchema, websiteSchema } from "@/lib/seo/json-ld";
+
+const site = Astro.site ?? Astro.url.origin;
 ---
 
 <Layout
-  title="Dr. Akin Akinpelu — Executive Coach & Corporate Transformation Strategist"
+  title="Akin Akinpelu, Ph.D., Amb., FLPi — Leadership Scholar & Institution Builder"
   ogImage={SITE_IMAGES.portrait}
   preloadImage={SITE_IMAGES.portrait}
+  jsonLd={[personSchema(site), websiteSchema(site)]}
 >
   <div class="flex min-h-screen flex-col bg-[var(--ploy-background-primary)]">
     <SiteHeader client:load />

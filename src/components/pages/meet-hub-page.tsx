@@ -80,7 +80,7 @@ export function MeetHubPage({ content }: MeetHubPageProps) {
           <Reveal delay={0.15} className="relative min-h-[28rem] overflow-x-hidden border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
             <OptimizedImage
               src={MEET_PORTRAIT_URL}
-              alt="Dr. Akin Akinpelu"
+              alt="Akin Akinpelu"
               priority
               width={960}
               height={1200}

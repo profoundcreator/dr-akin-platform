@@ -1,4 +1,5 @@
 import { SITE_PAGES } from "@/data/site-content";
+import { PUBLIC_WORK_SLUGS } from "@/data/ecosystem";
 import { mergePublishedWithStatic } from "@/lib/content/merge-published-with-static";
 import { STATIC_WORK_ORG_META } from "@/lib/work-orgs/constants";
 import {
@@ -40,14 +41,17 @@ function staticOrgToPlatform(meta: (typeof STATIC_WORK_ORG_META)[number]): Platf
 }
 
 const STATIC_ORGS = STATIC_WORK_ORG_META.map(staticOrgToPlatform);
+const PUBLIC_WORK_SLUG_SET = new Set<string>(PUBLIC_WORK_SLUGS);
 
 export async function getPublicWorkOrgs(): Promise<PlatformWorkOrg[]> {
   const fromDb = await getPublishedWorkOrgsFromDb();
-  const merged = mergePublishedWithStatic(fromDb, STATIC_ORGS);
+  const publicRows = fromDb.filter((org) => PUBLIC_WORK_SLUG_SET.has(org.slug));
+  const merged = mergePublishedWithStatic(publicRows, STATIC_ORGS);
   return merged.sort((a, b) => a.sortOrder - b.sortOrder || a.pillarTitle.localeCompare(b.pillarTitle));
 }
 
 export async function getPublicWorkOrgBySlug(slug: string): Promise<PlatformWorkOrg | null> {
+  if (!PUBLIC_WORK_SLUG_SET.has(slug)) return null;
   const fromDb = await getWorkOrgBySlugFromDb(slug);
   if (fromDb) return fromDb;
   return STATIC_ORGS.find((org) => org.slug === slug) ?? null;

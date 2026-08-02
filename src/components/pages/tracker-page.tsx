@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import {
   AlertCircle,
   Calendar,
+  Download,
   FileText,
+  LockKeyhole,
   Mail,
   MapPin,
   MessageSquare,
@@ -18,6 +20,11 @@ import { formatEventLocation } from "@/lib/booking/format-rules";
 import { seedDemoRequests } from "@/lib/booking/storage";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
+import {
+  getOrganizerGrantedResources,
+  requestOrganizerResourceDownload,
+} from "@/lib/organizer-resources/api";
+import type { OrganizerGrantedResource } from "@/lib/organizer-resources/types";
 
 interface TrackerPageProps {
   reference: string;
@@ -51,6 +58,9 @@ function StatusBadge({ status }: { status: string }) {
 export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
   const [reference, setReference] = useState(initialRef);
   const [request, setRequest] = useState<BookingRequest | null>(null);
+  const [approvedMaterials, setApprovedMaterials] = useState<OrganizerGrantedResource[]>([]);
+  const [materialsError, setMaterialsError] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,6 +80,18 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
       try {
         const found = await getBookingByReference(resolved, token);
         setRequest(found);
+        if (found && token && isSupabaseConfigured) {
+          try {
+            setApprovedMaterials(await getOrganizerGrantedResources(resolved, token));
+          } catch (resourceError) {
+            setApprovedMaterials([]);
+            setMaterialsError(
+              resourceError instanceof Error
+                ? resourceError.message
+                : "Approved materials could not be loaded.",
+            );
+          }
+        }
       } catch {
         setRequest(null);
       } finally {
@@ -116,6 +138,21 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
   }
 
   const latestEvent = request.statusHistory[request.statusHistory.length - 1];
+
+  async function downloadMaterial(resource: OrganizerGrantedResource) {
+    setDownloadingId(resource.resourceId);
+    setMaterialsError(null);
+    try {
+      const signedUrl = await requestOrganizerResourceDownload(reference, resource.resourceId);
+      window.location.assign(signedUrl);
+    } catch (downloadError) {
+      setMaterialsError(
+        downloadError instanceof Error ? downloadError.message : "The secure download failed.",
+      );
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   return (
     <PageShell>
@@ -227,6 +264,60 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
                 </div>
               </Reveal>
             )}
+
+            <Reveal delay={0.12}>
+              <div className="ploy-surface-elevated space-y-4 p-6">
+                <div>
+                  <Heading as="h2" size="label">
+                    Approved Materials
+                  </Heading>
+                  <p className="mt-2 text-sm text-[var(--ploy-text-secondary)]">
+                    Materials approved for this engagement are protected by your booking link.
+                    Downloads use a short-lived private link; do not share it.
+                  </p>
+                </div>
+                {materialsError && (
+                  <p className="rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-4 py-3 text-sm text-[var(--ploy-status-error)]">
+                    {materialsError}
+                  </p>
+                )}
+                {approvedMaterials.length === 0 ? (
+                  <div className="flex gap-3 text-sm text-[var(--ploy-text-tertiary)]">
+                    <LockKeyhole className="mt-0.5 size-4 shrink-0" />
+                    <p>No approved materials have been released for this booking yet.</p>
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {approvedMaterials.map((resource) => (
+                      <li
+                        key={resource.grantId}
+                        className="flex flex-wrap items-center gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-subtle)] px-4 py-3 text-sm"
+                      >
+                        <FileText className="size-4 text-[var(--ploy-text-accent)]" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium">{resource.title}</p>
+                          <p className="text-xs text-[var(--ploy-text-tertiary)]">
+                            {resource.category} · version {resource.version}
+                            {resource.expiresAt
+                              ? ` · available until ${new Date(resource.expiresAt).toLocaleString()}`
+                              : ""}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => downloadMaterial(resource)}
+                          disabled={downloadingId === resource.resourceId}
+                          className="inline-flex items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 font-medium disabled:opacity-50"
+                        >
+                          <Download className="size-4" />
+                          {downloadingId === resource.resourceId ? "Preparing..." : "Download"}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </Reveal>
 
             <Reveal delay={0.15}>
               <div className="ploy-surface-elevated space-y-4 p-6">

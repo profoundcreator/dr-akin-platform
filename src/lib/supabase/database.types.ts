@@ -103,6 +103,37 @@ export interface DbAuditEvent {
   created_at: string;
 }
 
+export interface DbOrganizerResourceFile {
+  id: string;
+  logical_key: string;
+  title: string;
+  category: string;
+  audience_variant: "professional" | "christian" | "universal";
+  version: number;
+  file_name: string;
+  object_path: string;
+  mime_type: string;
+  size_bytes: number;
+  status: "available" | "retired";
+  is_current: boolean;
+  created_by: string;
+  created_at: string;
+  retired_by: string | null;
+  retired_at: string | null;
+}
+
+export interface DbBookingResourceGrant {
+  id: string;
+  booking_request_id: string;
+  resource_file_id: string;
+  granted_by: string;
+  granted_at: string;
+  expires_at: string | null;
+  revoked_by: string | null;
+  revoked_at: string | null;
+  revoke_reason: string | null;
+}
+
 export interface DbEvent {
   id: string;
   slug: string;
@@ -162,8 +193,10 @@ export interface DbInsightArticle {
   title: string;
   category: string;
   summary: string;
+  seo_description: string | null;
   body: string;
   hero_image_path: string | null;
+  social_image_alt: string | null;
   source_label: string | null;
   source_url: string | null;
   published_at: string | null;
@@ -275,6 +308,16 @@ export interface Database {
         Insert: Partial<DbAuditEvent>;
         Update: never;
       };
+      organizer_resource_files: {
+        Row: DbOrganizerResourceFile;
+        Insert: never;
+        Update: never;
+      };
+      booking_resource_grants: {
+        Row: DbBookingResourceGrant;
+        Insert: never;
+        Update: never;
+      };
       featured_podcast_episodes: {
         Row: DbFeaturedPodcastEpisode;
         Insert: Partial<DbFeaturedPodcastEpisode> &
@@ -325,6 +368,18 @@ export interface Database {
         Args: { p_form: Record<string, unknown>; p_source?: string };
         Returns: CreateBookingResult;
       };
+      submit_general_enquiry: {
+        Args: {
+          p_name: string;
+          p_email: string;
+          p_organization?: string;
+          p_subject: string;
+          p_message: string;
+          p_privacy_agreed: boolean;
+          p_website?: string;
+        };
+        Returns: string;
+      };
       get_booking_for_organizer: {
         Args: { p_reference: string; p_access_token: string };
         Returns: Record<string, unknown> | null;
@@ -367,6 +422,46 @@ export interface Database {
           metadata: Record<string, unknown> | null;
           created_at: string;
         }[];
+      };
+      register_organizer_resource: {
+        Args: {
+          p_logical_key: string;
+          p_title: string;
+          p_category: string;
+          p_file_name: string;
+          p_object_path: string;
+          p_mime_type: string;
+          p_size_bytes: number;
+        };
+        Returns: DbOrganizerResourceFile;
+      };
+      retire_organizer_resource: {
+        Args: { p_resource_file_id: string };
+        Returns: DbOrganizerResourceFile;
+      };
+      grant_booking_resource: {
+        Args: {
+          p_booking_request_id: string;
+          p_resource_file_id: string;
+          p_expires_at?: string;
+        };
+        Returns: DbBookingResourceGrant;
+      };
+      revoke_booking_resource: {
+        Args: { p_grant_id: string; p_reason?: string };
+        Returns: DbBookingResourceGrant;
+      };
+      get_organizer_resources: {
+        Args: { p_reference: string; p_access_token: string };
+        Returns: Record<string, unknown> | null;
+      };
+      record_organizer_resource_access: {
+        Args: {
+          p_reference: string;
+          p_access_token: string;
+          p_resource_file_id: string;
+        };
+        Returns: boolean;
       };
     };
   };

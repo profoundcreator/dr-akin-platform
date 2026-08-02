@@ -15,6 +15,7 @@ import {
   type SiteSettings,
 } from "@/lib/site-settings/site-settings";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
 
 export function HeroSection() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SITE_SETTINGS);
@@ -64,26 +65,25 @@ export function HeroSection() {
         >
           <Reveal className="max-w-4xl">
             <p className="ploy-eyebrow mb-8 max-w-2xl">
-              Forbes Thought Leader · Professor of Educational Leadership · AU Agenda
-              2063 Ambassador
+              {AU_TITLE}
             </p>
             <Heading as="h1" size="display" className="ploy-text-balance">
-              Building leaders and institutions
+              Leadership for institutions.
               <span className="block text-[var(--ploy-text-secondary)]">
-                that outlast the moment.
+                Partnership for Africa’s future.
               </span>
             </Heading>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-              Dr. Akin Akinpelu works across corporate strategy, academic reform, public
-              policy, and marketplace ministry—helping leaders turn ideas into institutions
-              that endure.
+              {PUBLIC_NAME} works across governance, enterprise and education—strengthening
+              institutions, developing leaders and building partnerships that advance Africa’s
+              long-term transformation.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button variant="primary" showArrow href="/work">
                 Explore the ecosystem
               </Button>
               <Button variant="secondary" href="/meet-akin">
-                Meet Dr. Akin
+                Meet Akin
               </Button>
             </div>
           </Reveal>
@@ -91,7 +91,7 @@ export function HeroSection() {
           {!isMinimal && (
             <div className="mt-16 flex items-center gap-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
               <span className="h-px w-16 bg-[var(--ploy-border-primary)]" />
-              Leadership · Systems · Legacy
+              Governance · Enterprise · Education
             </div>
           )}
         </div>
@@ -103,7 +103,7 @@ export function HeroSection() {
           >
             <OptimizedImage
               src={portraitUrl}
-              alt="Dr. Akin Akinpelu seated in a burgundy suit"
+              alt={`${PUBLIC_NAME} seated in a burgundy suit`}
               priority
               width={960}
               height={1200}

@@ -23,7 +23,7 @@ export function NotFoundPage() {
                 Return home
               </Button>
               <Button variant="secondary" href="/book-dr-akin">
-                Book Dr. Akin
+                Invite Akin Akinpelu
               </Button>
             </div>
           </Reveal>

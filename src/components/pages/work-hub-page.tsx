@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -9,8 +8,8 @@ import { Reveal } from "@/components/ui/reveal";
 import type { PageContent } from "@/data/site-content";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { SITE_IMAGES } from "@/lib/media/site-images";
-import { formatWorkOrgNumber } from "@/lib/work-orgs/mappers";
-import { getPublicWorkOrgs } from "@/lib/work-orgs/public-orgs";
+import { ECOSYSTEM_PILLARS, ECOSYSTEM_PLATFORMS } from "@/data/ecosystem";
+import { PUBLIC_NAME } from "@/data/person-identity";
 import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
 
 const WORK_PORTRAIT_URL = SITE_IMAGES.portrait;
@@ -20,13 +19,7 @@ interface WorkHubPageProps {
   initialOrgs?: PlatformWorkOrg[];
 }
 
-export function WorkHubPage({ content, initialOrgs = [] }: WorkHubPageProps) {
-  const [platforms, setPlatforms] = useState<PlatformWorkOrg[]>(initialOrgs);
-
-  useEffect(() => {
-    getPublicWorkOrgs().then(setPlatforms);
-  }, []);
-
+export function WorkHubPage({ content }: WorkHubPageProps) {
   return (
     <PageShell>
       <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)]">
@@ -56,7 +49,7 @@ export function WorkHubPage({ content, initialOrgs = [] }: WorkHubPageProps) {
           <Reveal delay={0.15} className="relative min-h-[28rem] overflow-x-hidden border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-[32rem] lg:border-l lg:border-t-0">
             <OptimizedImage
               src={WORK_PORTRAIT_URL}
-              alt="Dr. Akin Akinpelu"
+              alt={PUBLIC_NAME}
               priority
               width={960}
               height={1200}
@@ -74,35 +67,59 @@ export function WorkHubPage({ content, initialOrgs = [] }: WorkHubPageProps) {
               The ecosystem
             </p>
             <Heading as="h2" size="section" tone="inverse" className="ploy-text-balance">
-              Four operating arms. One integrated agenda.
+              Three pillars. Six platforms. One integrated agenda.
             </Heading>
           </Reveal>
 
-          <div className="border-t border-[var(--ploy-text-inverse)]/15">
-            {platforms.map((platform, i) => (
-              <Reveal key={platform.slug} delay={i * 0.05}>
-                <div className="grid gap-6 border-b border-[var(--ploy-text-inverse)]/15 py-8 lg:grid-cols-[auto_1fr_auto] lg:items-start lg:gap-10">
-                  <span className="font-serif text-3xl text-[var(--ploy-accent-primary)] md:text-4xl">
-                    {formatWorkOrgNumber(platform.sortOrder)}
-                  </span>
-                  <div className="space-y-2">
-                    <Heading as="h3" size="card" tone="inverse">
-                      {platform.pillarTitle}
-                    </Heading>
-                    <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-inverse)]/60">
-                      {platform.brandLabel}
-                    </p>
-                    <p className="max-w-2xl leading-relaxed text-[var(--ploy-text-inverse)]/75">
-                      {platform.hubCardDescription}
+          <div className="space-y-16">
+            {ECOSYSTEM_PILLARS.map((pillar, pillarIndex) => (
+              <Reveal key={pillar.id} delay={pillarIndex * 0.05}>
+                <div id={pillar.id} className="scroll-mt-24">
+                  <div className="grid gap-4 border-b border-[var(--ploy-text-inverse)]/30 pb-6 lg:grid-cols-[0.3fr_1fr]">
+                    <Heading as="h3" size="card" tone="inverse">{pillar.name}</Heading>
+                    <p className="max-w-3xl leading-relaxed text-[var(--ploy-text-inverse)]/70">
+                      {pillar.summary}
                     </p>
                   </div>
-                  <a
-                    href={`/work/${platform.slug}`}
-                    className="inline-flex shrink-0 items-center gap-2 self-start text-sm font-semibold text-[var(--ploy-text-inverse)] underline decoration-[var(--ploy-text-inverse)]/30 underline-offset-4 transition-colors hover:decoration-[var(--ploy-text-inverse)]"
-                  >
-                    Launch platform
-                    <ArrowUpRight className="size-4" aria-hidden="true" />
-                  </a>
+                  {pillar.platforms.map((platform) => {
+                    const platformIndex = ECOSYSTEM_PLATFORMS.findIndex(
+                      (item) => item.id === platform.id,
+                    );
+                    return (
+                      <div
+                        key={platform.id}
+                        className="grid gap-6 border-b border-[var(--ploy-text-inverse)]/15 py-8 lg:grid-cols-[auto_1fr_auto] lg:items-start lg:gap-10"
+                      >
+                        <span className="font-serif text-3xl text-[var(--ploy-accent-primary)] md:text-4xl">
+                          {String(platformIndex + 1).padStart(2, "0")}
+                        </span>
+                        <div className="space-y-2">
+                          <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-inverse)]/60">
+                            {pillar.name}
+                          </p>
+                          <Heading as="h4" size="card" tone="inverse">
+                            {platform.name}
+                          </Heading>
+                          <p className="max-w-2xl leading-relaxed text-[var(--ploy-text-inverse)]/75">
+                            {platform.summary}
+                          </p>
+                        </div>
+                        {platform.isNavigable === false ? (
+                          <span className="shrink-0 self-start font-mono text-xs uppercase tracking-[0.12em] text-[var(--ploy-text-inverse)]/50">
+                            Event & community
+                          </span>
+                        ) : (
+                          <a
+                            href={platform.href}
+                            className="inline-flex shrink-0 items-center gap-2 self-start text-sm font-semibold text-[var(--ploy-text-inverse)] underline decoration-[var(--ploy-text-inverse)]/30 underline-offset-4 transition-colors hover:decoration-[var(--ploy-text-inverse)]"
+                          >
+                            Explore platform
+                            <ArrowUpRight className="size-4" aria-hidden="true" />
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </Reveal>
             ))}

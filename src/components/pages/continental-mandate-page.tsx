@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
 import { openEnquiryModal } from "@/lib/enquiry";
+import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
 
 const STATS = [
   {
@@ -57,16 +58,14 @@ export function ContinentalMandatePage() {
           <div className="flex flex-col justify-center px-6 py-14 md:px-10 md:py-20 lg:px-14 lg:py-24 xl:px-20">
             <Reveal className="max-w-4xl space-y-8">
               <p className="ploy-eyebrow">
-                African Union Agenda 2063 · Ambassadorial Assembly
+                {AU_TITLE}
               </p>
               <Heading as="h1" size="display" className="ploy-text-balance">
                 Advancing governance and strategic engagement across Africa.
               </Heading>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--ploy-text-secondary)] md:text-xl">
-                As Ambassador for the African Union Agenda 2063 Ambassadors Assembly,
-                Dr. Akin advances political affairs, strategic engagement, and governance
-                advocacy — connecting continental policy to the leaders and institutions
-                building Africa&apos;s future.
+                As {AU_TITLE}, {PUBLIC_NAME} contributes to continental engagement around
+                governance, institutional capacity, leadership and strategic partnerships.
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Button type="button" variant="primary" showArrow onClick={openEnquiryModal}>
@@ -130,9 +129,9 @@ export function ContinentalMandatePage() {
             </Heading>
             <p className="text-lg leading-relaxed text-[var(--ploy-text-inverse)]/75">
               Agenda 2063 is the African Union&apos;s blueprint for an integrated, prosperous,
-              and peaceful continent. Dr. Akin&apos;s ambassadorial work sits at the intersection
-              of governance, strategic engagement, and leadership development — ensuring the
-              continent&apos;s aspirations connect to the institutions and people who execute them.
+              and peaceful continent. His work sits at the intersection of governance, strategic
+              engagement and leadership development—connecting the continent&apos;s aspirations to
+              the institutions and people who can carry them forward.
             </p>
           </Reveal>
           <Reveal delay={0.1} className="space-y-8">
@@ -156,7 +155,7 @@ export function ContinentalMandatePage() {
           <Reveal className="mb-12 grid gap-6 lg:grid-cols-[0.35fr_1fr] lg:items-end">
             <Heading as="h2" size="section">The mandate</Heading>
             <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              Three focus areas through which the ambassadorial role advances Agenda 2063.
+              Three focus areas through which the continental role supports Agenda 2063.
             </p>
           </Reveal>
           <div className="border-t border-[var(--ploy-border-primary)]">

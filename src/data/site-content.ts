@@ -1,4 +1,5 @@
 import { SITE_IMAGES } from "@/lib/media/site-images";
+import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
 
 export interface PageSection {
   title: string;
@@ -22,23 +23,55 @@ export interface PageContent {
 export const SITE_PAGES: Record<string, PageContent> = {
   work: {
     slug: "work",
-    title: "Work — Dr. Akin Akinpelu",
-    kicker: "Corporate · Academic · Public Policy · Marketplace",
-    headline: "One leader. Four operating arms.",
-    headlineSecondary: "A single agenda.",
+    title: `Work — ${PUBLIC_NAME}`,
+    kicker: "Governance · Enterprise · Education",
+    headline: "Three strategic pillars. Six platforms.",
+    headlineSecondary: "One commitment to Africa’s progress.",
     description:
-      "Dr. Akin Akinpelu works across corporate transformation, educational reform, execution strategy, and technology alliances — helping leaders turn vision into durable systems.",
+      "Akin Akinpelu’s work connects public leadership, enterprise development and education. Each platform addresses a distinct part of the same challenge: building capable institutions, productive people and partnerships that can sustain Africa’s growth.",
     sections: [
       {
-        title: "Integrated ecosystem",
-        body: "Each platform addresses a distinct sphere of leadership and institutional development, while sharing a common commitment to African excellence and global impact.",
+        title: "One connected ecosystem",
+        body: "Across governance, enterprise and education, six platforms strengthen institutions, expand opportunity and turn Africa’s ambitions into durable systems.",
       },
     ],
     relatedLinks: [
-      { label: "AALD — Corporate Transformation", href: "/work/aald" },
-      { label: "Erudio Hub — Educational Reform", href: "/work/erudio-hub" },
-      { label: "PERFORMX — Execution Think Tank", href: "/work/performx" },
-      { label: "TC Resource Technology", href: "/work/tc-resource-technology" },
+      { label: AU_TITLE, href: "/meet-akin/au-ambassador" },
+      { label: "Future Africa", href: "/work/future-africa" },
+      { label: "AALD", href: "/work/aald" },
+      { label: "Erudio Hub", href: "/work/erudio-hub" },
+      { label: "Auctus Africa", href: "/work/auctus-africa" },
+    ],
+    cta: { label: "Discuss a partnership", href: "/book-dr-akin" },
+  },
+  "work-future-africa": {
+    slug: "work/future-africa",
+    title: "Future Africa — Governance and Continental Collaboration",
+    kicker: "Governance · Continental collaboration",
+    headline: "Reimagining Africa’s future—",
+    headlineSecondary: "one institution, economy and life at a time.",
+    description:
+      "Future Africa is a continental platform designed to accelerate the aspirations of Agenda 2063 through collaboration, leadership and strategic action. It brings governments, development institutions, academia, business, civil society, traditional institutions, the African diaspora and citizens into a shared platform for implementation.",
+    sections: [
+      {
+        title: "From aspiration to coordinated action",
+        body: "Africa’s opportunity is matched by the scale of the work required. Future Africa exists to strengthen and connect existing efforts—not to create parallel structures—by cultivating ethical leadership, investing in human capital and building partnerships across sectors and borders.",
+      },
+      {
+        title: "Flagship initiatives",
+        body: "Planned initiatives are designed to connect public leadership, institutional collaboration and citizen participation around practical implementation.",
+        bullets: [
+          "Government Partnerships & Institutional Collaboration",
+          "Future Africa School of Governance",
+          "Future Africa Ambassadors Network",
+          "Future Africa Festival",
+          "Youth Leadership & Human Capital Development",
+        ],
+      },
+      {
+        title: "A platform for implementation",
+        body: "Future Africa mobilises today’s institutions and citizens through collaboration, leadership and strategic action to help build the Africa of tomorrow.",
+      },
     ],
     cta: { label: "Discuss a partnership", href: "/book-dr-akin" },
   },
@@ -61,7 +94,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Invite Dr. Akin to speak", href: "/meet-akin/speaking" },
+    cta: { label: "Invite Akin Akinpelu to speak", href: "/meet-akin/speaking" },
   },
   "work-erudio-hub": {
     slug: "work/erudio-hub",
@@ -107,55 +140,60 @@ export const SITE_PAGES: Record<string, PageContent> = {
     ],
     cta: { label: "Book an advisory session", href: "/book-dr-akin" },
   },
-  "work-tc": {
-    slug: "work/tc-resource-technology",
-    title: "TC Resource Technology",
-    kicker: "TC Resource Tech · Tech Alliances",
-    headline: "Technology partnerships for",
-    headlineSecondary: "institutional scale.",
+  "work-auctus-africa": {
+    slug: "work/auctus-africa",
+    title: "Auctus Africa — Education and Social Transformation",
+    kicker: "Education · Social transformation",
+    headline: "Turning potential into opportunity",
+    headlineSecondary: "across African communities.",
     description:
-      "TC Resource Technology connects enterprises and institutions with the technology alliances needed to scale operations and deliver impact.",
+      "Auctus Social Transformation Initiative is a non-profit organisation committed to bridging the gap between potential and opportunity through education, empowerment, environmental responsibility and pathways to economic participation.",
     sections: [
       {
-        title: "Partnership model",
-        body: "Strategic technology advisory, vendor selection, and implementation oversight for complex organisational transformations.",
+        title: "Human capital for community transformation",
+        body: "Auctus Africa works with learners, educators, institutions and communities to strengthen capacity and widen access to the knowledge, skills and partnerships people need to thrive.",
+      },
+      {
+        title: "Programme highlights",
+        body: "Its programmes connect educator development, youth opportunity and practical pathways into education, enterprise and skilled work.",
         bullets: [
-          "Digital transformation roadmaps",
-          "Enterprise systems advisory",
-          "Technology vendor partnerships",
-          "Implementation governance",
+          "The 7 Star Programme for teacher and educator development",
+          "Youth empowerment and 21st-century skills",
+          "Graduate pathways into education",
+          "Technical, vocational and entrepreneurship initiatives",
         ],
       },
     ],
-    cta: { label: "Explore an alliance", href: "/book-dr-akin" },
+    cta: { label: "Visit Auctus Africa", href: "https://auctusafrica.org/" },
+    secondaryCta: { label: "Explore the education pillar", href: "/work" },
   },
   "meet-akin": {
     slug: "meet-akin",
-    title: "Meet Dr. Akin",
-    kicker: "Corporate · Academic · Public Policy · Marketplace",
-    headline: "Leadership across four spheres",
-    headlineSecondary: "of influence.",
+    title: `Meet ${PUBLIC_NAME}`,
+    kicker: "Governance · Enterprise · Education",
+    headline: "Leadership for institutions.",
+    headlineSecondary: "Partnership for Africa’s future.",
     description:
-      "Dr. Akin Akinpelu Ph.D is an executive coach, author, and corporate transformation strategist working at the intersection of business, education, public policy, and marketplace ministry.",
+      `${PUBLIC_NAME} is a leadership scholar, governance practitioner, diplomat and institution builder working across governance, enterprise and education.`,
     sections: [
       {
-        title: "Four spheres",
-        body: "His work spans corporate boardrooms, classrooms, policy chambers, and faith-driven marketplace leadership — with a single through-line: building institutions that outlast their founders.",
+        title: "Three strategic pillars",
+        body: "His work connects public leadership, enterprise development and education with a single through-line: building capable institutions and developing transformational leaders.",
       },
     ],
     cta: { label: "Inquire for advisory", href: "/meet-akin/speaking" },
   },
   "meet-profile": {
     slug: "meet-akin/profile",
-    title: "Profile — Dr. Akin Akinpelu",
+    title: `Profile — ${PUBLIC_NAME}`,
     kicker: "Profile · Biography & credentials",
     headline: "Biography and credentials",
     description:
-      "Dr. Akin Akinpelu brings decades of experience in executive coaching, organisational consulting, and leadership development across Africa and the global diaspora.",
+      `${PUBLIC_NAME} is a leadership scholar, governance practitioner, diplomat and institution builder advancing Africa’s long-term transformation.`,
     sections: [
       {
         title: "Background",
-        body: "A sought-after advisor to C-suite leaders, boards, and institutions, Dr. Akin has authored multiple books on leadership, execution, and institutional transformation.",
+        body: "A sought-after advisor to C-suite leaders, boards, and institutions, Akin Akinpelu has authored multiple books on leadership, execution, and institutional transformation.",
         bullets: [
           "Executive coach and corporate strategist",
           "Author of nine published titles",
@@ -173,7 +211,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
     headline: "Advancing governance and strategic engagement",
     headlineSecondary: "across Africa.",
     description:
-      "Dr. Akin serves as Ambassador for the African Union Agenda 2063 Ambassadors Assembly, advancing political affairs, strategic engagement, and governance advocacy across the continent.",
+      `${PUBLIC_NAME} serves as ${AU_TITLE}, contributing to continental engagement around governance, institutional capacity, leadership and strategic partnerships.`,
     sections: [
       {
         title: "Agenda 2063",
@@ -184,12 +222,12 @@ export const SITE_PAGES: Record<string, PageContent> = {
   },
   "meet-edu": {
     slug: "meet-akin/edu-governance",
-    title: "Board Governance — Dr. Akin Akinpelu",
+    title: `Board Governance — ${PUBLIC_NAME}`,
     kicker: "Board Governance · Advisory",
     headline: "Boards, advisory roles, and",
     headlineSecondary: "governance excellence.",
     description:
-      "Dr. Akin advises boards and governance bodies on leadership transitions, fiduciary responsibility, and long-term institutional stewardship.",
+      "Akin Akinpelu advises boards and governance bodies on leadership transitions, fiduciary responsibility, and long-term institutional stewardship.",
     sections: [
       {
         title: "Governance focus",
@@ -200,13 +238,13 @@ export const SITE_PAGES: Record<string, PageContent> = {
   },
   "meet-speaking": {
     slug: "meet-akin/speaking",
-    title: "Keynote Speaking — Dr. Akin Akinpelu",
+    title: `Keynote Speaking — ${PUBLIC_NAME}`,
     kicker:
-      "Dr. Akin Akinpelu · Keynote Speaker · Consultant · Author · Strategist",
+      `${PUBLIC_NAME} · Keynote Speaker`,
     headline: "A speaker who moves rooms",
     headlineSecondary: "from the main stage to the boardroom.",
     description:
-      "Dr. Akin delivers keynotes, panel contributions, workshops, and fireside conversations for conferences, corporate retreats, and leadership summits worldwide.",
+      `${PUBLIC_NAME} delivers keynotes, panel contributions, workshops and fireside conversations across governance, enterprise and education.`,
     sections: [
       {
         title: "Before you book",
@@ -223,8 +261,8 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "After submission you receive a booking reference, confirmation email, and secure tracking link. Initial status: Received. Response within 3–5 business days.",
       },
     ],
-    cta: { label: "Book Dr. Akin", href: "/book-dr-akin" },
-    secondaryCta: { label: "About Dr. Akin", href: "/meet-akin/profile" },
+    cta: { label: "Invite Akin Akinpelu", href: "/book-dr-akin" },
+    secondaryCta: { label: "About Akin", href: "/meet-akin/profile" },
   },
   resources: {
     slug: "resources",
@@ -237,7 +275,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
     sections: [
       {
         title: "Library",
-        body: "Dr. Akin's published works distil decades of coaching and consulting into actionable frameworks.",
+        body: "Akin Akinpelu's published works distil decades of coaching and consulting into actionable frameworks.",
       },
       {
         title: "Marketplace Ministry",
@@ -274,11 +312,11 @@ export const SITE_PAGES: Record<string, PageContent> = {
     kicker: "Organizer Resources",
     headline: "Approved biographies, photographs, and event materials",
     description:
-      "Current approved versions of speaker materials for confirmed engagements. Access to additional resources is provided after booking confirmation.",
+      "Organizer packs are not public downloads. Approved materials are released only to individual bookings through their secure, token-protected tracking link.",
     sections: [
       {
         title: "Available materials",
-        body: "Short, medium, and full biographies; official headshots; introduction scripts; and technical requirements.",
+        body: "After the team approves access, your booking tracker will show the current materials assigned to your engagement. Each download uses a short-lived private link.",
         bullets: [
           "Biography (short, medium, full)",
           "Official headshots and photographs",
@@ -288,6 +326,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
     ],
     cta: { label: "Submit a booking request", href: "/book-dr-akin" },
+    relatedLinks: [{ label: "Contact the team", href: "/contact" }],
   },
 };
 

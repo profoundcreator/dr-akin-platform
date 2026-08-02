@@ -4,8 +4,7 @@ export const WORK_ORG_BRAND_OPTIONS: { value: EventBrand; label: string }[] = [
   { value: "aald", label: "AALD" },
   { value: "erudio", label: "Erudio Hub" },
   { value: "performx", label: "PERFORMX" },
-  { value: "tc_resource", label: "TC Resource Tech" },
-  { value: "dr_akin", label: "Dr. Akin" },
+  { value: "dr_akin", label: "Akin Akinpelu" },
   { value: "other", label: "Other" },
 ];
 
@@ -24,43 +23,43 @@ export const MIGRATION_011_HINT =
 
 export const STATIC_WORK_ORG_META = [
   {
+    siteKey: "work-future-africa",
+    slug: "future-africa",
+    brandKey: "other" as EventBrand,
+    sortOrder: 1,
+    pillarTitle: "Governance",
+    brandLabel: "Future Africa",
+    hubCardDescription:
+      "A continental platform mobilising institutions and citizens around practical action for Agenda 2063.",
+  },
+  {
     siteKey: "work-aald",
     slug: "aald",
     brandKey: "aald" as EventBrand,
-    sortOrder: 1,
-    pillarTitle: "Corporate Transformation",
+    sortOrder: 2,
+    pillarTitle: "Enterprise",
     brandLabel: "AALD",
     hubCardDescription:
-      "Leadership systems and institutional capability designed to hold under pressure and compound over time.",
+      "Leadership and institutional development for stronger systems, capable leaders and sustainable performance.",
   },
   {
     siteKey: "work-erudio-hub",
     slug: "erudio-hub",
     brandKey: "erudio" as EventBrand,
-    sortOrder: 2,
-    pillarTitle: "Educational Reform",
+    sortOrder: 4,
+    pillarTitle: "Education",
     brandLabel: "Erudio Hub",
     hubCardDescription:
-      "Systemic reform of how nations teach, govern schools, and develop the next generation of African educators.",
+      "Educational reform, educator development and institutional capacity for schools and systems.",
   },
   {
-    siteKey: "work-performx",
-    slug: "performx",
-    brandKey: "performx" as EventBrand,
-    sortOrder: 3,
-    pillarTitle: "Execution Think Tank",
-    brandLabel: "PERFORMX",
+    siteKey: "work-auctus-africa",
+    slug: "auctus-africa",
+    brandKey: "other" as EventBrand,
+    sortOrder: 5,
+    pillarTitle: "Education",
+    brandLabel: "Auctus Africa",
     hubCardDescription:
-      "A high-performance practice turning strategy into disciplined execution for leaders and operating teams.",
-  },
-  {
-    siteKey: "work-tc",
-    slug: "tc-resource-technology",
-    brandKey: "tc_resource" as EventBrand,
-    sortOrder: 4,
-    pillarTitle: "Tech Alliances",
-    brandLabel: "TC Resource Tech",
-    hubCardDescription:
-      "Technology partnerships and infrastructure extending the reach of every other arm of the ecosystem.",
+      "Social transformation connecting education, youth empowerment and economic opportunity.",
   },
 ] as const;

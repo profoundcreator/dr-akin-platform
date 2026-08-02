@@ -1,33 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Heading } from "@/components/ui/heading";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Reveal } from "@/components/ui/reveal";
+import { ECOSYSTEM_PILLARS } from "@/data/ecosystem";
 import { SITE_IMAGES } from "@/lib/media/site-images";
-import { getPublicWorkOrgs } from "@/lib/work-orgs/public-orgs";
-import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
 
 const SYSTEM_VISUAL_URL = SITE_IMAGES.ecosystemVisual;
 
 export function AaldSection() {
-  const [ecosystemArms, setEcosystemArms] = useState<PlatformWorkOrg[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    getPublicWorkOrgs()
-      .then((orgs) => {
-        setEcosystemArms(orgs);
-        setActiveIndex(0);
-      })
-      .finally(() => setLoaded(true));
-  }, []);
-
-  if (!loaded || ecosystemArms.length === 0) return null;
-
-  const activeItem = ecosystemArms[activeIndex] ?? ecosystemArms[0];
+  const activeItem = ECOSYSTEM_PILLARS[activeIndex] ?? ECOSYSTEM_PILLARS[0];
 
   return (
     <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">
@@ -35,17 +20,17 @@ export function AaldSection() {
         <Reveal className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
           <p className="ploy-eyebrow">The ecosystem</p>
           <Heading as="h2" size="section" className="ploy-text-balance">
-            A connected system for building leaders, institutions, and public impact.
+            One leader. Three pillars. A continental vision.
           </Heading>
         </Reveal>
 
         <div className="mt-14 grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
           <div className="border-t border-[var(--ploy-border-primary)]">
-            {ecosystemArms.map((item, index) => {
+            {ECOSYSTEM_PILLARS.map((item, index) => {
               const isActive = index === activeIndex;
               return (
                 <button
-                  key={item.slug}
+                  key={item.id}
                   type="button"
                   onMouseEnter={() => setActiveIndex(index)}
                   onFocus={() => setActiveIndex(index)}
@@ -61,10 +46,10 @@ export function AaldSection() {
                           : "text-[var(--ploy-text-secondary)]"
                       }`}
                     >
-                      {item.pillarTitle}
+                      {item.name}
                     </span>
                     <span className="mt-2 block font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
-                      {item.brandLabel}
+                      {item.platforms.map((platform) => platform.name).join(" · ")}
                     </span>
                   </span>
                   <ArrowUpRight
@@ -90,18 +75,29 @@ export function AaldSection() {
             />
             <div className="absolute inset-x-5 bottom-5 rounded-lg bg-[var(--ploy-background-primary)]/95 p-6 backdrop-blur md:inset-x-8 md:bottom-8 md:p-8">
               <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--ploy-text-secondary)]">
-                {activeItem.brandLabel}
+                {activeItem.name}
               </p>
               <p className="mt-3 max-w-xl text-lg leading-relaxed text-[var(--ploy-text-primary)]">
-                {activeItem.hubCardDescription}
+                {activeItem.summary}
               </p>
-              <a
-                href={`/work/${activeItem.slug}`}
-                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]"
-              >
-                Explore platform
-                <ArrowUpRight className="size-4" aria-hidden="true" />
-              </a>
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
+                {activeItem.platforms.map((platform) =>
+                  platform.isNavigable === false ? (
+                    <span key={platform.id} className="inline-flex items-center text-sm font-semibold text-[var(--ploy-text-secondary)]">
+                      {platform.name}
+                    </span>
+                  ) : (
+                    <a
+                      key={platform.id}
+                      href={platform.href}
+                      className="inline-flex items-center gap-2 text-sm font-semibold underline decoration-[var(--ploy-border-primary)] underline-offset-4 hover:decoration-[var(--ploy-text-primary)]"
+                    >
+                      {platform.name}
+                      <ArrowUpRight className="size-4" aria-hidden="true" />
+                    </a>
+                  ),
+                )}
+              </div>
             </div>
           </Reveal>
         </div>

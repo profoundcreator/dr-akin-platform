@@ -49,7 +49,7 @@ export function logisticsLabelForFormat(format: string): string {
 }
 
 export function logisticsHelperForFormat(format: string): string {
-  const base = "Tell us what travel and on-site support your team will arrange for Dr. Akin.";
+  const base = "Tell us what travel and on-site support your team will arrange for Akin Akinpelu.";
   return isHybridFormat(format) ? `${base} (For the in-person portion.)` : base;
 }
 
@@ -57,7 +57,7 @@ export const LOGISTICS_PLACEHOLDER =
   "e.g. Business-class flights covered, hotel for 2 nights, airport pickup and local driver";
 
 export const PROTOCOL_HELPER =
-  "Describe any security, reception, or on-site protocol expectations for this event. Dr. Akin's team will share speaker requirements after review.";
+  "Describe any security, reception, or on-site protocol expectations for this event. Akin's team will share speaker requirements after review.";
 
 export const PROTOCOL_PLACEHOLDER =
   "e.g. Airport VIP reception, security detail at venue, dress code, head-of-state attendance";

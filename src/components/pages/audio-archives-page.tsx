@@ -75,7 +75,7 @@ export function AudioArchivesPage() {
             </div>
             <div className="border-t border-[var(--ploy-accent-primary)] pt-6">
               <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-                Hosted by Dr. Akin Akinpelu
+                Hosted by Akin Akinpelu
               </p>
             </div>
           </Reveal>

@@ -1,19 +1,25 @@
 import type { EventBrand, EventType } from "@/lib/supabase/database.types";
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  hosted_by_dr_akin: "Hosted by Dr. Akin",
+  hosted_by_dr_akin: "Hosted by Akin Akinpelu",
   featured_appearance: "Featured appearance",
   org_brand: "Organisation brand",
 };
 
-export const EVENT_BRAND_LABELS: Record<EventBrand, string> = {
-  dr_akin: "Dr. Akin",
+const PUBLIC_EVENT_BRAND_LABELS = {
+  dr_akin: "Akin Akinpelu",
   aald: "AALD",
   erudio: "Erudio Hub",
   performx: "PERFORMX",
-  tc_resource: "TC Resource Technology",
   other: "Other",
 };
+
+// Keep legacy rows readable while omitting TC Resource from Object.entries()-driven new choices.
+export const EVENT_BRAND_LABELS = Object.defineProperty(
+  PUBLIC_EVENT_BRAND_LABELS,
+  "tc_resource",
+  { value: "Legacy organisation", enumerable: false },
+) as Record<EventBrand, string>;
 
 export const EVENT_STATUS_LABELS = {
   draft: "Draft",

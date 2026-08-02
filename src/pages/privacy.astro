@@ -1,0 +1,65 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { PageShell } from "@/components/layout/page-shell";
+import { PERSON_IDENTITY } from "@/data/person-identity";
+---
+
+<Layout
+  title={`Privacy Notice — ${PERSON_IDENTITY.publicName}`}
+  description={`How information submitted through the ${PERSON_IDENTITY.shortName} website is collected, used, protected, and retained.`}
+>
+  <PageShell client:load>
+    <article class="mx-auto w-full max-w-3xl space-y-10 px-6 py-16 lg:py-24">
+      <header class="space-y-4">
+        <p class="ploy-kicker">Privacy</p>
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Privacy notice</h1>
+        <p class="text-sm text-[var(--ploy-text-tertiary)]">Last updated: 2 August 2026</p>
+      </header>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Information we collect</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We collect information you choose to provide through contact and booking forms, such as
+          your name, contact details, organization, event details, and message.
+        </p>
+      </section>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">How we use it</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We use submitted information to assess and respond to enquiries, coordinate engagements,
+          maintain appropriate records, secure the service, and meet legal obligations. We do not
+          sell personal information.
+        </p>
+      </section>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Sharing and international processing</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Information may be processed by authorized team members and service providers that host
+          or operate this website. Those providers may process data in other countries subject to
+          their contractual and legal safeguards.
+        </p>
+      </section>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Retention and security</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We retain information only as long as reasonably necessary for the purpose for which it
+          was collected, legitimate operational records, and applicable legal requirements. We use
+          proportionate technical and organizational safeguards, but no online service is risk-free.
+        </p>
+      </section>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Your choices</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Depending on applicable law, you may ask to access, correct, or delete your information,
+          or object to certain processing. Use the <a class="underline" href="/contact">contact form</a>
+          and include “Privacy request” in the subject.
+        </p>
+      </section>
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Contact</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Questions about this notice can be sent through the <a class="underline" href="/contact">contact page</a>.
+        </p>
+      </section>
+    </article>
+  </PageShell>
+</Layout>

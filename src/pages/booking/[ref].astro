@@ -9,6 +9,6 @@ export function getStaticPaths() {
 const { ref } = Astro.params;
 ---
 
-<Layout title={`Booking Status — ${ref}`}>
+<Layout title={`Booking Status — ${ref}`} noIndex>
   <TrackerPage client:load reference={ref ?? ""} />
 </Layout>

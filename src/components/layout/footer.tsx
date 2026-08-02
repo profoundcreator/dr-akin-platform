@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
+import { PERSON_IDENTITY } from "@/data/person-identity";
+import { APPROVED_SOCIAL_LINKS, SITE_CONTACT } from "@/data/site-contact";
 import { FOOTER_COLUMNS } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 
@@ -14,7 +16,7 @@ export function Footer() {
           <div>
             <p className="ploy-eyebrow">Advisory · Keynotes · Transformation</p>
             <Heading as="h2" size="section" className="mt-6 max-w-4xl ploy-text-balance">
-              Bring Dr. Akin into the room where the next system is being built.
+              Bring Akin into the room where the next system is being built.
             </Heading>
           </div>
           <Button
@@ -31,25 +33,38 @@ export function Footer() {
       </section>
 
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-14 md:px-10 lg:px-14 xl:px-20">
-        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(3,0.75fr)]">
+        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)]">
           <div>
             <a
               href="/"
               className="text-xl font-semibold tracking-[-0.03em] text-[var(--ploy-text-primary)]"
             >
-              Dr. Akin Akinpelu{" "}
-              <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[var(--ploy-accent-primary)]">
-                Ph.D
-              </span>
+              {PERSON_IDENTITY.publicName}
             </a>
             <p className="mt-5 max-w-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              Leadership strategist, educator, author, and marketplace-ministry leader
-              across corporate, academic, and public spheres.
+              Leadership scholar, governance strategist, diplomat, and institution builder
+              working across Governance, Enterprise, and Education.
             </p>
             <div className="mt-6 text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              <p>+234 706 589 5185</p>
-              <p>hello@theakinakinpelu.org</p>
+              <p><a href={`tel:${SITE_CONTACT.phone.replace(/\s/g, "")}`}>{SITE_CONTACT.phone}</a></p>
+              <p><a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a></p>
             </div>
+            {APPROVED_SOCIAL_LINKS.length > 0 && (
+              <ul className="mt-5 flex flex-wrap gap-4 text-sm">
+                {APPROVED_SOCIAL_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--ploy-text-link)] hover:underline"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {FOOTER_COLUMNS.map((column) => (
@@ -77,8 +92,8 @@ export function Footer() {
 
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-6 text-xs text-[var(--ploy-text-secondary)] md:px-10 lg:px-14 xl:px-20">
         <div className="mx-auto flex max-w-[var(--ploy-canvas-main)] flex-col gap-2 md:flex-row md:justify-between">
-          <p>© {new Date().getFullYear()} Dr. Akin Akinpelu. All rights reserved.</p>
-          <p>Executive Coach · Author · Corporate Transformation Strategist</p>
+          <p>© {new Date().getFullYear()} {PERSON_IDENTITY.publicName}. All rights reserved.</p>
+          <p>{PERSON_IDENTITY.auTitle}</p>
         </div>
       </div>
     </footer>

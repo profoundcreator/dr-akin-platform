@@ -5,6 +5,6 @@ import { LibraryBookBySlug } from "@/components/pages/library-book-by-slug";
 const slug = Astro.url.searchParams.get("slug") ?? "";
 ---
 
-<Layout title="Library — Dr. Akin Akinpelu" description="Book details from the Dr. Akin library">
+<Layout title="Library — Akin Akinpelu, Ph.D., Amb., FLPi" description="Books and published ideas from Akin Akinpelu">
   <LibraryBookBySlug client:load slug={slug} />
 </Layout>
