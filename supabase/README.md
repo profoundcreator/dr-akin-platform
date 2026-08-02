@@ -32,6 +32,7 @@ In the Supabase **SQL Editor**, run in order:
 11. `migrations/013_preloaded_content_controls.sql`
 12. `migrations/014_insight_hero_images.sql`
 13. `migrations/015_admin_reliability.sql` — invited self-activation + auditor read-only on bookings/inbox
+14. `migrations/016_phase_e_security.sql` — audit log access, publish/delete RLS, `/admin/audit-log` RPC
 
 Verify migration 015 after running:
 
@@ -67,7 +68,57 @@ When you connect a custom domain later, add `https://your-domain.com/admin/login
 
 ### Email rate limits
 
-Supabase limits how many auth emails (invites, password setup) can be sent per hour on free tiers. If admin shows **email rate limit exceeded**, wait ~1 hour or adjust **Authentication → Rate Limits** in Supabase before resending.
+Supabase’s **built-in email** caps at **2 auth emails per hour** and cannot be raised. For team invites at scale, use **custom SMTP** (see [§ Resend SMTP for auth emails](#resend-smtp-for-auth-emails-sprint-2) below).
+
+If you still see **email rate limit exceeded**, wait ~1 hour or finish Resend setup, then raise **Authentication → Rate Limits → Email sent** after custom SMTP is enabled.
+
+### Resend SMTP for auth emails (Sprint 2)
+
+Removes the 2/hour invite cap. Team invite emails go through Resend instead of Supabase’s shared mailer.
+
+**Prerequisites:** A [Resend](https://resend.com) account and a **verified sending domain** (e.g. `drakinakinpelu.com`). Without a verified domain, Resend only sends to your own address for testing.
+
+#### A — Resend
+
+1. Sign up at [resend.com](https://resend.com)
+2. **Domains → Add domain** → enter your domain (e.g. `drakinakinpelu.com`)
+3. Add the DNS records Resend shows (TXT/MX) at your domain registrar; wait until Resend shows **Verified**
+4. **API Keys → Create API Key** → name `supabase-auth` → copy the key (starts with `re_`)
+
+#### B — Supabase SMTP
+
+1. [Supabase project](https://supabase.com/dashboard/project/isxzrhviqbqmtuhubcsp) → **Authentication** → **Emails** → **SMTP Settings**
+2. Enable **Custom SMTP**
+3. Enter:
+
+| Field | Value |
+|--------|--------|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | Your Resend API key (`re_…`) |
+| Sender email | `no-reply@yourdomain.com` (must be on the verified domain) |
+| Sender name | `Dr. Akin Platform` |
+
+4. **Save**
+
+#### C — Raise Supabase email rate limit
+
+After custom SMTP is saved:
+
+1. **Authentication → Rate Limits**
+2. Increase **Rate limit for sending emails** (e.g. **30** or **100** per hour for testing)
+3. Save
+
+#### D — Smoke test
+
+1. Admin → **Team** → invite a test address (or resend to someone still `invited`)
+2. Check inbox (and spam) for an email from your sender address
+3. Link should land on `https://dr-akin-platform.vercel.app/admin/login`
+
+**Fallback if rate-limited again:** `node scripts/generate-invite-link.mjs "email@example.com" "Full Name" role_name` — sends no email; copy the link manually.
+
+Official guide: [Resend — Send with Supabase SMTP](https://resend.com/docs/send-with-supabase-smtp)
 
 ## 5. Create the Super Admin
 

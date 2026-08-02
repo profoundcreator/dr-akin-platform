@@ -152,6 +152,20 @@ export function canPermanentlyDeleteWorkOrgs(profile: AdminProfile | null): bool
   return canPermanentlyDeleteBooks(profile);
 }
 
+export function canAccessAuditLog(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return (
+    profile!.role === "super_admin" ||
+    profile!.role === "technical_admin" ||
+    profile!.role === "read_only_auditor"
+  );
+}
+
+export function canExportAuditLog(profile: AdminProfile | null): boolean {
+  if (!canAccessAdmin(profile)) return false;
+  return profile!.role === "super_admin" || profile!.role === "technical_admin";
+}
+
 export function formatAdminRole(role: AdminRole): string {
   return ADMIN_ROLE_LABELS[role] ?? role;
 }

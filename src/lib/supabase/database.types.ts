@@ -352,6 +352,22 @@ export interface Database {
         Args: { p_target_id: string };
         Returns: AdminProfile;
       };
+      list_audit_events: {
+        Args: { p_limit?: number; p_offset?: number };
+        Returns: {
+          id: string;
+          actor_id: string | null;
+          actor_role: AdminRole | null;
+          actor_name: string | null;
+          actor_email: string | null;
+          event_type: string;
+          target_type: string | null;
+          target_id: string | null;
+          summary: Record<string, unknown> | null;
+          metadata: Record<string, unknown> | null;
+          created_at: string;
+        }[];
+      };
     };
   };
 }

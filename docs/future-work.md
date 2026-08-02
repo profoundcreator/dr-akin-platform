@@ -45,4 +45,4 @@ Recommendation when we build this: prefer a tool with a **free custom subdomain 
 ## Related items (also on the roadmap)
 
 - **Enquiry modal & pages** — UX and workflow fixes before email notifications
-- **Resend (or similar)** — transactional email for enquiry confirmations and admin alerts (separate from Supabase Auth invite emails)
+- **Resend (or similar)** — transactional email for enquiry confirmations and admin alerts (separate from Supabase Auth invite emails; auth invites: see `supabase/README.md` § Resend SMTP)
