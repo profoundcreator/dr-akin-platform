@@ -39,6 +39,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       { label: AU_TITLE, href: "/meet-akin/au-ambassador" },
       { label: "Future Africa", href: "/work/future-africa" },
       { label: "AALD", href: "/work/aald" },
+      { label: "PERFORMX", href: "/work/performx" },
       { label: "Erudio Hub", href: "/work/erudio-hub" },
       { label: "Auctus Africa", href: "/work/auctus-africa" },
     ],

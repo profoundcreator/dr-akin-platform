@@ -58,7 +58,6 @@ export const ECOSYSTEM_PILLARS: readonly EcosystemPillar[] = [
         id: "performx",
         name: "PERFORMX",
         href: "/work/performx",
-        isNavigable: false,
         summary:
           "A leadership event and community where ideas, relationships and practical tools converge to help people and institutions perform at a higher level.",
       },
@@ -96,6 +95,7 @@ export const ECOSYSTEM_PLATFORMS = ECOSYSTEM_PILLARS.flatMap((pillar) =>
 export const PUBLIC_WORK_SLUGS = [
   "future-africa",
   "aald",
+  "performx",
   "erudio-hub",
   "auctus-africa",
 ] as const;

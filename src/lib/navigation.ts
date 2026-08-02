@@ -27,18 +27,12 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Work",
     href: "/work",
     links: [
-      {
-        label: "Work overview",
-        href: "/work",
-        description: "Three pillars · Six platforms",
-      },
+      { label: "Work overview", href: "/work" },
       ...ECOSYSTEM_PILLARS.flatMap((pillar) =>
         pillar.platforms.map((platform) => ({
           label: platform.name,
           href: platform.href,
-          description: platform.summary,
           group: pillar.name,
-          disabled: platform.isNavigable === false,
         })),
       ),
     ],
@@ -75,8 +69,6 @@ export const FOOTER_COLUMNS = [
       { label: "Governance", href: "/work#governance" },
       { label: "Enterprise", href: "/work#enterprise" },
       { label: "Education", href: "/work#education" },
-      { label: "Future Africa", href: "/work/future-africa" },
-      { label: "Auctus Africa", href: "/work/auctus-africa" },
     ],
   },
   {

@@ -37,6 +37,7 @@ In the Supabase **SQL Editor**, run in order:
 16. `migrations/018_organizer_resources.sql` — private organizer materials, booking grants, roles and audited access
 17. `migrations/019_contact_geo_foundation.sql` — rate-limited contact enquiries and insight SEO metadata
 18. `migrations/020_continental_ecosystem.sql` — retires TC Resource, keeps PERFORMX destination-free, and publishes Future Africa/Auctus Africa CMS entries
+19. `migrations/021_restore_performx.sql` — republishes the PERFORMX work org page
 
 Verify migration 015 after running:
 

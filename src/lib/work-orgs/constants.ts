@@ -43,6 +43,16 @@ export const STATIC_WORK_ORG_META = [
       "Leadership and institutional development for stronger systems, capable leaders and sustainable performance.",
   },
   {
+    siteKey: "work-performx",
+    slug: "performx",
+    brandKey: "performx" as EventBrand,
+    sortOrder: 3,
+    pillarTitle: "Enterprise",
+    brandLabel: "PERFORMX",
+    hubCardDescription:
+      "A leadership event and community helping people and institutions perform at a higher level.",
+  },
+  {
     siteKey: "work-erudio-hub",
     slug: "erudio-hub",
     brandKey: "erudio" as EventBrand,
