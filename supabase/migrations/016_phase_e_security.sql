@@ -1,5 +1,17 @@
 -- Phase E: audit log access control, publish/delete enforcement on CMS tables
--- Run after 015_admin_reliability.sql
+-- Requires is_active_admin() / admin_has_role() from earlier migrations.
+-- Defines is_writable_admin() here if migration 015 was only partially applied.
+
+CREATE OR REPLACE FUNCTION is_writable_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT is_active_admin()
+    AND NOT admin_has_role(ARRAY['read_only_auditor']::admin_role[]);
+$$;
 
 CREATE OR REPLACE FUNCTION is_audit_viewer_admin()
 RETURNS BOOLEAN
