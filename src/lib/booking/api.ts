@@ -308,6 +308,7 @@ export interface EnquiryRecord {
   source: string;
   contactName: string;
   contactEmail: string;
+  contactPhone: string | null;
   organization: string | null;
   subject: string | null;
   message: string | null;
@@ -323,6 +324,7 @@ const MOCK_ENQUIRIES: EnquiryRecord[] = [
     source: "Booking",
     contactName: "Sarah Mensah",
     contactEmail: "sarah@acmecorp.com",
+    contactPhone: null,
     organization: "Acme Corp",
     subject: "Annual Leadership Summit",
     message: "Keynote for 500 executives in Lagos.",
@@ -336,6 +338,7 @@ const MOCK_ENQUIRIES: EnquiryRecord[] = [
     source: "Contact",
     contactName: "James Okafor",
     contactEmail: "j.okafor@university.edu",
+    contactPhone: null,
     organization: "State University",
     subject: "Board advisory enquiry",
     message: "Interested in governance advisory for our board.",
@@ -363,6 +366,7 @@ export async function getEnquiries(): Promise<EnquiryRecord[]> {
     source: row.source,
     contactName: row.contact_name,
     contactEmail: row.contact_email,
+    contactPhone: row.contact_phone,
     organization: row.organization,
     subject: row.subject,
     message: row.message,
@@ -371,6 +375,92 @@ export async function getEnquiries(): Promise<EnquiryRecord[]> {
     bookingRequestId: row.booking_request_id,
     createdAt: row.created_at,
   }));
+}
+
+function mapEnquiryRow(row: {
+  id: string;
+  source: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  organization: string | null;
+  subject: string | null;
+  message: string | null;
+  status: string;
+  priority: string;
+  booking_request_id: string | null;
+  created_at: string;
+}): EnquiryRecord {
+  return {
+    id: row.id,
+    source: row.source,
+    contactName: row.contact_name,
+    contactEmail: row.contact_email,
+    contactPhone: row.contact_phone,
+    organization: row.organization,
+    subject: row.subject,
+    message: row.message,
+    status: row.status,
+    priority: row.priority,
+    bookingRequestId: row.booking_request_id,
+    createdAt: row.created_at,
+  };
+}
+
+export async function getEnquiryById(enquiryId: string): Promise<EnquiryRecord | null> {
+  const supabase = tryGetSupabaseClient();
+
+  if (!supabase) {
+    return MOCK_ENQUIRIES.find((e) => e.id === enquiryId) ?? null;
+  }
+
+  const { data, error } = await supabase
+    .from("enquiries")
+    .select("*")
+    .eq("id", enquiryId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+
+  return mapEnquiryRow(data);
+}
+
+export async function convertEnquiryToBooking(
+  enquiryId: string,
+): Promise<{ bookingRequestId: string; reference: string }> {
+  const supabase = tryGetSupabaseClient();
+
+  if (!supabase) {
+    const enquiry = MOCK_ENQUIRIES.find((e) => e.id === enquiryId);
+    if (!enquiry) throw new Error("Enquiry not found");
+    if (enquiry.bookingRequestId) throw new Error("Already linked to a booking");
+    enquiry.bookingRequestId = "mock-booking-id";
+    enquiry.status = "Open";
+    return { bookingRequestId: "mock-booking-id", reference: "DAA-0000" };
+  }
+
+  const { data, error } = await supabase.rpc("convert_enquiry_to_booking", {
+    p_enquiry_id: enquiryId,
+  });
+
+  if (error) throw new Error(error.message);
+
+  const result = data as {
+    booking_request_id: string;
+    reference: string;
+    access_token: string;
+  };
+
+  await logAuditEvent("enquiry.converted_to_booking", "enquiry", enquiryId, {
+    bookingRequestId: result.booking_request_id,
+    reference: result.reference,
+  });
+
+  return {
+    bookingRequestId: result.booking_request_id,
+    reference: result.reference,
+  };
 }
 
 export async function updateEnquiryStatus(

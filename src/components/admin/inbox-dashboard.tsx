@@ -113,9 +113,10 @@ export function InboxDashboard() {
               </p>
             ) : (
               filtered.map((enquiry) => (
-                <div
+                <a
                   key={enquiry.id}
-                  className="rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] p-5"
+                  href={`/admin/inbox/detail?id=${enquiry.id}`}
+                  className="block rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] p-5 transition-colors hover:border-[var(--ploy-border-default)] hover:bg-[var(--ploy-background-secondary)]"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-1">
@@ -139,7 +140,11 @@ export function InboxDashboard() {
                         </p>
                       )}
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div
+                      className="flex flex-col items-end gap-2"
+                      onClick={(e) => e.preventDefault()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
                       <span className="text-xs text-[var(--ploy-text-tertiary)]">
                         {new Date(enquiry.createdAt).toLocaleDateString()}
                       </span>
@@ -168,7 +173,7 @@ export function InboxDashboard() {
                       )}
                     </div>
                   </div>
-                </div>
+                </a>
               ))
             )}
           </div>

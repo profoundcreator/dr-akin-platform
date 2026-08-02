@@ -88,7 +88,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: "Events", href: "/events" },
       { label: "Book Dr. Akin", href: "/book-dr-akin" },
-      { label: "Track a Booking", href: "/booking/DAA-8492" },
+      { label: "Track a Booking", href: "/track-booking" },
       { label: "Organizer Resources", href: "/organizer-resources" },
     ],
   },

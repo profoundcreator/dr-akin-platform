@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -54,16 +54,24 @@ export function BookingForm({
   const [trackerUrl, setTrackerUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [copiedRef, setCopiedRef] = useState(false);
 
   useEffect(() => {
     setForm(loadDraft());
   }, []);
 
   useEffect(() => {
+    if (!submittedRef) return;
+    sessionStorage.removeItem(SESSION_KEY);
+    onDirtyChange?.(false);
+  }, [submittedRef, onDirtyChange]);
+
+  useEffect(() => {
+    if (submittedRef) return;
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(form));
     const dirty = JSON.stringify(form) !== JSON.stringify(EMPTY_BOOKING_FORM);
     onDirtyChange?.(dirty);
-  }, [form, onDirtyChange]);
+  }, [form, onDirtyChange, submittedRef]);
 
   const updateField = useCallback(
     <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
@@ -117,21 +125,45 @@ export function BookingForm({
   };
 
   if (submittedRef) {
+    const trackHref = trackerUrl ?? `/booking/${submittedRef}`;
+
+    async function copyReference() {
+      try {
+        await navigator.clipboard.writeText(submittedRef!);
+        setCopiedRef(true);
+        window.setTimeout(() => setCopiedRef(false), 2000);
+      } catch {
+        /* clipboard unavailable */
+      }
+    }
+
     return (
       <div className="space-y-6 text-center">
         <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[var(--ploy-background-accent-muted)]">
           <CheckCircle2 className="size-8 text-[var(--ploy-text-accent)]" />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Heading as="h2" size="card">
             Request submitted successfully
           </Heading>
           <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-            Your booking reference is{" "}
-            <strong className="font-semibold text-[var(--ploy-text-primary)]">
+            Save your booking reference — you&apos;ll need it to track status.
+          </p>
+          <div className="mx-auto flex max-w-sm items-center justify-center gap-2 rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] px-4 py-3">
+            <code className="text-lg font-semibold tracking-wide text-[var(--ploy-text-primary)]">
               {submittedRef}
-            </strong>
-            . Our team will review your invitation and respond within 3–5 business days.
+            </code>
+            <button
+              type="button"
+              onClick={copyReference}
+              className="inline-flex size-9 items-center justify-center rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] text-[var(--ploy-text-secondary)] hover:bg-[var(--ploy-interactive-secondary)]"
+              aria-label="Copy booking reference"
+            >
+              {copiedRef ? <Check className="size-4" /> : <Copy className="size-4" />}
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+            Our team will review your invitation and respond within 3–5 business days.
             {!isSupabaseConfigured && (
               <span className="mt-2 block text-xs text-[var(--ploy-text-tertiary)]">
                 Running in local demo mode — configure Supabase for persistent storage.
@@ -140,7 +172,7 @@ export function BookingForm({
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button href={trackerUrl ?? `/booking/${submittedRef}`} variant="primary" showArrow>
+          <Button href={trackHref} variant="primary" showArrow>
             Track your request
           </Button>
           {variant === "modal" && (

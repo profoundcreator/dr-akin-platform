@@ -8,7 +8,6 @@ import {
   Mail,
   MapPin,
   MessageSquare,
-  Upload,
 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Heading } from "@/components/ui/heading";
@@ -232,21 +231,14 @@ export function TrackerPage({ reference: initialRef }: TrackerPageProps) {
 
             <Reveal delay={0.15}>
               <div className="ploy-surface-elevated space-y-4 p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <Heading as="h2" size="label">
-                    Documents
-                  </Heading>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1.5 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-default)] px-3 py-1.5 text-xs font-medium text-[var(--ploy-text-primary)] hover:bg-[var(--ploy-interactive-secondary)]"
-                  >
-                    <Upload className="size-3.5" />
-                    Upload document
-                  </button>
-                </div>
+                <Heading as="h2" size="label">
+                  Documents
+                </Heading>
                 {request.documents.length === 0 ? (
                   <p className="text-sm text-[var(--ploy-text-tertiary)]">
-                    No documents uploaded yet.
+                    {request.status === "Information Required"
+                      ? "Email requested documents to the Executive Assistant team — they will attach files to your booking. Online upload is coming soon."
+                      : "No documents uploaded yet."}
                   </p>
                 ) : (
                   <ul className="space-y-2">

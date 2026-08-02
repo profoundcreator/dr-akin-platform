@@ -126,7 +126,11 @@ export function EnquiryModal({ open, onClose, triggerRef }: EnquiryModalProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <BookingForm variant="modal" onDirtyChange={setDirty} />
+          <BookingForm
+            variant="modal"
+            onDirtyChange={setDirty}
+            onSubmitted={() => setDirty(false)}
+          />
         </div>
 
         <div className="border-t border-[var(--ploy-border-subtle)] px-6 py-4">
