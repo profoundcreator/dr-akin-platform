@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import {
-  clearAuthHashFromUrl,
+  establishSessionFromAuthHash,
   parseAuthHashType,
   type InviteCallbackType,
 } from "@/lib/auth/invite-callback";
@@ -56,25 +56,18 @@ export function AdminLoginForm() {
         return;
       }
 
-      const { data, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        setError(sessionError.message);
+      const result = await establishSessionFromAuthHash(supabase);
+      if (!result.ok) {
+        setError(result.message);
         setCheckingInvite(false);
         return;
       }
 
-      const sessionEmail = data.session?.user.email;
-      if (data.session && sessionEmail) {
-        clearAuthHashFromUrl();
-        setInviteFlow({ email: sessionEmail, flowType: hashType });
-      } else {
-        setError("Invite link expired or invalid. Ask your admin to resend the invite.");
-      }
-
+      setInviteFlow({ email: result.email, flowType: result.flowType });
       setCheckingInvite(false);
     }
 
-    if (hashType) {
+    if (parseAuthHashType()) {
       resolveInviteSession();
       return;
     }

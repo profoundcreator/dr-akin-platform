@@ -38,6 +38,14 @@ export function AdminInviteSetupForm({ email, flowType }: AdminInviteSetupFormPr
 
     try {
       const supabase = getSupabaseClient();
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Your setup session expired. Open the invite link from your email again.");
+      }
+
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
 

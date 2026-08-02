@@ -127,6 +127,15 @@ export async function inviteTeamMember(input: {
       };
     }
 
+    if (response.status === 429) {
+      return {
+        ok: false,
+        message:
+          payload.error ??
+          "Too many invite emails sent recently. Wait about an hour before trying again.",
+      };
+    }
+
     if (response.status >= 500) {
       return {
         ok: false,

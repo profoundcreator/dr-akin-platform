@@ -74,6 +74,12 @@ async function resolveAdminSession(
         signOut: true,
       };
     }
+
+    // Keep the auth session alive on /admin/login while the invitee sets a password.
+    if (typeof window !== "undefined" && window.location.pathname === "/admin/login") {
+      return { ok: false, message: "Complete password setup.", signOut: false };
+    }
+
     profile = await activateInvitedAdminIfReady(user, profile);
   }
 

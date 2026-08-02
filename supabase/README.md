@@ -59,6 +59,10 @@ If Site URL is still `http://localhost:3000`, invite emails will send people to 
 
 When you connect a custom domain later, add `https://your-domain.com/admin/login` to Redirect URLs and update Site URL.
 
+### Email rate limits
+
+Supabase limits how many auth emails (invites, password setup) can be sent per hour on free tiers. If admin shows **email rate limit exceeded**, wait ~1 hour or adjust **Authentication → Rate Limits** in Supabase before resending.
+
 ## 5. Create the Super Admin
 
 1. Add user in **Authentication → Users**

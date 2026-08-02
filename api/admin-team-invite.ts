@@ -131,46 +131,42 @@ async function findAuthUserByEmail(
   return null;
 }
 
-function isExistingAuthUserError(error: { message?: string; status?: number }): boolean {
-  const message = (error.message ?? "").toLowerCase();
-  return (
-    error.status === 422 ||
-    message.includes("already registered") ||
-    message.includes("already been registered") ||
-    message.includes("user already exists")
-  );
+function isEmailRateLimitError(error: unknown): boolean {
+  const message = errorMessage(error).toLowerCase();
+  return message.includes("rate limit") || message.includes("too many requests");
 }
+
+const EMAIL_RATE_LIMIT_ERROR =
+  "Supabase email rate limit reached (too many invite emails in a short time). Wait about an hour, then use Resend invite — or raise limits in Supabase → Authentication → Rate Limits.";
 
 async function sendInviteEmail(
   adminClient: SupabaseClient,
   publicClient: SupabaseClient,
   email: string,
-  fullName?: string,
+  fullName: string | undefined,
+  existingAuthUser: boolean,
 ): Promise<{ user: User; delivery: "invite" | "password_setup" }> {
   const redirectTo = getInviteRedirectUrl();
-  const inviteOptions = {
-    redirectTo,
-    data: fullName ? { full_name: fullName } : undefined,
-  };
 
-  const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, inviteOptions);
+  if (!existingAuthUser) {
+    const inviteOptions = {
+      redirectTo,
+      data: fullName ? { full_name: fullName } : undefined,
+    };
 
-  if (!error && data.user) {
+    const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, inviteOptions);
+
+    if (error) throw error;
+    if (!data.user) throw new Error("Invite email could not be sent.");
     return { user: data.user, delivery: "invite" };
   }
 
-  if (error && !isExistingAuthUserError(error)) {
-    throw error;
-  }
-
-  // Password reset emails must use the anon key — service role returns "Invalid API key".
+  // Existing Auth user (resend / repair) — one email only to avoid rate limits.
   const { error: resetError } = await publicClient.auth.resetPasswordForEmail(email, {
     redirectTo,
   });
 
-  if (resetError) {
-    throw resetError;
-  }
+  if (resetError) throw resetError;
 
   const existing = await findAuthUserByEmail(adminClient, email);
   if (!existing) {
@@ -296,11 +292,11 @@ export async function POST(request: Request): Promise<Response> {
     let delivery: "invite" | "password_setup" = "invite";
 
     if (!authUser) {
-      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName, false);
       authUser = sent.user;
       delivery = sent.delivery;
     } else if (shouldSendInviteEmail) {
-      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName);
+      const sent = await sendInviteEmail(adminClient, publicClient, email, fullName, true);
       delivery = sent.delivery;
     }
 
@@ -351,6 +347,9 @@ export async function POST(request: Request): Promise<Response> {
       memberId: authUser.id,
     });
   } catch (error) {
+    if (isEmailRateLimitError(error)) {
+      return jsonResponse(429, { error: EMAIL_RATE_LIMIT_ERROR });
+    }
     if (isInvalidApiKeyError(error)) {
       return jsonResponse(503, { error: SERVICE_ROLE_SETUP_ERROR });
     }
