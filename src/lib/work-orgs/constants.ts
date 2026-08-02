@@ -40,7 +40,7 @@ export const STATIC_WORK_ORG_META = [
     pillarTitle: "Enterprise",
     brandLabel: "AALD",
     hubCardDescription:
-      "Leadership and institutional development for stronger systems, capable leaders and sustainable performance.",
+      "Consulting, training and research for African corporates and diaspora institutions.",
   },
   {
     siteKey: "work-performx",

@@ -52,7 +52,7 @@ export const ECOSYSTEM_PILLARS: readonly EcosystemPillar[] = [
         name: "AALD",
         href: "/work/aald",
         summary:
-          "Leadership and institutional development for organisations seeking stronger systems, capable leaders and sustainable performance.",
+          "Consulting, training and research for African corporates and diaspora institutions building stronger leadership and performance.",
       },
       {
         id: "performx",

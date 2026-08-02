@@ -78,20 +78,21 @@ export const SITE_PAGES: Record<string, PageContent> = {
   },
   "work-aald": {
     slug: "work/aald",
-    title: "AALD — Corporate Transformation",
-    kicker: "AALD · Corporate Transformation",
-    headline: "African Academy of Leadership Development",
+    title: "AALD — Learning & Development for African Enterprise",
+    kicker: "Enterprise · Consulting · Training · Research",
+    headline: "Building stronger African organisations—",
+    headlineSecondary: "through consulting, training and research.",
     description:
-      "AALD develops leaders at every level through structured programmes, corporate consulting, and a community of purpose-driven executives.",
+      "AALD partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
     sections: [
       {
         title: "What we do",
-        body: "End-to-end corporate transformation engagements — from diagnostic assessments to culture redesign, change management, and sustained performance.",
+        body: "Akin Akinpelu Learning & Development Company delivers innovative consulting, executive training and applied research for organisations building across the continent and beyond.",
         bullets: [
-          "Executive leadership programmes",
-          "Organisational diagnostics",
-          "Culture and values alignment",
-          "Change leadership support",
+          "Strategic consulting and organisational diagnostics",
+          "Executive training and leadership development",
+          "Applied research and capability building",
+          "Culture, performance and transformation support",
         ],
       },
     ],
@@ -198,7 +199,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         bullets: [
           "Executive coach and corporate strategist",
           "Author of nine published titles",
-          "Founder of the AALD ecosystem",
+          "Founder, Akin Akinpelu Learning & Development Company (AALD)",
           "Advisor to governments and enterprises",
         ],
       },
