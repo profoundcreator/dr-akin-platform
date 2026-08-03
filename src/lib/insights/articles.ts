@@ -63,6 +63,14 @@ function isPublicInsight(insight: PlatformInsight): boolean {
   return insight.status === "published" && !insight.manuallyHidden;
 }
 
+function sortPublishedInsights(insights: PlatformInsight[]): PlatformInsight[] {
+  return [...insights].sort((a, b) => {
+    const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return bTime - aTime || a.sortOrder - b.sortOrder || a.title.localeCompare(b.title);
+  });
+}
+
 export async function getPublishedInsightsFromDb(): Promise<PlatformInsight[]> {
   if (!isSupabaseConfigured) return [];
 
@@ -73,12 +81,10 @@ export async function getPublishedInsightsFromDb(): Promise<PlatformInsight[]> {
     .from("insights_articles")
     .select("*")
     .eq("status", "published")
-    .eq("manually_hidden", false)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .order("sort_order", { ascending: true });
+    .eq("manually_hidden", false);
 
   if (error) return [];
-  return (data ?? []).map(mapRow).filter(isPublicInsight);
+  return sortPublishedInsights((data ?? []).map(mapRow).filter(isPublicInsight));
 }
 
 export async function getInsightBySlugFromDb(slug: string): Promise<PlatformInsight | null> {
@@ -106,12 +112,10 @@ export async function getAdminInsights(): Promise<PlatformInsight[]> {
 
   const { data, error } = await supabase
     .from("insights_articles")
-    .select("*")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .order("sort_order", { ascending: true });
+    .select("*");
 
   if (error) throw new Error(formatSchemaSetupError(error.message));
-  return (data ?? []).map(mapRow);
+  return sortPublishedInsights((data ?? []).map(mapRow));
 }
 
 export async function getPendingInsights(): Promise<PlatformInsight[]> {

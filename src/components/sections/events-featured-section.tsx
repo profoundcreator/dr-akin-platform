@@ -38,19 +38,38 @@ export function EventsFeaturedSection() {
       return;
     }
 
-    Promise.all([getPublicSiteSettings(), getHomepageFeaturedEvent()])
-      .then(([siteSettings, event]) => {
-        setSettings(siteSettings);
-        setFeatured(event);
+    let cancelled = false;
+
+    getPublicSiteSettings()
+      .then((siteSettings) => {
+        if (!cancelled) setSettings(siteSettings);
       })
       .catch(() => {
-        setSettings(DEFAULT_SITE_SETTINGS);
-        setFeatured(null);
+        if (!cancelled) setSettings(DEFAULT_SITE_SETTINGS);
+      });
+
+    getHomepageFeaturedEvent()
+      .then((event) => {
+        if (!cancelled) setFeatured(event);
       })
-      .finally(() => setLoaded(true));
+      .catch(() => {
+        if (!cancelled) setFeatured(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!loaded || !settings.homepageEventsEnabled || !featured) return null;
+  const showSection =
+    loaded &&
+    featured &&
+    (settings.homepageEventsEnabled || featured.isHomepageFeatured);
+
+  if (!showSection) return null;
 
   const coverUrl = getEventCoverUrl(featured.coverImagePath);
 

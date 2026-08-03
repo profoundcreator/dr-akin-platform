@@ -170,13 +170,9 @@ export function InsightArticlePage({
               )}
             </Reveal>
             {heroImageUrl && (
-              <Reveal delay={0.05}>
-                <InsightArticleHero src={heroImageUrl} alt="" />
-              </Reveal>
+              <InsightArticleHero src={heroImageUrl} alt="" />
             )}
-            <Reveal delay={0.1}>
-              <InsightArticleBody html={body} />
-            </Reveal>
+            <InsightArticleBody html={body} />
             <Button variant="ghost" href="/insights">
               <ArrowRight className="size-4 rotate-180" />
               Back to insights

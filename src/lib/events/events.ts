@@ -185,9 +185,12 @@ export async function getUpcomingPublishedEvents(): Promise<PlatformEvent[]> {
 }
 
 export async function getHomepageFeaturedEvent(): Promise<PlatformEvent | null> {
-  const upcoming = await getUpcomingPublishedEvents();
-  const featured = upcoming.find((event) => event.isHomepageFeatured);
-  return featured ?? upcoming[0] ?? null;
+  const events = await getPublishedEvents();
+  const homepageFeatured = events.find((event) => event.isHomepageFeatured);
+  if (homepageFeatured) return homepageFeatured;
+
+  const now = Date.now();
+  return events.find((event) => new Date(event.startsAt).getTime() > now) ?? null;
 }
 
 export async function setEventHomepageFeatured(eventId: string): Promise<void> {
