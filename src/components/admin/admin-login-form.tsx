@@ -32,7 +32,7 @@ export function AdminLoginForm() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("error") === "profile") {
       setError(
-        "You signed in, but your admin profile is missing or inactive. Check Part B in Supabase (admin_profiles table).",
+        "You signed in, but the platform could not load your admin profile. Confirm your account exists in Supabase → admin_profiles with account_state = active, then sign in again.",
       );
     }
   }, []);
@@ -119,11 +119,13 @@ export function AdminLoginForm() {
 
     try {
       await signIn(email, password);
-      const { data } = await getSupabaseClient().auth.getSession();
+      const supabase = getSupabaseClient();
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
       if (!data.session) {
         throw new Error("Sign in succeeded but the session was not saved. Please try again.");
       }
-      window.location.href = "/admin/requests";
+      window.location.replace("/admin/requests");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed");
     } finally {

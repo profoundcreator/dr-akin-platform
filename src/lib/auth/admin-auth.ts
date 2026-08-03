@@ -108,7 +108,12 @@ export async function fetchAdminProfile(userId: string): Promise<AdminProfile | 
     .eq("id", userId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error("[admin-auth] admin_profiles lookup failed:", error.message);
+    return null;
+  }
+
+  if (!data) return null;
   return data as AdminProfile;
 }
 
@@ -125,7 +130,9 @@ export async function signInAdmin(email: string, password: string) {
 
   const resolved = await resolveAdminSession(data.session, data.user);
   if (!resolved.ok) {
-    await supabase.auth.signOut();
+    if (resolved.signOut) {
+      await supabase.auth.signOut();
+    }
     throw new Error(resolved.message);
   }
 
@@ -179,15 +186,17 @@ export async function getCurrentAdmin(): Promise<{
 /** Validates an existing auth session for admin routes and auth state listeners. */
 export async function resolveAdminProfileForSession(
   session: Session | null,
-): Promise<AdminProfile | null> {
-  if (!session?.user) return null;
+): Promise<{ profile: AdminProfile | null; message: string | null }> {
+  if (!session?.user) {
+    return { profile: null, message: null };
+  }
 
   const resolved = await resolveAdminSession(session, session.user);
   if (!resolved.ok) {
     const supabase = tryGetSupabaseClient();
     if (resolved.signOut && supabase) await supabase.auth.signOut();
-    return null;
+    return { profile: null, message: resolved.message };
   }
 
-  return resolved.profile;
+  return { profile: resolved.profile, message: null };
 }

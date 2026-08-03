@@ -4,13 +4,18 @@ import { useEffect, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { AdminErrorBoundary } from "@/components/admin/admin-error-boundary";
 import { AdminAuthProvider, useAdminAuth } from "@/context/admin-auth-provider";
+import { Button } from "@/components/ui/button";
 
 function AdminAuthRedirect({
   message,
   showLoginLink = false,
+  showRetry = false,
+  onRetry,
 }: {
   message: string;
   showLoginLink?: boolean;
+  showRetry?: boolean;
+  onRetry?: () => void;
 }) {
   return (
     <div
@@ -22,51 +27,58 @@ function AdminAuthRedirect({
         style={{ color: "#6b6560" }}
         aria-hidden="true"
       />
-      <p className="max-w-sm text-sm" style={{ color: "#3d3a36" }}>
+      <p className="max-w-md text-sm" style={{ color: "#3d3a36" }}>
         {message}
       </p>
-      {showLoginLink && (
-        <a
-          href="/admin/login"
-          className="rounded-md bg-[#1a1a1a] px-4 py-2 text-sm font-medium text-white no-underline"
-        >
-          Continue to admin sign in
-        </a>
-      )}
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {showRetry && onRetry && (
+          <Button type="button" variant="primary" size="sm" onClick={onRetry}>
+            Try again
+          </Button>
+        )}
+        {showLoginLink && (
+          <a
+            href="/admin/login"
+            className="rounded-md bg-[#1a1a1a] px-4 py-2 text-sm font-medium text-white no-underline"
+          >
+            Continue to admin sign in
+          </a>
+        )}
+      </div>
     </div>
   );
 }
 
 function AdminAuthGate({ children }: { children: ReactNode }) {
-  const { profile, session, loading, configured, authError } = useAdminAuth();
+  const { profile, session, loading, configured, authError, profileError, refresh, signOut } =
+    useAdminAuth();
   const isAuthenticated = Boolean(session && profile);
+  const awaitingProfile = Boolean(session && !profile && loading);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || awaitingProfile || isAuthenticated) return;
 
     if (!configured) {
       window.location.replace("/admin/login");
       return;
     }
 
-    if (!isAuthenticated) {
-      const destination =
-        session && !profile ? "/admin/login?error=profile" : "/admin/login";
-      window.location.replace(destination);
+    if (!session) {
+      window.location.replace("/admin/login");
     }
-  }, [loading, configured, isAuthenticated, session, profile]);
+  }, [loading, awaitingProfile, configured, isAuthenticated, session]);
 
   useEffect(() => {
-    if (loading || isAuthenticated || !configured) return;
+    if (loading || awaitingProfile || isAuthenticated || !session || !profileError) return;
 
     const timer = window.setTimeout(() => {
-      window.location.replace(
-        session && !profile ? "/admin/login?error=profile" : "/admin/login",
-      );
-    }, 2500);
+      void signOut().finally(() => {
+        window.location.replace("/admin/login?error=profile");
+      });
+    }, 4000);
 
     return () => window.clearTimeout(timer);
-  }, [loading, isAuthenticated, configured, session, profile]);
+  }, [loading, awaitingProfile, isAuthenticated, session, profileError, signOut]);
 
   if (!configured) {
     return (
@@ -77,7 +89,7 @@ function AdminAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (authError && !isAuthenticated) {
+  if (authError && !session) {
     return (
       <AdminAuthRedirect
         message={`${authError} Redirecting to sign in…`}
@@ -86,14 +98,30 @@ function AdminAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (loading || !isAuthenticated) {
+  if (awaitingProfile || (loading && !profileError)) {
     return (
       <AdminAuthRedirect
-        message={
-          session && !profile
-            ? "Loading your admin profile…"
-            : "Verifying admin access…"
-        }
+        message="Verifying admin access…"
+        showLoginLink
+      />
+    );
+  }
+
+  if (session && !profile && profileError) {
+    return (
+      <AdminAuthRedirect
+        message={`${profileError} Returning to sign in…`}
+        showLoginLink
+        showRetry
+        onRetry={() => void refresh()}
+      />
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <AdminAuthRedirect
+        message="Admin sign-in is required. Redirecting…"
         showLoginLink
       />
     );

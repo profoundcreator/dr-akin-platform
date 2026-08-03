@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -21,6 +22,7 @@ interface AdminAuthContextValue {
   loading: boolean;
   configured: boolean;
   authError: string | null;
+  profileError: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -33,16 +35,46 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const applySessionTaskRef = useRef<Promise<void> | null>(null);
+  const latestSessionRef = useRef<Session | null>(null);
 
   const applySession = useCallback(async (nextSession: Session | null) => {
-    setSession(nextSession);
-    if (!nextSession?.user) {
-      setProfile(null);
+    latestSessionRef.current = nextSession;
+
+    if (applySessionTaskRef.current) {
+      await applySessionTaskRef.current;
+      if (latestSessionRef.current !== nextSession) {
+        return applySession(latestSessionRef.current);
+      }
       return;
     }
 
-    const resolvedProfile = await resolveAdminProfileForSession(nextSession);
-    setProfile(resolvedProfile);
+    const task = (async () => {
+      setSession(nextSession);
+      setProfileError(null);
+
+      if (!nextSession?.user) {
+        setProfile(null);
+        return;
+      }
+
+      const result = await resolveAdminProfileForSession(nextSession);
+      if (latestSessionRef.current !== nextSession) return;
+
+      setProfile(result.profile);
+      setProfileError(result.profile ? null : result.message);
+    })();
+
+    applySessionTaskRef.current = task;
+
+    try {
+      await task;
+    } finally {
+      if (applySessionTaskRef.current === task) {
+        applySessionTaskRef.current = null;
+      }
+    }
   }, []);
 
   const refresh = useCallback(async () => {
@@ -63,6 +95,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
       setSession(null);
       setProfile(null);
+      setProfileError(null);
     } finally {
       setLoading(false);
     }
@@ -75,36 +108,25 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    const supabase = getSupabaseClient();
 
-    async function bootstrap() {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (cancelled) return;
+
       setLoading(true);
       setAuthError(null);
 
-      try {
-        const supabase = getSupabaseClient();
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        if (!cancelled) await applySession(data.session);
-      } catch (err) {
-        if (!cancelled) {
-          setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
-          setSession(null);
-          setProfile(null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    void bootstrap();
-
-    const supabase = getSupabaseClient();
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      void applySession(nextSession).catch(() => {
-        if (!cancelled) setProfile(null);
-      }).finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      void applySession(nextSession)
+        .catch((err) => {
+          if (!cancelled) {
+            setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
+            setProfile(null);
+            setProfileError(null);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     });
 
     return () => {
@@ -118,12 +140,14 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setSession(result.session);
     setProfile(result.profile);
     setAuthError(null);
+    setProfileError(null);
   }, []);
 
   const signOut = useCallback(async () => {
     await signOutAdmin(profile);
     setSession(null);
     setProfile(null);
+    setProfileError(null);
   }, [profile]);
 
   return (
@@ -134,6 +158,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         loading,
         configured: isSupabaseConfigured,
         authError,
+        profileError,
         signIn,
         signOut,
         refresh,
