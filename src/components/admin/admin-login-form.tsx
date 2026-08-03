@@ -14,10 +14,19 @@ import {
   parseAuthHashType,
   type InviteCallbackType,
 } from "@/lib/auth/invite-callback";
+import { consumeAdminLoginError } from "@/lib/auth/login-redirect";
 import { getSupabaseClient, tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export function AdminLoginForm() {
-  const { signIn, configured, session, profile, loading: authLoading } = useAdminAuth();
+  const {
+    signIn,
+    signOut,
+    configured,
+    session,
+    profile,
+    profileError,
+    loading: authLoading,
+  } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,12 +39,20 @@ export function AdminLoginForm() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "profile") {
-      setError(
-        "You signed in, but the platform could not load your admin profile. Confirm your account exists in Supabase → admin_profiles with account_state = active, then sign in again.",
-      );
-    }
+    const stashed = consumeAdminLoginError();
+    const queryError =
+      params.get("error") === "profile"
+        ? "You signed in, but the platform could not load your admin profile. Confirm your account exists in Supabase → admin_profiles with account_state = active."
+        : null;
+
+    setError(stashed ?? queryError);
   }, []);
+
+  useEffect(() => {
+    if (profileError && !error) {
+      setError(profileError);
+    }
+  }, [profileError, error]);
 
   useEffect(() => {
     if (authLoading || !configured || inviteFlow || checkingInvite) return;
@@ -133,6 +150,20 @@ export function AdminLoginForm() {
     }
   };
 
+  async function clearStaleSession() {
+    setError(null);
+    setLoading(true);
+    try {
+      await signOut();
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not clear session.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-md space-y-8">
       <div className="flex flex-col items-center gap-6 text-center">
@@ -149,6 +180,15 @@ export function AdminLoginForm() {
         </p>
         </div>
       </div>
+
+      {(error || (session && !profile && profileError)) && (
+        <div
+          className="rounded-[var(--ploy-radius-xl)] border border-[oklch(0.55_0.2_25/0.25)] bg-[oklch(0.55_0.2_25/0.08)] px-4 py-3 text-sm text-[var(--ploy-status-error)]"
+          role="alert"
+        >
+          {error ?? profileError}
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
@@ -184,12 +224,6 @@ export function AdminLoginForm() {
           />
         </div>
 
-        {error && (
-          <p className="rounded-[var(--ploy-radius-md)] bg-[oklch(0.55_0.2_25/0.08)] px-3 py-2 text-sm text-[var(--ploy-status-error)]">
-            {error}
-          </p>
-        )}
-
         <Button type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? (
             <>
@@ -200,6 +234,12 @@ export function AdminLoginForm() {
             "Sign in"
           )}
         </Button>
+
+        {session && !profile && (
+          <Button type="button" variant="secondary" className="w-full" disabled={loading} onClick={clearStaleSession}>
+            Clear session and try again
+          </Button>
+        )}
       </form>
     </div>
   );

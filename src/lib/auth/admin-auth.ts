@@ -48,7 +48,17 @@ async function resolveAdminSession(
   session: Session,
   user: User,
 ): Promise<AdminSessionResult> {
-  let profile = await fetchAdminProfile(user.id);
+  const lookup = await fetchAdminProfile(user.id);
+
+  if (lookup.errorMessage) {
+    return {
+      ok: false,
+      message: lookup.errorMessage,
+      signOut: true,
+    };
+  }
+
+  let profile = lookup.profile;
 
   if (!profile) {
     return { ok: false, message: "This account is not authorized for admin access.", signOut: true };
@@ -75,11 +85,6 @@ async function resolveAdminSession(
       };
     }
 
-    // Keep the auth session alive on /admin/login while the invitee sets a password.
-    if (typeof window !== "undefined" && window.location.pathname === "/admin/login") {
-      return { ok: false, message: "Complete password setup.", signOut: false };
-    }
-
     profile = await activateInvitedAdminIfReady(user, profile);
   }
 
@@ -98,9 +103,14 @@ async function resolveAdminSession(
   return { ok: true, profile };
 }
 
-export async function fetchAdminProfile(userId: string): Promise<AdminProfile | null> {
+export async function fetchAdminProfile(userId: string): Promise<{
+  profile: AdminProfile | null;
+  errorMessage: string | null;
+}> {
   const supabase = tryGetSupabaseClient();
-  if (!supabase) return null;
+  if (!supabase) {
+    return { profile: null, errorMessage: "Supabase is not configured." };
+  }
 
   const { data, error } = await supabase
     .from("admin_profiles")
@@ -110,11 +120,17 @@ export async function fetchAdminProfile(userId: string): Promise<AdminProfile | 
 
   if (error) {
     console.error("[admin-auth] admin_profiles lookup failed:", error.message);
-    return null;
+    return {
+      profile: null,
+      errorMessage: `Could not load your admin profile (${error.message}). Ask a Super Admin to verify your admin_profiles row.`,
+    };
   }
 
-  if (!data) return null;
-  return data as AdminProfile;
+  if (!data) {
+    return { profile: null, errorMessage: null };
+  }
+
+  return { profile: data as AdminProfile, errorMessage: null };
 }
 
 export async function signInAdmin(email: string, password: string) {

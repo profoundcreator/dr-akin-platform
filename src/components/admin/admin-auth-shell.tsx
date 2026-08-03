@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { AdminErrorBoundary } from "@/components/admin/admin-error-boundary";
 import { AdminAuthProvider, useAdminAuth } from "@/context/admin-auth-provider";
+import { redirectToAdminLogin } from "@/lib/auth/login-redirect";
 import { Button } from "@/components/ui/button";
 
 function AdminAuthRedirect({
@@ -59,23 +60,24 @@ function AdminAuthGate({ children }: { children: ReactNode }) {
     if (loading || awaitingProfile || isAuthenticated) return;
 
     if (!configured) {
-      window.location.replace("/admin/login");
+      redirectToAdminLogin("Admin sign-in is required.");
       return;
     }
 
     if (!session) {
-      window.location.replace("/admin/login");
+      redirectToAdminLogin(profileError ?? authError);
     }
-  }, [loading, awaitingProfile, configured, isAuthenticated, session]);
+  }, [loading, awaitingProfile, configured, isAuthenticated, session, profileError, authError]);
 
   useEffect(() => {
     if (loading || awaitingProfile || isAuthenticated || !session || !profileError) return;
 
     const timer = window.setTimeout(() => {
+      const reason = profileError;
       void signOut().finally(() => {
-        window.location.replace("/admin/login?error=profile");
+        redirectToAdminLogin(reason);
       });
-    }, 4000);
+    }, 3000);
 
     return () => window.clearTimeout(timer);
   }, [loading, awaitingProfile, isAuthenticated, session, profileError, signOut]);
