@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { FileUp, PackageOpen } from "lucide-react";
-import { AdminLayoutShell } from "./admin-layout-shell";
+import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { useAdminAuth } from "@/context/admin-auth-provider";

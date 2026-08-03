@@ -22,10 +22,15 @@ export class AdminErrorBoundary extends Component<
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("[admin] render error", error, info.componentStack);
+    if (typeof window !== "undefined") {
+      (window as Window & { __adminLastError?: string }).__adminLastError = error.message;
+    }
   }
 
   render() {
     if (this.state.error) {
+      const message = this.state.error.message || "Unknown admin render error";
+
       return (
         <div
           className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center"
@@ -35,6 +40,12 @@ export class AdminErrorBoundary extends Component<
           <p className="max-w-md text-sm opacity-80">
             Something prevented the admin screen from loading. Try signing in again or refresh
             the page.
+          </p>
+          <p
+            className="max-w-lg rounded-md border border-[#d4cfc8] bg-white/70 px-4 py-3 font-mono text-xs text-left break-words"
+            style={{ color: "#3d3a36" }}
+          >
+            {message}
           </p>
           <a
             href="/admin/login"

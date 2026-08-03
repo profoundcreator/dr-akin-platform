@@ -4,7 +4,7 @@ import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpe
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, formatAdminRole } from "@/lib/auth/permissions";
-import { isSupabaseConfigured } from "@/lib/booking/api";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 

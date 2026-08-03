@@ -152,7 +152,7 @@ export function EaReviewModal({ request, open, onClose }: EaReviewModalProps) {
             </div>
           </dl>
 
-          {request.form.vipProtocol.trim() && (
+          {request.form?.vipProtocol?.trim() && (
             <div className="rounded-[var(--ploy-radius-lg)] bg-[var(--ploy-background-secondary)] p-4 text-sm">
               <p className="font-medium">Event security & reception</p>
               <p className="mt-1 text-[var(--ploy-text-secondary)]">{request.form.vipProtocol}</p>

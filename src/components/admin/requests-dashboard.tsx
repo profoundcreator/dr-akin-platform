@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Clock, Filter, Search } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2 as ConfirmedIcon,
+  Clock as ClockIcon,
+  Filter as FilterIcon,
+  Search,
+} from "lucide-react";
 import { AdminDemoModeBanner } from "@/components/admin/admin-demo-mode-banner";
 import { EaReviewModal } from "@/components/admin/ea-review-modal";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
@@ -13,6 +19,21 @@ import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
 
 type AdminFilter = (typeof ADMIN_FILTER_STATUSES)[number]["id"];
+
+function bookingSearchText(request: BookingRequest): string {
+  const form = request.form;
+  return [
+    request.reference,
+    form?.name,
+    form?.organization,
+    form?.eventTitle,
+    form?.country,
+    form?.city,
+  ]
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .join(" ")
+    .toLowerCase();
+}
 
 function matchesFilter(request: BookingRequest, filter: AdminFilter): boolean {
   switch (filter) {
@@ -76,14 +97,7 @@ export function RequestsDashboard() {
     return requests.filter((r) => {
       if (!matchesFilter(r, filter)) return false;
       if (!search.trim()) return true;
-      const q = search.toLowerCase();
-      return (
-        r.reference.toLowerCase().includes(q) ||
-        r.form.name.toLowerCase().includes(q) ||
-        r.form.organization.toLowerCase().includes(q) ||
-        r.form.eventTitle.toLowerCase().includes(q) ||
-        r.form.country.toLowerCase().includes(q)
-      );
+      return bookingSearchText(r).includes(search.toLowerCase());
     });
   }, [requests, filter, search]);
 
@@ -113,9 +127,9 @@ export function RequestsDashboard() {
         <div className="space-y-8">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: "New requests", value: stats.new, icon: Clock },
-              { label: "Under review", value: stats.review, icon: Filter },
-              { label: "Confirmed", value: stats.confirmed, icon: CheckCircle2 },
+              { label: "New requests", value: stats.new, icon: ClockIcon },
+              { label: "Under review", value: stats.review, icon: FilterIcon },
+              { label: "Confirmed", value: stats.confirmed, icon: ConfirmedIcon },
               { label: "Pending info", value: stats.pending, icon: AlertTriangle },
             ].map(({ label, value, icon: Icon }) => (
               <div key={label} className="ploy-surface-elevated p-5">
@@ -196,21 +210,22 @@ export function RequestsDashboard() {
                           )}
                         </td>
                         <td className="py-4 pr-4">
-                          <p className="font-medium">{request.form.name}</p>
+                          <p className="font-medium">{request.form?.name ?? "—"}</p>
                           <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                            {request.form.organization}
+                            {request.form?.organization ?? "—"}
                           </p>
                         </td>
                         <td className="py-4 pr-4">
-                          <p className="font-medium">{request.form.eventTitle}</p>
+                          <p className="font-medium">{request.form?.eventTitle ?? "—"}</p>
                           <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                            {request.form.engagementType} · {request.form.format}
+                            {request.form?.engagementType ?? "—"} · {request.form?.format ?? "—"}
                           </p>
                         </td>
                         <td className="py-4 pr-4 text-[var(--ploy-text-secondary)]">
-                          {request.form.preferredDate || "—"}
+                          {request.form?.preferredDate || "—"}
                           <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                            {request.form.city}, {request.form.country}
+                            {[request.form?.city, request.form?.country].filter(Boolean).join(", ") ||
+                              "—"}
                           </p>
                         </td>
                         <td className="py-4 pr-4">

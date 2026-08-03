@@ -41,12 +41,37 @@ export function getStoredAccessToken(reference: string): string | null {
   }
 }
 
+function normalizeBookingForm(raw: unknown): BookingFormData {
+  const form = raw && typeof raw === "object" ? (raw as Partial<BookingFormData>) : {};
+
+  return {
+    name: form.name ?? "",
+    organization: form.organization ?? "",
+    email: form.email ?? "",
+    phone: form.phone ?? "",
+    timezone: form.timezone ?? "",
+    engagementType: form.engagementType ?? "",
+    eventTitle: form.eventTitle ?? "",
+    audienceSize: form.audienceSize ?? "",
+    format: form.format ?? "",
+    preferredDate: form.preferredDate ?? "",
+    alternativeDate: form.alternativeDate ?? "",
+    city: form.city ?? "",
+    country: form.country ?? "",
+    travelDetails: form.travelDetails ?? "",
+    budgetRange: form.budgetRange ?? "",
+    recordingPermission: form.recordingPermission ?? "",
+    vipProtocol: form.vipProtocol ?? "",
+    termsAgreed: Boolean(form.termsAgreed),
+  };
+}
+
 function mapDbToBooking(row: DbBookingRequest, extras?: {
   statusHistory?: StatusEvent[];
   documents?: BookingDocument[];
   assignedEa?: string | null;
 }): BookingRequest {
-  const form = row.form_data as BookingFormData;
+  const form = normalizeBookingForm(row.form_data);
   return {
     id: row.id,
     reference: row.reference,
