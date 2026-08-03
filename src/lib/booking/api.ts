@@ -12,6 +12,7 @@ import {
 } from "@/lib/booking/storage";
 import { getMockBookingRequests } from "@/lib/booking/mock-demo-data";
 import { getBookingLookupStrategy } from "@/lib/booking/tracker-access";
+import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { tryGetSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { DbBookingRequest } from "@/lib/supabase/database.types";
 
@@ -108,7 +109,7 @@ function mapOrganizerPayload(payload: Record<string, unknown>): BookingRequest {
 export async function createBookingRequest(
   form: BookingFormData,
   source = "web",
-): Promise<{ reference: string; accessToken: string }> {
+): Promise<{ id: string; reference: string; accessToken: string }> {
   const supabase = tryGetSupabaseClient();
 
   if (supabase) {
@@ -119,17 +120,19 @@ export async function createBookingRequest(
 
     if (error) throw new Error(error.message);
 
-    const result = data as { reference: string; access_token: string };
+    const result = data as { id: string; reference: string; access_token: string };
     saveAccessToken(result.reference, result.access_token);
+    notifySubmission({ kind: "booking", bookingId: result.id });
 
     return {
+      id: result.id,
       reference: result.reference,
       accessToken: result.access_token,
     };
   }
 
   const local = createLocalBooking(form);
-  return { reference: local.reference, accessToken: "" };
+  return { id: local.id, reference: local.reference, accessToken: "" };
 }
 
 export async function getBookingByReference(

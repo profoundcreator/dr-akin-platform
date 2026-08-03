@@ -57,6 +57,7 @@ export interface DbBookingRequest {
   conflict_detected: boolean;
   submission_source: string;
   form_data: Record<string, unknown>;
+  admin_notified_at: string | null;
   created_at: string;
   updated_at: string;
   assigned_ea?: { full_name: string } | null;
@@ -87,6 +88,7 @@ export interface DbEnquiry {
   assigned_admin_id: string | null;
   booking_request_id: string | null;
   payload: Record<string, unknown> | null;
+  admin_notified_at: string | null;
   created_at: string;
   updated_at: string;
 }

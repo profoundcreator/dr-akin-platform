@@ -1,3 +1,4 @@
+import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export interface GeneralEnquiryInput {
@@ -27,5 +28,8 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
   });
 
   if (error) throw new Error(error.message);
-  return data as string;
+
+  const enquiryId = data as string;
+  notifySubmission({ kind: "enquiry", enquiryId });
+  return enquiryId;
 }

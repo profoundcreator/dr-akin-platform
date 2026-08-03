@@ -125,6 +125,39 @@ After custom SMTP is saved:
 
 Official guide: [Resend — Send with Supabase SMTP](https://resend.com/docs/send-with-supabase-smtp)
 
+### Resend notifications (enquiry & booking → Gmail)
+
+When someone submits the **contact form** or **booking form**, the site sends a team notification via the [Resend API](https://resend.com/docs/api-reference/emails/send-email) (separate from Supabase auth SMTP). Replies go to the submitter's email; the EA team reads notifications in Gmail.
+
+#### A — Apply migration
+
+Run **`022_submission_notifications.sql`** in the Supabase SQL Editor (tracks `admin_notified_at` so each submission emails once).
+
+#### B — Vercel environment variables
+
+Add in **Vercel → Project → Settings → Environment Variables** (Production + Preview):
+
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `RESEND_API_KEY` | `re_…` | Resend API key (can reuse the auth key or create `platform-notifications`) |
+| `NOTIFICATION_FROM_EMAIL` | `Dr. Akin Platform <notifications@yourdomain.com>` | Verified sender on your Resend domain |
+| `ADMIN_NOTIFICATION_EMAIL` | `ea@gmail.com` | Team inbox that receives new enquiry/booking alerts |
+| `NOTIFICATION_REPLY_TO` | `hello@theakinakinpelu.org` | Optional — address shown on submitter auto-replies (defaults to `ADMIN_NOTIFICATION_EMAIL`) |
+| `SEND_SUBMITTER_CONFIRMATION` | `true` | Optional — send “we received your request” to the submitter (default `true`) |
+
+`SUPABASE_SERVICE_ROLE_KEY` must already be set (used to load the submission server-side).
+
+Redeploy after saving variables.
+
+#### C — Smoke test
+
+1. Submit a test enquiry at `/contact` (use a real inbox you control for the submitter address).
+2. Check **`ADMIN_NOTIFICATION_EMAIL`** — subject `[Contact] …`, **Reply-To** should be the submitter.
+3. Submit a booking at `/book-dr-akin` — subject `[Booking DAA-…] …` with admin link.
+4. Confirm optional auto-reply arrives at the submitter address.
+
+If notifications fail, the form still saves to Supabase; check Vercel function logs for `/api/notify-submission`.
+
 ## 5. Create the Super Admin
 
 1. Add user in **Authentication → Users**
@@ -177,7 +210,8 @@ npm run dev
    - `PUBLIC_SUPABASE_URL`
    - `PUBLIC_SUPABASE_ANON_KEY`
    - `PUBLIC_SITE_URL` (your public site URL, e.g. `https://dr-akin-platform.vercel.app`)
-   - `SUPABASE_SERVICE_ROLE_KEY` (for Team invites)
+   - `SUPABASE_SERVICE_ROLE_KEY` (for Team invites and submission notifications)
+   - `RESEND_API_KEY`, `NOTIFICATION_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL` (see [§ Resend notifications](#resend-notifications-enquiry--booking--gmail))
    - `VERCEL_DEPLOY_HOOK_URL` (recommended — see below)
 3. Deploy — `vercel.json` includes CMS slug rewrites and the booking tracker
 
