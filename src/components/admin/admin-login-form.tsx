@@ -15,6 +15,7 @@ import {
   type InviteCallbackType,
 } from "@/lib/auth/invite-callback";
 import { consumeAdminLoginError } from "@/lib/auth/login-redirect";
+import { setInviteSetupActive } from "@/lib/auth/admin-session-bootstrap";
 import { getSupabaseClient, tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export function AdminLoginForm() {
@@ -55,11 +56,16 @@ export function AdminLoginForm() {
   }, [profileError, error]);
 
   useEffect(() => {
+    setInviteSetupActive(Boolean(inviteFlow));
+    return () => setInviteSetupActive(false);
+  }, [inviteFlow]);
+
+  useEffect(() => {
     if (authLoading || !configured || inviteFlow || checkingInvite) return;
-    if (session && profile) {
+    if (session && profile && !profileError) {
       window.location.replace("/admin/requests");
     }
-  }, [authLoading, configured, session, profile, inviteFlow, checkingInvite]);
+  }, [authLoading, configured, session, profile, profileError, inviteFlow, checkingInvite]);
 
   useEffect(() => {
     if (!configured) {
@@ -89,6 +95,7 @@ export function AdminLoginForm() {
       }
 
       setInviteFlow({ email: result.email, flowType: result.flowType });
+      setInviteSetupActive(true);
       setCheckingInvite(false);
     }
 

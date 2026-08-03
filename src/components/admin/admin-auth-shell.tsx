@@ -51,13 +51,13 @@ function AdminAuthRedirect({
 }
 
 function AdminAuthGate({ children }: { children: ReactNode }) {
-  const { profile, session, loading, configured, authError, profileError, refresh, signOut } =
+  const { profile, session, loading, configured, authError, profileError, refresh } =
     useAdminAuth();
   const isAuthenticated = Boolean(session && profile);
-  const awaitingProfile = Boolean(session && !profile && loading);
+  const resolving = Boolean(session && !profile && (loading || !profileError));
 
   useEffect(() => {
-    if (loading || awaitingProfile || isAuthenticated) return;
+    if (loading || resolving || isAuthenticated) return;
 
     if (!configured) {
       redirectToAdminLogin("Admin sign-in is required.");
@@ -67,20 +67,17 @@ function AdminAuthGate({ children }: { children: ReactNode }) {
     if (!session) {
       redirectToAdminLogin(profileError ?? authError);
     }
-  }, [loading, awaitingProfile, configured, isAuthenticated, session, profileError, authError]);
+  }, [loading, resolving, configured, isAuthenticated, session, profileError, authError]);
 
   useEffect(() => {
-    if (loading || awaitingProfile || isAuthenticated || !session || !profileError) return;
+    if (loading || resolving || isAuthenticated || !profileError) return;
 
     const timer = window.setTimeout(() => {
-      const reason = profileError;
-      void signOut().finally(() => {
-        redirectToAdminLogin(reason);
-      });
-    }, 3000);
+      redirectToAdminLogin(profileError);
+    }, 2500);
 
     return () => window.clearTimeout(timer);
-  }, [loading, awaitingProfile, isAuthenticated, session, profileError, signOut]);
+  }, [loading, resolving, isAuthenticated, profileError]);
 
   if (!configured) {
     return (
@@ -100,16 +97,11 @@ function AdminAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (awaitingProfile || (loading && !profileError)) {
-    return (
-      <AdminAuthRedirect
-        message="Verifying admin access…"
-        showLoginLink
-      />
-    );
+  if (resolving) {
+    return <AdminAuthRedirect message="Verifying admin access…" showLoginLink />;
   }
 
-  if (session && !profile && profileError) {
+  if (profileError) {
     return (
       <AdminAuthRedirect
         message={`${profileError} Returning to sign in…`}

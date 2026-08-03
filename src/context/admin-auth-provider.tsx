@@ -12,9 +12,10 @@ import {
   signInAdmin,
   signOutAdmin,
 } from "@/lib/auth/admin-auth";
+import { clearAdminBootstrapUser } from "@/lib/auth/admin-session-bootstrap";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { AdminProfile } from "@/lib/supabase/database.types";
-import type { Session } from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 interface AdminAuthContextValue {
   session: Session | null;
@@ -36,18 +37,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const skipSignedInEventRef = useRef(false);
   const applySessionTaskRef = useRef<Promise<void> | null>(null);
-  const latestSessionRef = useRef<Session | null>(null);
 
   const applySession = useCallback(async (nextSession: Session | null) => {
-    latestSessionRef.current = nextSession;
-
     if (applySessionTaskRef.current) {
       await applySessionTaskRef.current;
-      if (latestSessionRef.current !== nextSession) {
-        return applySession(latestSessionRef.current);
-      }
-      return;
     }
 
     const task = (async () => {
@@ -60,7 +55,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       }
 
       const result = await resolveAdminProfileForSession(nextSession);
-      if (latestSessionRef.current !== nextSession) return;
+
+      if (result.signOut) {
+        const supabase = getSupabaseClient();
+        await supabase.auth.signOut();
+        setSession(null);
+        setProfile(null);
+        setProfileError(result.message);
+        return;
+      }
 
       setProfile(result.profile);
       setProfileError(result.profile ? null : result.message);
@@ -110,24 +113,65 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     const supabase = getSupabaseClient();
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      if (cancelled) return;
-
+    async function bootstrap() {
       setLoading(true);
       setAuthError(null);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (!cancelled) await applySession(data.session);
+      } catch (err) {
+        if (!cancelled) {
+          setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
+          setSession(null);
+          setProfile(null);
+          setProfileError(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-      void applySession(nextSession)
-        .catch((err) => {
-          if (!cancelled) {
-            setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
-            setProfile(null);
-            setProfileError(null);
-          }
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
-        });
-    });
+    void bootstrap();
+
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, nextSession) => {
+        if (cancelled) return;
+
+        if (event === "INITIAL_SESSION") {
+          return;
+        }
+
+        if (event === "SIGNED_IN" && skipSignedInEventRef.current) {
+          skipSignedInEventRef.current = false;
+          return;
+        }
+
+        if (event === "SIGNED_OUT") {
+          setSession(null);
+          setProfile(null);
+          setProfileError(null);
+          setLoading(false);
+          clearAdminBootstrapUser();
+          return;
+        }
+
+        if (event === "TOKEN_REFRESHED" || event === "SIGNED_IN") {
+          setLoading(true);
+          void applySession(nextSession)
+            .catch((err) => {
+              if (!cancelled) {
+                setAuthError(
+                  err instanceof Error ? err.message : "Unable to verify admin session.",
+                );
+              }
+            })
+            .finally(() => {
+              if (!cancelled) setLoading(false);
+            });
+        }
+      },
+    );
 
     return () => {
       cancelled = true;
@@ -136,6 +180,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, [applySession]);
 
   const signIn = useCallback(async (email: string, password: string) => {
+    skipSignedInEventRef.current = true;
     const result = await signInAdmin(email, password);
     setSession(result.session);
     setProfile(result.profile);
@@ -145,6 +190,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await signOutAdmin(profile);
+    clearAdminBootstrapUser();
     setSession(null);
     setProfile(null);
     setProfileError(null);

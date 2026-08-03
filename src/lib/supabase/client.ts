@@ -20,7 +20,8 @@ export function getSupabaseClient(): SupabaseClient<Database> {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        // Invite links on /admin/login call establishSessionFromAuthHash explicitly.
+        detectSessionInUrl: false,
       },
     });
   }
