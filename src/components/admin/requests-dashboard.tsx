@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock, Filter, Search } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Filter, Search } from "lucide-react";
 import { AdminDemoModeBanner } from "@/components/admin/admin-demo-mode-banner";
 import { EaReviewModal } from "@/components/admin/ea-review-modal";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
