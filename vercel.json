@@ -4,6 +4,11 @@
       "source": "/work/tc-resource-technology",
       "destination": "/work",
       "permanent": true
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/login",
+      "permanent": false
     }
   ],
   "rewrites": [

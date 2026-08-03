@@ -12,7 +12,7 @@
     "verify:supabase:keys": "node scripts/verify-supabase-keys.mjs",
     "verify:migration:015": "node scripts/verify-migration-015.mjs",
     "verify:booking-tracker": "node scripts/verify-booking-tracker-guard.mjs",
-    "verify:vercel:keys": "vercel env pull .env.vercel.production --environment=production --yes && node scripts/verify-supabase-keys.mjs .env.vercel.production",
+    "verify:vercel:keys": "npx vercel env pull .env.vercel.production --environment=production --yes && node scripts/verify-supabase-keys.mjs .env.vercel.production",
     "setup:env": "node scripts/setup-env.mjs",
     "setup:service-role": "node scripts/setup-service-role.mjs"
   },
