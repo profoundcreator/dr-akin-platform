@@ -17,7 +17,7 @@ import {
 import { getSupabaseClient, tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export function AdminLoginForm() {
-  const { signIn, configured } = useAdminAuth();
+  const { signIn, configured, session, profile, loading: authLoading } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +36,13 @@ export function AdminLoginForm() {
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (authLoading || !configured || inviteFlow || checkingInvite) return;
+    if (session && profile) {
+      window.location.replace("/admin/requests");
+    }
+  }, [authLoading, configured, session, profile, inviteFlow, checkingInvite]);
 
   useEffect(() => {
     if (!configured) {

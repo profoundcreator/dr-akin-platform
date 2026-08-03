@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from "react";
 import {
-  getCurrentAdmin,
   resolveAdminProfileForSession,
   signInAdmin,
   signOutAdmin,
@@ -21,6 +20,7 @@ interface AdminAuthContextValue {
   profile: AdminProfile | null;
   loading: boolean;
   configured: boolean;
+  authError: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -32,6 +32,18 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const applySession = useCallback(async (nextSession: Session | null) => {
+    setSession(nextSession);
+    if (!nextSession?.user) {
+      setProfile(null);
+      return;
+    }
+
+    const resolvedProfile = await resolveAdminProfileForSession(nextSession);
+    setProfile(resolvedProfile);
+  }, []);
 
   const refresh = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -39,36 +51,73 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const current = await getCurrentAdmin();
-    setSession(current?.session ?? null);
-    setProfile(current?.profile ?? null);
-    setLoading(false);
-  }, []);
+    setLoading(true);
+    setAuthError(null);
+
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      await applySession(data.session);
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
+      setSession(null);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [applySession]);
 
   useEffect(() => {
-    refresh();
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
 
-    if (!isSupabaseConfigured) return;
+    let cancelled = false;
+
+    async function bootstrap() {
+      setLoading(true);
+      setAuthError(null);
+
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (!cancelled) await applySession(data.session);
+      } catch (err) {
+        if (!cancelled) {
+          setAuthError(err instanceof Error ? err.message : "Unable to verify admin session.");
+          setSession(null);
+          setProfile(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void bootstrap();
 
     const supabase = getSupabaseClient();
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession);
-      if (newSession?.user) {
-        const p = await resolveAdminProfileForSession(newSession);
-        setProfile(p);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      void applySession(nextSession).catch(() => {
+        if (!cancelled) setProfile(null);
+      }).finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     });
 
-    return () => sub.subscription.unsubscribe();
-  }, [refresh]);
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [applySession]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const result = await signInAdmin(email, password);
     setSession(result.session);
     setProfile(result.profile);
+    setAuthError(null);
   }, []);
 
   const signOut = useCallback(async () => {
@@ -84,6 +133,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         profile,
         loading,
         configured: isSupabaseConfigured,
+        authError,
         signIn,
         signOut,
         refresh,
