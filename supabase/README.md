@@ -125,38 +125,52 @@ After custom SMTP is saved:
 
 Official guide: [Resend — Send with Supabase SMTP](https://resend.com/docs/send-with-supabase-smtp)
 
-### Resend notifications (enquiry & booking → Gmail)
+### Resend notifications (enquiry & booking → EA inbox)
 
-When someone submits the **contact form** or **booking form**, the site sends a team notification via the [Resend API](https://resend.com/docs/api-reference/emails/send-email) (separate from Supabase auth SMTP). Replies go to the submitter's email; the EA team reads notifications in Gmail.
+When someone submits the **contact form** or **booking form**, the site sends a team notification via the [Resend API](https://resend.com/docs/api-reference/emails/send-email) (separate from Supabase auth SMTP). Replies go to the submitter's email; the EA team reads notifications at **`ea@theakinakinpelu.org`**.
 
 #### A — Apply migration
 
 Run **`022_submission_notifications.sql`** in the Supabase SQL Editor (tracks `admin_notified_at` so each submission emails once).
 
-#### B — Vercel environment variables
+#### B — Resend dashboard (required for API sends)
+
+Transactional notifications use the **Resend API**, not Supabase SMTP. You must complete this in [resend.com](https://resend.com):
+
+1. **Domains → Add domain** → `theakinakinpelu.org`
+2. Add the **sending** DNS records Resend shows (SPF/DKIM — usually TXT/CNAME). These are **in addition to** your existing MX records for `ea@` / `hello@`; do not remove MX.
+3. Wait until Resend shows the domain as **Verified**
+4. **API Keys → Create API Key** → copy the `re_…` key
+
+Without a verified domain, Resend only delivers to the Resend account owner's email (test mode) — **`ea@` will not receive anything**.
+
+#### C — Vercel environment variables
 
 Add in **Vercel → Project → Settings → Environment Variables** (Production + Preview):
 
 | Variable | Example | Purpose |
 |----------|---------|---------|
-| `RESEND_API_KEY` | `re_…` | Resend API key (can reuse the auth key or create `platform-notifications`) |
-| `NOTIFICATION_FROM_EMAIL` | `Dr. Akin Platform <notifications@yourdomain.com>` | Verified sender on your Resend domain |
-| `ADMIN_NOTIFICATION_EMAIL` | `ea@gmail.com` | Team inbox that receives new enquiry/booking alerts |
-| `NOTIFICATION_REPLY_TO` | `hello@theakinakinpelu.org` | Optional — address shown on submitter auto-replies (defaults to `ADMIN_NOTIFICATION_EMAIL`) |
+| `RESEND_API_KEY` | `re_…` | Resend API key from step B |
+| `NOTIFICATION_FROM_EMAIL` | `notifications@theakinakinpelu.org` | Must be on the **verified** Resend domain |
+| `ADMIN_NOTIFICATION_EMAIL` | `ea@theakinakinpelu.org` | EA shared inbox |
+| `NOTIFICATION_REPLY_TO` | `ea@theakinakinpelu.org` | Submitter auto-reply address (optional; defaults to admin inbox) |
 | `SEND_SUBMITTER_CONFIRMATION` | `true` | Optional — send “we received your request” to the submitter (default `true`) |
 
 `SUPABASE_SERVICE_ROLE_KEY` must already be set (used to load the submission server-side).
 
 Redeploy after saving variables.
 
-#### C — Smoke test
+**Config check:** call `/api/notifications-status?key=YOUR_NOTIFICATIONS_STATUS_KEY` (set `NOTIFICATIONS_STATUS_KEY` in Vercel first) — all checks should be `true` before testing. Without the key, the endpoint returns 404.
+
+#### D — Smoke test
 
 1. Submit a test enquiry at `/contact` (use a real inbox you control for the submitter address).
-2. Check **`ADMIN_NOTIFICATION_EMAIL`** — subject `[Contact] …`, **Reply-To** should be the submitter.
+2. Check **`ea@theakinakinpelu.org`** — subject `[Contact] …`, **Reply-To** should be the submitter.
 3. Submit a booking at `/book-dr-akin` — subject `[Booking DAA-…] …` with admin link.
 4. Confirm optional auto-reply arrives at the submitter address.
+5. If nothing arrives, open browser DevTools → Console for `[notifications]` warnings, and Vercel → Functions → `/api/notify-submission` logs.
 
-If notifications fail, the form still saves to Supabase; check Vercel function logs for `/api/notify-submission`.
+If notifications fail, the form still saves to Supabase.
 
 ## 5. Create the Super Admin
 

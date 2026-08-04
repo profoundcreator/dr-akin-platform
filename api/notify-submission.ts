@@ -1,5 +1,6 @@
 import { createServiceSupabaseClient } from "./lib/supabase-service";
 import { siteUrl } from "./lib/env";
+import { isSameSiteRequest } from "./lib/request-guard";
 import {
   buildBookingAdminMail,
   buildBookingConfirmationMail,
@@ -32,6 +33,10 @@ function readFormField(form: Record<string, unknown>, key: string): string | nul
 }
 
 export async function POST(request: Request): Promise<Response> {
+  if (!isSameSiteRequest(request)) {
+    return json(403, { error: "Forbidden." });
+  }
+
   const mailConfig = getNotificationMailConfig();
   if (!mailConfig) {
     return json(503, { error: NOTIFICATIONS_NOT_CONFIGURED });
@@ -108,6 +113,7 @@ export async function POST(request: Request): Promise<Response> {
 
     if (!adminResult.ok) {
       await supabase.from("enquiries").update({ admin_notified_at: null }).eq("id", enquiry.id);
+      console.error("[notifications] enquiry admin alert failed:", adminResult.error);
       return json(502, { error: adminResult.error });
     }
 
@@ -116,13 +122,16 @@ export async function POST(request: Request): Promise<Response> {
         contactName: enquiry.contact_name,
         subject: enquiry.subject,
       });
-      await sendMail(mailConfig, {
+      const confirmationResult = await sendMail(mailConfig, {
         to: enquiry.contact_email,
         subject: confirmation.subject,
         html: confirmation.html,
         text: confirmation.text,
         replyTo: mailConfig.replyTo,
       });
+      if (!confirmationResult.ok) {
+        console.error("[notifications] enquiry confirmation failed:", confirmationResult.error);
+      }
     }
 
     return json(200, { ok: true });
@@ -195,6 +204,7 @@ export async function POST(request: Request): Promise<Response> {
 
     if (!adminResult.ok) {
       await supabase.from("booking_requests").update({ admin_notified_at: null }).eq("id", booking.id);
+      console.error("[notifications] booking admin alert failed:", adminResult.error);
       return json(502, { error: adminResult.error });
     }
 
@@ -207,13 +217,16 @@ export async function POST(request: Request): Promise<Response> {
         reference: booking.reference,
         trackerUrl,
       });
-      await sendMail(mailConfig, {
+      const confirmationResult = await sendMail(mailConfig, {
         to: booking.organizer_email,
         subject: confirmation.subject,
         html: confirmation.html,
         text: confirmation.text,
         replyTo: mailConfig.replyTo,
       });
+      if (!confirmationResult.ok) {
+        console.error("[notifications] booking confirmation failed:", confirmationResult.error);
+      }
     }
 
     return json(200, { ok: true });

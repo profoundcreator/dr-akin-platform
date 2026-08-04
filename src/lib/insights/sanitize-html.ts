@@ -31,7 +31,8 @@ function sanitizeAnchorTag(tag: string): string {
   if (!hrefMatch) return "";
 
   const href = (hrefMatch[2] ?? hrefMatch[3] ?? hrefMatch[4] ?? "").trim();
-  if (!href || /^\s*javascript:/i.test(href)) return "";
+  if (!href || /^\s*(javascript|data|vbscript):/i.test(href)) return "";
+  if (/^\/\//.test(href)) return "";
 
   const safeHref = href.replace(/"/g, "&quot;");
   return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer">`;
