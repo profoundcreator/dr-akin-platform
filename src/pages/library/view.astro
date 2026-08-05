@@ -1,10 +1,9 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { LibraryBookBySlug } from "@/components/pages/library-book-by-slug";
+const slug = Astro.url.searchParams.get("slug")?.trim() ?? "";
 
-const slug = Astro.url.searchParams.get("slug") ?? "";
+if (slug) {
+  return Astro.redirect(`/library/${slug}`, 301);
+}
+
+return Astro.redirect("/resources", 301);
 ---
-
-<Layout title="Library — Akin Akinpelu, Ph.D., Amb., FLPi" description="Books and published ideas from Akin Akinpelu">
-  <LibraryBookBySlug client:load slug={slug} />
-</Layout>

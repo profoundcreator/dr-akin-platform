@@ -52,22 +52,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/booking/:ref", "destination": "/booking/DAA-8492" },
-    {
-      "source": "/events/:slug((?!view$)[a-z0-9-]+)",
-      "destination": "/events/view?slug=:slug"
-    },
-    {
-      "source": "/library/:slug((?!view$)[a-z0-9-]+)",
-      "destination": "/library/view?slug=:slug"
-    },
-    {
-      "source": "/insights/:slug((?!view$)[a-z0-9-]+)",
-      "destination": "/insights/view?slug=:slug"
-    },
-    {
-      "source": "/work/:slug((?!view$)[a-z0-9-]+)",
-      "destination": "/work/view?slug=:slug"
-    }
+    { "source": "/booking/:ref", "destination": "/booking/DAA-8492" }
   ]
 }

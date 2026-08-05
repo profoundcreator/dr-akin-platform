@@ -1,10 +1,9 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { EventDetailBySlug } from "@/components/pages/event-detail-by-slug";
+const slug = Astro.url.searchParams.get("slug")?.trim() ?? "";
 
-const slug = Astro.url.searchParams.get("slug") ?? "";
+if (slug) {
+  return Astro.redirect(`/events/${slug}`, 301);
+}
+
+return Astro.redirect("/events", 301);
 ---
-
-<Layout title="Event — Akin Akinpelu, Ph.D., Amb., FLPi" description="Event details and registration">
-  <EventDetailBySlug client:load slug={slug} />
-</Layout>

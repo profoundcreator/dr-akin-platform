@@ -20,7 +20,7 @@ function includeInSitemap(page) {
   if (pathname.startsWith("/booking")) return false;
   if (pathname === "/book-dr-akin" || pathname === "/track-booking") return false;
   if (pathname === "/404") return false;
-  // Vercel rewrite shells — public URLs use /insights/{slug} etc.
+  // Legacy /view redirect shells — canonical URLs are /insights/{slug} etc.
   if (pathname.endsWith("/view")) return false;
   return true;
 }

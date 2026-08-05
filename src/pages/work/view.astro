@@ -1,10 +1,9 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { WorkOrgBySlug } from "@/components/pages/work-org-by-slug";
+const slug = Astro.url.searchParams.get("slug")?.trim() ?? "";
 
-const slug = Astro.url.searchParams.get("slug") ?? "";
+if (slug) {
+  return Astro.redirect(`/work/${slug}`, 301);
+}
+
+return Astro.redirect("/work", 301);
 ---
-
-<Layout title="Work — Akin Akinpelu, Ph.D., Amb., FLPi" description="Three strategic pillars and six platforms spanning Governance, Enterprise, and Education">
-  <WorkOrgBySlug client:load slug={slug} />
-</Layout>
