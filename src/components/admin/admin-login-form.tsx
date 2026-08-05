@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import {
   establishSessionFromAuthHash,
+  hasInviteCallbackInUrl,
+  parseAuthCallbackError,
   parseAuthHashType,
   type InviteCallbackType,
 } from "@/lib/auth/invite-callback";
@@ -44,7 +46,7 @@ export function AdminLoginForm() {
     const queryError =
       params.get("error") === "profile"
         ? "You signed in, but the platform could not load your admin profile. Confirm your account exists in Supabase → admin_profiles with account_state = active."
-        : null;
+        : parseAuthCallbackError();
 
     setError(stashed ?? queryError);
   }, []);
@@ -82,24 +84,26 @@ export function AdminLoginForm() {
     const hashType = parseAuthHashType();
 
     async function resolveInviteSession() {
-      if (!hashType) {
+      if (!hashType && !hasInviteCallbackInUrl()) {
         setCheckingInvite(false);
         return;
       }
 
+      setInviteSetupActive(true);
+
       const result = await establishSessionFromAuthHash(supabase);
       if (!result.ok) {
         setError(result.message);
+        setInviteSetupActive(false);
         setCheckingInvite(false);
         return;
       }
 
       setInviteFlow({ email: result.email, flowType: result.flowType });
-      setInviteSetupActive(true);
       setCheckingInvite(false);
     }
 
-    if (parseAuthHashType()) {
+    if (hasInviteCallbackInUrl()) {
       resolveInviteSession();
       return;
     }
@@ -184,6 +188,11 @@ export function AdminLoginForm() {
         </Heading>
         <p className="text-sm text-[var(--ploy-text-secondary)]">
           Approved administrators only. Public self-registration is disabled.
+        </p>
+        <p className="text-sm text-[var(--ploy-text-secondary)]">
+          If you were invited, open the link in your invite email to{" "}
+          <span className="font-medium text-[var(--ploy-text-primary)]">create your password</span>{" "}
+          first — then return here to sign in.
         </p>
         </div>
       </div>
