@@ -40,7 +40,7 @@ export const STATIC_WORK_ORG_META = [
     pillarTitle: "Enterprise",
     brandLabel: "AALD",
     hubCardDescription:
-      "Consulting, training and research for African corporates and diaspora institutions.",
+      "Consulting, training and research for African corporates and diaspora institutions building stronger leadership and performance.",
   },
   {
     siteKey: "work-performx",
@@ -50,7 +50,7 @@ export const STATIC_WORK_ORG_META = [
     pillarTitle: "Enterprise",
     brandLabel: "PERFORMX",
     hubCardDescription:
-      "A leadership event and community helping people and institutions perform at a higher level.",
+      "PerformX Nexus — a catalytic ecosystem where leaders, institutions and sectors converge to perform at a higher level.",
   },
   {
     siteKey: "work-erudio-hub",
