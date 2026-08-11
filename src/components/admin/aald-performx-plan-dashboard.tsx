@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import {
+  canAccessContentPlans,
   canReviewContentPlans,
   isPrivilegedAdmin,
 } from "@/lib/auth/permissions";
@@ -66,6 +67,7 @@ function statusPillClass(status: ContentPlanData["status"]): string {
 export function AaldPerformxPlanDashboard() {
   const { profile } = useAdminAuth();
   const isApprover = canReviewContentPlans(profile);
+  const canView = canAccessContentPlans(profile);
   const isSuperAdmin = isPrivilegedAdmin(profile);
   const [plan, setPlan] = useState<ContentPlanData | null>(null);
   const [tab, setTab] = useState<TabId>("overview");
@@ -185,15 +187,34 @@ export function AaldPerformxPlanDashboard() {
     });
   };
 
-  if (!isApprover) {
+  if (!canView) {
     return (
       <AdminLayoutShell
         title="Content planning"
         subtitle="AALD + PerformX Nexus + Summit 2026"
       >
         <p className="text-sm text-[var(--ploy-text-secondary)]">
-          You do not have permission to review content plans. Contact a Super Admin or Executive Assistant.
+          You do not have permission to open the planning workspace.
         </p>
+      </AdminLayoutShell>
+    );
+  }
+
+  if (!isApprover) {
+    return (
+      <AdminLayoutShell
+        title="Content planning"
+        subtitle="AALD + PerformX Nexus + Summit 2026"
+      >
+        <div className="ploy-surface-elevated space-y-3 p-6 text-sm text-[var(--ploy-text-secondary)]">
+          <p>
+            This workspace is for approvers (Super Admin, Executive Assistant, or Admin Manager).
+          </p>
+          <p className="text-[var(--ploy-text-tertiary)]">
+            Your role can see the Planning link but cannot edit decisions or sign off. Ask an approver to review{" "}
+            <code className="text-xs">docs/content-strategy/aald-performx-planning.md</code> or complete the review in this workspace.
+          </p>
+        </div>
       </AdminLayoutShell>
     );
   }

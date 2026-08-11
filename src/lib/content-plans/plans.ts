@@ -216,10 +216,9 @@ export async function logContentPlanAudit(
   if (!supabase) return;
 
   await supabase.rpc("log_audit_event", {
-    p_action: action,
-    p_entity_type: "content_plan",
-    p_entity_id: planSlug,
-    p_actor_id: actorId ?? null,
-    p_metadata: { slug: planSlug },
+    p_event_type: action,
+    p_target_type: "content_plan",
+    p_summary: { slug: planSlug },
+    p_metadata: actorId ? { actorId } : undefined,
   });
 }

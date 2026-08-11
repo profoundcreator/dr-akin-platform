@@ -3,7 +3,7 @@
 import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
-import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, canReviewContentPlans, formatAdminRole } from "@/lib/auth/permissions";
+import { canAccessAuditLog, canAccessContentPlans, canAccessTeamAdmin, canManageResources, formatAdminRole } from "@/lib/auth/permissions";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
@@ -78,7 +78,7 @@ export function AdminLayoutShell({ children, title, subtitle }: AdminLayoutShell
               if ("requiresResourceAccess" in item && item.requiresResourceAccess && !canManageResources(profile)) {
                 return false;
               }
-              if ("requiresPlanningAccess" in item && item.requiresPlanningAccess && !canReviewContentPlans(profile)) {
+              if ("requiresPlanningAccess" in item && item.requiresPlanningAccess && !canAccessContentPlans(profile)) {
                 return false;
               }
               return true;
