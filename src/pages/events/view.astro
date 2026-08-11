@@ -1,9 +1,24 @@
 ---
-const slug = Astro.url.searchParams.get("slug")?.trim() ?? "";
-
-if (slug) {
-  return Astro.redirect(`/events/${slug}`, 301);
-}
-
-return Astro.redirect("/events", 301);
 ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <script is:inline>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var slug = (params.get("slug") || "").trim();
+        var target = slug ? "/events/" + encodeURIComponent(slug) : "/events";
+        window.location.replace(target);
+      })();
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/events" />
+    </noscript>
+  </head>
+  <body>
+    <p><a href="/events">Continue to Events</a></p>
+  </body>
+</html>

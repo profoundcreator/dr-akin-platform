@@ -49,6 +49,30 @@
       "source": "/admin",
       "destination": "/admin/login",
       "permanent": false
+    },
+    {
+      "source": "/insights/view",
+      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
+      "destination": "/insights/$1",
+      "permanent": true
+    },
+    {
+      "source": "/events/view",
+      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
+      "destination": "/events/$1",
+      "permanent": true
+    },
+    {
+      "source": "/library/view",
+      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
+      "destination": "/library/$1",
+      "permanent": true
+    },
+    {
+      "source": "/work/view",
+      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
+      "destination": "/work/$1",
+      "permanent": true
     }
   ],
   "rewrites": [

@@ -15,14 +15,48 @@ import { resolve } from "node:path";
 const BASE_URL = (process.env.BASE_URL ?? "https://dr-akin-platform.vercel.app").replace(/\/$/, "");
 const WITH_SUPABASE = process.argv.includes("--with-supabase");
 
+async function fetchRedirectCheck({ name, path, finalPath, status = 200 }) {
+  const url = `${BASE_URL}${path}`;
+  try {
+    const res = await fetch(url, {
+      redirect: "manual",
+      headers: { "User-Agent": "dr-akin-smoke/1.0" },
+    });
+    const location = res.headers.get("location") ?? "";
+    const ok =
+      (res.status === 301 || res.status === 308) &&
+      (location.endsWith(finalPath) || location.includes(finalPath));
+    return ok
+      ? { name, url, ok: true }
+      : { name, url, ok: false, detail: `expected redirect to ${finalPath}, got ${res.status} ${location}` };
+  } catch (err) {
+    return {
+      name,
+      url,
+      ok: false,
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+const REDIRECT_CHECKS = [
+  { name: "TC Resource retired redirect", path: "/work/tc-resource-technology", finalPath: "/work" },
+  { name: "Insights view canonical redirect", path: "/insights/view?slug=culture-as-strategic-asset", finalPath: "/insights/culture-as-strategic-asset" },
+];
+
 /** @type {{ name: string; path: string; expect?: RegExp; status?: number; manual?: boolean }[]} */
 const CHECKS = [
-  { name: "Homepage", path: "/", expect: /Akin|Dr\.|Governance/i },
+  { name: "Homepage", path: "/", expect: /Akin|Governance|Three pillars/i },
   { name: "Contact", path: "/contact", expect: /enquiry|contact/i },
   { name: "Book Dr Akin", path: "/book-dr-akin", expect: /book|engagement|invitation/i },
   { name: "Track booking", path: "/track-booking", expect: /track|reference|booking/i },
   { name: "Work hub", path: "/work", expect: /work|ecosystem|platform/i },
   { name: "PERFORMX", path: "/work/performx", expect: /performx|PERFORMX/i },
+  { name: "Future Africa", path: "/work/future-africa", expect: /Future Africa|Agenda 2063/i },
+  { name: "Auctus Africa", path: "/work/auctus-africa", expect: /Auctus|auctusafrica/i },
+  { name: "Organizer resources", path: "/organizer-resources", expect: /organizer|approved materials/i },
+  { name: "Meet profile", path: "/meet-akin/profile", expect: /1,000,000\+|Special Emissary/i },
+  { name: "Speaking", path: "/meet-akin/speaking", expect: /Governance & Leadership|Enterprise Development/i },
   { name: "Insights hub", path: "/insights", expect: /insight|essay|field note/i },
   { name: "Events hub", path: "/events", expect: /event/i },
   { name: "Library hub", path: "/resources", expect: /library|book/i },
@@ -119,6 +153,12 @@ console.log(`\n🔍 Production smoke test\n   Base URL: ${BASE_URL}\n`);
 const httpResults = [];
 for (const check of CHECKS) {
   const result = await fetchCheck(check);
+  httpResults.push(result);
+  console.log(result.ok ? `✅ ${result.name}` : `❌ ${result.name} — ${result.detail}`);
+}
+
+for (const check of REDIRECT_CHECKS) {
+  const result = await fetchRedirectCheck(check);
   httpResults.push(result);
   console.log(result.ok ? `✅ ${result.name}` : `❌ ${result.name} — ${result.detail}`);
 }

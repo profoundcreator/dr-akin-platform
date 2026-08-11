@@ -1,9 +1,25 @@
 ---
-const slug = Astro.url.searchParams.get("slug")?.trim() ?? "";
-
-if (slug) {
-  return Astro.redirect(`/insights/${slug}`, 301);
-}
-
-return Astro.redirect("/insights", 301);
+/** Legacy shell — canonical URLs are /insights/{slug}. Vercel redirects query URLs; inline script handles static preview. */
 ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <script is:inline>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var slug = (params.get("slug") || "").trim();
+        var target = slug ? "/insights/" + encodeURIComponent(slug) : "/insights";
+        window.location.replace(target);
+      })();
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/insights" />
+    </noscript>
+  </head>
+  <body>
+    <p><a href="/insights">Continue to Insights</a></p>
+  </body>
+</html>
