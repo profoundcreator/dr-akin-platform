@@ -1,8 +1,8 @@
 # AALD + PerformX Nexus + Summit 2026 — Planning Document
 
-Status key: **Approved direction** means recommended by source review. **Review** means awaiting interactive approval in the admin planning workspace. **Hold** means blocked until a decision is recorded.
+Status key: **Approved direction** means recommended by source review. **Review** means awaiting client approval in Cursor. **Hold** means blocked until a decision is recorded.
 
-Interactive review: `/admin/planning/aald-performx` (shortcut: `/planning/aald-performx` redirects there)
+**Approval workflow:** Review this document in Cursor. Confirm the five decisions in chat. Implementation follows client sign-off.
 
 ## Route map
 
@@ -38,29 +38,31 @@ Cross-links: work pages ↔ summit event ↔ AALD parent brand.
 
 ## Decisions matrix
 
+Confirm each decision in Cursor chat (reply with number + choice, or “approve all recommended”).
+
 ### 1. Use 2026 concept note theme on the summit event page
 
-- [x] Yes — use Leading Frontiers: Innovate, Integrate, Impact *(recommended)*
+- [ ] Yes — use Leading Frontiers: Innovate, Integrate, Impact *(recommended)*
 - [ ] No — use Nexus brochure theme instead
 
 ### 2. Replace "Execution Think Tank" with PerformX Nexus positioning
 
-- [x] Yes — adopt PerformX Nexus ecosystem framing *(recommended)*
+- [ ] Yes — adopt PerformX Nexus ecosystem framing *(recommended)*
 - [ ] No — keep Execution Think Tank positioning
 
 ### 3. Contact routing
 
-- [x] Site routes primary (/contact, /book-dr-akin); brand email secondary *(recommended)*
+- [ ] Site routes primary (/contact, /book-dr-akin); brand email secondary *(recommended)*
 - [ ] Brand emails and phones primary on page
 
 ### 4. No public sponsor pricing on the web
 
-- [x] Yes — hide pricing; use Request partnership deck CTA *(recommended)*
+- [ ] Yes — hide pricing; use Request partnership deck CTA *(recommended)*
 - [ ] No — publish sponsor tiers/pricing publicly
 
 ### 5. Horizon Council depth on PerformX work page (v1)
 
-- [x] Teaser only — short summary + contact CTA *(recommended)*
+- [ ] Teaser only — short summary + contact CTA *(recommended)*
 - [ ] Full Horizon Council section on work page
 
 ## Page plans
@@ -130,29 +132,30 @@ Sector ownership on request — no public pricing.
 - Theme: Leading Frontiers: Innovate, Integrate, Impact
 - Venue: Landmark Event Centre, Lagos
 - Primary CTA: Register interest → `/contact`
+- Secondary CTA: Explore PerformX Nexus → `/work/performx`
 
-**About · Audiences · Sectors · Brand lineage**
+**About the summit**
 
-See admin planning workspace for full section copy maps.
+Two-day leadership convening across eight sectors — Power Room sessions and Nexus Honors. Part of PerformX Nexus and AALD.
+
+**Delegates, speakers and sponsors**
+
+Each pathway coordinated through the team. Registration URLs added when available. Sponsor packages on request — no public pricing.
+
+**Brand lineage**
+
+PerformX Summit is the flagship convening of PerformX Nexus (Enterprise pillar, alongside AALD).
 
 ## Approval checklist
 
-- [ ] All five decisions recorded with a selected option
-- [ ] Variables register reviewed (no unresolved conflicts marked "hold")
+- [ ] All five decisions confirmed in Cursor
+- [ ] Variables register reviewed (no unresolved conflicts)
 - [ ] `/work/aald` copy map approved
 - [ ] `/work/performx` copy map approved
 - [ ] `/events/performx-summit-2026` copy map approved
 - [ ] Cross-links and CTA destinations approved
-- [ ] Claims register aligned (reach, years, identity — no brochure conflicts published)
-- [ ] Approver sign-off (super_admin / executive_assistant / admin_manager)
+- [ ] Claims register aligned (reach, years, identity)
 
-## Implementation sequence
+## Implementation status
 
-1. Complete interactive review at `/admin/planning/aald-performx`.
-2. Mark plan approved when all gates pass.
-3. Update `work_orgs` and `site-content.ts` for AALD and PerformX.
-4. Update PERFORMX summary in `ecosystem.ts`.
-5. Seed and publish `performx-summit-2026` event.
-6. Smoke test all routes, cross-links and OG metadata.
-
-No production CMS copy implementation should proceed until this checklist is complete.
+Content updates are in `site-content.ts`, `ecosystem.ts`, and migration `025_aald_performx_content.sql` (aligned to recommended defaults above). Final sign-off in Cursor closes this planning doc.

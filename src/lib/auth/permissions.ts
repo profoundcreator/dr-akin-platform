@@ -171,16 +171,6 @@ export function canApproveWorkOrgs(profile: AdminProfile | null): boolean {
   return canApproveEvents(profile);
 }
 
-export function canReviewContentPlans(profile: AdminProfile | null): boolean {
-  return canApproveWorkOrgs(profile);
-}
-
-/** Any operational admin can open the planning workspace; approvers can edit and sign off. */
-export function canAccessContentPlans(profile: AdminProfile | null): boolean {
-  if (!canAccessAdmin(profile)) return false;
-  return profile!.role !== "read_only_auditor";
-}
-
 export function canPermanentlyDeleteWorkOrgs(profile: AdminProfile | null): boolean {
   return canPermanentlyDeleteBooks(profile);
 }
