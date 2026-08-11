@@ -1,0 +1,343 @@
+DR. AKIN PLATFORM — PHOTOGRAPHY & VISUAL ASSET BRIEF
+For: Lead photographer & creative team
+Document date: 4 August 2026
+Purpose: Guide photograph selection, new shoots, and art direction per page
+
+
+═══════════════════════════════════════════════════════════════════════════════
+POST-LAUNCH BACKLOG (REFERENCE)
+═══════════════════════════════════════════════════════════════════════════════
+
+VISUAL / PHOTOGRAPHY
+• Full site photography audit and shoot (this brief)
+• Replace placeholder book covers (Seven Star Student / Seven Star Teacher)
+• Work org hero visuals (mix of photography + artsy per brand)
+• Optional insight article hero art system
+• Event cover photography standards for CMS uploads
+• Homepage portrait/banner refresh
+
+SECURITY HARDENING (separate track)
+• Admin 2FA for privileged roles
+• Booking token expiry/rotation
+• Content-Security-Policy
+• Vercel WAF / edge rate limits
+• Server-side notification webhooks
+• Upload malware scanning for organizer materials
+
+
+═══════════════════════════════════════════════════════════════════════════════
+ARTSY VS. PHOTOGRAPHY — CREATIVE DIRECTION (STRAIGHT ANSWER)
+═══════════════════════════════════════════════════════════════════════════════
+
+INSIGHTS (hub + articles)
+Recommendation: ARTSY / EDITORIAL — not portraits
+Why: Insights is a writing product. Text-led cards match high-end editorial sites. Individual articles may use optional hero art that is conceptual (typography, texture, abstract leadership/Africa motifs) — not another headshot. Use photography only when an essay is tied to a specific event or moment (e.g. a summit photo for a field note).
+
+FUTURE AFRICA (/work/future-africa)
+Recommendation: ARTSY / INSTITUTIONAL — not a Dr Akin studio portrait
+Why: Future Africa is a continental platform, not a personal page. Best visuals: map/contour graphics, Agenda 2063 motifs, pan-African collaboration imagery, or documentary photography of summits and institutional settings — not a solo portrait.
+
+AUCTUS AFRICA (/work/auctus-africa)
+Recommendation: ARTSY / COMMUNITY PHOTOGRAPHY — not a Dr Akin hero portrait
+Why: NGO/education brand. Warm illustration, community imagery (learners, teachers, classrooms — with consent), or abstract “growth/human capital” art. Dr Akin only if photographed at an actual Auctus programme.
+
+WHERE PHOTOGRAPHY IS STRONGER THAN ARTSY
+AALD, PERFORMX, and Erudio Hub are operating brands where Dr Akin is the visible founder. These benefit from real photography — speaking, consulting, training, education reform meetings — not pure abstract art. Artsy can support the hero, but human/institutional proof helps conversion.
+
+KEYNOTE SPEAKING and PROFILE pages definitely need strong portrait and stage photography.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LEGEND (used throughout this document)
+═══════════════════════════════════════════════════════════════════════════════
+
+REQUIRED — Page feels broken or untrustworthy without this asset
+RECOMMENDED — Materially improves credibility or conversion
+OPTIONAL — Nice to have; site works without it
+SKIP — Intentionally no photograph (and why)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+GLOBAL (EVERY PAGE)
+═══════════════════════════════════════════════════════════════════════════════
+
+HEADER / FOOTER LOGO
+Current: Monochrome wordmark PNG
+Need: REQUIRED (brand asset — designer deliverable, not photographer)
+Notes: Not a photograph
+
+DEFAULT SOCIAL / OG IMAGE (link previews on WhatsApp, LinkedIn, etc.)
+Current: Dr Akin portrait
+Need: REQUIRED
+Photo type: Updated formal portrait; square-safe crop for 1200×630; neutral background; direct or 3/4 gaze
+
+
+═══════════════════════════════════════════════════════════════════════════════
+HOME PAGE (/)
+═══════════════════════════════════════════════════════════════════════════════
+
+HERO PORTRAIT
+Current: dr-akin-portrait.webp
+Need: REQUIRED
+Photo type: Primary brand portrait — 3/4 or chest-up; formal/ambassadorial dress; soft key light; minimal background (cream, grey, or subtle institutional). Eye contact or slight off-camera thoughtfulness. This is the first impression — must feel statesman-like and approachable.
+
+HERO BANNER (if enabled in admin)
+Current: Optional CMS upload
+Need: OPTIONAL
+Photo type: Wide environmental shot — AU setting, conference stage, or Africa skyline. Not a second headshot. 16:9, strong horizontal composition.
+
+INSIGHTS SECTION (homepage)
+Current: Text-only cards
+Need: SKIP
+Why: Editorial grid works without images; thumbnails would clutter the homepage.
+
+ECOSYSTEM SECTION (“One leader. Three pillars.”)
+Current: ecosystem-visual.webp
+Need: RECOMMENDED (visual refresh)
+Photo type: Either (a) abstract continental graphic from art director, OR (b) environmental photo of Dr Akin in institutional context (AU, boardroom, stage). Not a duplicate of the hero portrait.
+
+EVENTS FEATURED SECTION
+Current: Event cover from CMS (or date numeral placeholder)
+Need: RECOMMENDED per featured event
+Photo type: Event-specific — venue, stage, or branded conference graphic. Photographer shoots at events; admin uploads via CMS.
+
+LIBRARY FEATURED SECTION
+Current: Book cover image
+Need: REQUIRED
+Photo type: Real book cover art (design/publisher deliverable) — not lifestyle photography
+
+
+═══════════════════════════════════════════════════════════════════════════════
+WORK HUB (/work)
+═══════════════════════════════════════════════════════════════════════════════
+
+HERO
+Current: Same portrait as homepage
+Need: RECOMMENDED (use a variant)
+Photo type: Different crop or setting from homepage — e.g. wider shot at a podium or with African Union context — so repeat visitors do not see an identical image.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+WORK PLATFORM PAGES (/work/[slug])
+═══════════════════════════════════════════════════════════════════════════════
+
+───────────────────────────────────────────────────────────────────────────────
+FUTURE AFRICA (/work/future-africa)
+───────────────────────────────────────────────────────────────────────────────
+Current: No hero image (text-only layout)
+Need: ARTSY / INSTITUTIONAL — not a Dr Akin portrait
+Visual direction: Custom abstract map/contour art, Agenda 2063 palette, OR documentary summit/delegation photography (wide, institutional). Avoid solo studio portrait.
+
+───────────────────────────────────────────────────────────────────────────────
+AALD (/work/aald)
+───────────────────────────────────────────────────────────────────────────────
+Current: No hero image
+Need: RECOMMENDED — photography
+Photo type: Training/consulting in action — Dr Akin facilitating, whiteboard/session, corporate audience (medium wide). Professional, warm, African enterprise context.
+
+───────────────────────────────────────────────────────────────────────────────
+PERFORMX (/work/performx)
+───────────────────────────────────────────────────────────────────────────────
+Current: No hero image
+Need: RECOMMENDED — photography OR sharp graphic
+Photo type: High-performance aesthetic — leadership team session, OR abstract “execution” graphic. Stage/speaking photo also works.
+
+───────────────────────────────────────────────────────────────────────────────
+ERUDIO HUB (/work/erudio-hub)
+───────────────────────────────────────────────────────────────────────────────
+Current: No hero image
+Need: RECOMMENDED — photography
+Photo type: Education reform context — classroom, ministry meeting, educators in training, or Dr Akin with education leaders. Documentary, not studio.
+
+───────────────────────────────────────────────────────────────────────────────
+AUCTUS AFRICA (/work/auctus-africa)
+───────────────────────────────────────────────────────────────────────────────
+Current: No hero image
+Need: ARTSY / COMMUNITY — not Dr Akin portrait
+Visual direction: Illustration or community photography (youth, teachers, learning environments). Warm, hopeful palette. Dr Akin only if photographed at an Auctus programme.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+MEET AKIN
+═══════════════════════════════════════════════════════════════════════════════
+
+MEET HUB (/meet-akin)
+Section: Hero
+Need: REQUIRED (variant)
+Photo type: Portrait with “Meet the person” feel — slightly warmer or more candid than the homepage formal shot.
+
+PROFILE (/meet-akin/profile)
+Section: Hero
+Need: REQUIRED
+Photo type: Authoritative full-context portrait — biography-appropriate; academic/regalia optional if authentic.
+
+Section: Body (stats, credentials, boards, mission)
+Need: SKIP
+Why: Text and credentials carry the page; photos would distract.
+
+CONTINENTAL MANDATE / AU AMBASSADOR (/meet-akin/au-ambassador)
+Section: Hero
+Current: Typography panel (“2063” / “Continental Mandate”) — no photo
+Need: RECOMMENDED — institutional photo, not solo portrait
+Photo type: Dr Akin in official AU capacity, continental/diplomatic setting, OR approved official AU imagery (rights clearance required). Typography panel is acceptable to keep if no approved AU photo is available yet.
+
+Section: Body
+Need: SKIP
+
+BOARD GOVERNANCE (/meet-akin/edu-governance)
+Section: Hero
+Current: Typography panel (“07” / “Board Governance”) — no photo
+Need: OPTIONAL — photography
+Photo type: Boardroom/governance setting — seated discussion, board table, formal institutional. If unavailable, keep typography — it fits the sober tone.
+
+Section: Body
+Need: SKIP
+
+KEYNOTE SPEAKING (/meet-akin/speaking)
+Section: Hero
+Need: REQUIRED — strongest speaking asset on the entire site
+Photo type: Stage photography — wide shot (speaker + audience scale) OR dynamic mid-shot at podium. High energy, professional event lighting. Shoot multiple angles for future use.
+
+Section: Body (themes, stages)
+Need: OPTIONAL
+Photo type: 2–3 theme images from different events for social proof (leadership, transformation, Africa).
+
+
+═══════════════════════════════════════════════════════════════════════════════
+RESOURCES & LIBRARY
+═══════════════════════════════════════════════════════════════════════════════
+
+RESOURCES HUB (/resources)
+Section: Hero
+Current: Typography panel (“09” / “Books & Archives”)
+Need: OPTIONAL
+Photo type: Library/archive mood — bookshelves, desk with manuscripts — OR keep typography. Not a portrait.
+
+Section: Book grids
+Need: REQUIRED per book
+Asset type: Publisher/design cover art — photographer not involved except optional product reshoots.
+
+Section: Seven Star Student / Seven Star Teacher
+Current: Generic placeholder SVG graphics
+Need: REQUIRED (design deliverable, not photograph)
+Asset type: Real cover artwork from publisher or designer.
+
+Section: Audio collection link, Essays CTA
+Need: SKIP
+
+AUDIO ARCHIVES (/resources/audio)
+Section: Hero
+Current: Typography panel (“KC” / “The Kingdom Catalyst”)
+Need: OPTIONAL
+Photo type: Podcast cover art or studio/mic aesthetic — artsy/graphic preferred over Dr Akin portrait. Spotify embed supplies artwork in the player.
+
+Section: Featured episodes, Spotify embed
+Need: SKIP (external artwork handled by Spotify)
+
+LIBRARY BOOK DETAIL (/library/[slug])
+Need: REQUIRED
+Asset type: High-resolution front cover scan; slight shadow optional for depth.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSIGHTS
+═══════════════════════════════════════════════════════════════════════════════
+
+INSIGHTS HUB (/insights)
+Need: SKIP photography
+Why: Stay text-only — matches editorial positioning. Optional future enhancement: subtle background texture or category colour system (design, not photo).
+
+INSIGHT ARTICLE DETAIL (/insights/[slug])
+Need: OPTIONAL per article
+Visual direction: Editorial hero art (abstract, typographic, or concept illustration) — NOT a default Dr Akin photo. Photography only when the article is event-specific. Without a hero image, social link previews fall back to the default portrait.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+EVENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+EVENTS HUB (/events)
+Section: Hero
+Current: Event count numeral — no photo
+Need: SKIP or optional graphic
+Notes: Optional collage of event moments if desired later.
+
+Section: Event cards / “Next up”
+Need: RECOMMENDED per event
+Photo type: Venue, crowd, speaker on stage — 16:10 aspect ratio for CMS upload.
+
+EVENT DETAIL (/events/[slug])
+Need: RECOMMENDED
+Photo type: Same as event card, higher resolution. Branded event graphic acceptable if no event photography exists yet.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+CONTACT, BOOKING & UTILITY PAGES (NO PHOTOGRAPHS)
+═══════════════════════════════════════════════════════════════════════════════
+
+/contact — SKIP (form-focused; photos add no value)
+/book-dr-akin — SKIP (conversion form; distraction hurts completion)
+/track-booking — SKIP (functional utility page)
+/booking/[ref] — SKIP (private tracker; no page imagery)
+/organizer-resources — SKIP (operational; headshots are downloads, not inline page images)
+/privacy — SKIP (legal page)
+/404 — SKIP (error page)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+SHOOT PRIORITY LIST
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 1 — LAUNCH-QUALITY REFRESH (do first)
+1. Homepage hero portrait (formal, 3/4, high-resolution)
+2. Speaking/stage set (3–5 images, varied angles)
+3. OG/social portrait crop (1200×630 safe area)
+
+TIER 2 — CREDIBILITY
+4. AU/continental mandate imagery (official context, if permitted)
+5. AALD / training session imagery
+6. Event photography template shots for CMS uploads
+
+TIER 3 — DESIGN / ART DIRECTION (may not need photographer)
+7. Future Africa abstract/continental visual
+8. Auctus community imagery or illustration brief
+9. Insight article hero art system (template graphics)
+10. Seven Star book covers (publisher/designer)
+
+TIER 4 — NICE TO HAVE
+11. Work hub alternate portrait
+12. Board governance boardroom shot
+13. Resources hub atmospheric shot
+
+
+═══════════════════════════════════════════════════════════════════════════════
+TECHNICAL NOTES FOR PHOTOGRAPHER & RETOUCHER
+═══════════════════════════════════════════════════════════════════════════════
+
+ASPECT RATIOS THE SITE USES
+• Hero portraits: approximately 4:5 vertical
+• Event covers: 16:10
+• Open Graph / social previews: 1.91:1 (1200×630)
+• Book covers: approximately 2:3
+
+DELIVERABLES
+• WebP exports for web use
+• High-resolution masters (TIFF or PNG) for archive
+• Named files by page/use (e.g. hero-portrait-formal-v1.webp)
+
+AVOID
+• Heavy filters
+• Busy backgrounds
+• Using the same crop on every page
+
+CONSENT & RIGHTS
+• Any Auctus/community or audience shots require model/event releases
+• AU or official institutional imagery requires usage rights confirmation before publishing
+
+CURRENT SITE PREVIEW
+https://dr-akin-platform.vercel.app
+
+
+═══════════════════════════════════════════════════════════════════════════════
+END OF DOCUMENT
+═══════════════════════════════════════════════════════════════════════════════

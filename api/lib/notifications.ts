@@ -1,5 +1,12 @@
 import { Resend } from "resend";
-import { readEnv, readEnvBool } from "../env";
+import {
+  escapeHtml,
+  renderBrandedEmail,
+  renderDetailTable,
+  renderMessageBlock,
+  renderReferenceBadge,
+} from "./email-layout";
+import { readEnv, readEnvBool, siteUrl } from "./env";
 
 export interface NotificationMailConfig {
   resend: Resend;
@@ -9,9 +16,16 @@ export interface NotificationMailConfig {
   sendSubmitterConfirmation: boolean;
 }
 
+function normalizeFromAddress(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  if (trimmed.includes("<")) return trimmed;
+  return `Dr. Akin Akinpelu <${trimmed}>`;
+}
+
 export function getNotificationMailConfig(): NotificationMailConfig | null {
   const apiKey = readEnv("RESEND_API_KEY");
-  const from = readEnv("NOTIFICATION_FROM_EMAIL");
+  const from = normalizeFromAddress(readEnv("NOTIFICATION_FROM_EMAIL"));
   const adminTo = readEnv("ADMIN_NOTIFICATION_EMAIL");
   if (!apiKey || !from || !adminTo) return null;
 
@@ -39,24 +53,10 @@ export function isRecentSubmission(createdAt: string): boolean {
   return Date.now() - createdMs <= maxAgeMs;
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
 function field(label: string, value: string | null | undefined): string {
   const trimmed = (value ?? "").trim();
   if (!trimmed) return "";
   return `${label}: ${trimmed}`;
-}
-
-function fieldHtml(label: string, value: string | null | undefined): string {
-  const trimmed = (value ?? "").trim();
-  if (!trimmed) return "";
-  return `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(trimmed)}</p>`;
 }
 
 export interface EnquiryMailInput {
@@ -85,16 +85,21 @@ export function buildEnquiryAdminMail(input: EnquiryMailInput) {
     `Open in admin: ${input.adminUrl}`,
   ].filter(Boolean);
 
-  const html = [
-    "<p>New contact enquiry on the website.</p>",
-    fieldHtml("Name", input.contactName),
-    fieldHtml("Email", input.contactEmail),
-    fieldHtml("Organization", input.organization),
-    fieldHtml("Subject", input.subject),
-    "<p><strong>Message</strong></p>",
-    `<p style="white-space:pre-wrap">${escapeHtml(input.message?.trim() || "(empty)")}</p>`,
-    `<p><a href="${escapeHtml(input.adminUrl)}">Open in admin inbox</a></p>`,
-  ].join("");
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: `New contact enquiry from ${input.contactName}`,
+    eyebrow: "Admin alert",
+    title: input.subject?.trim() || "New contact enquiry",
+    introHtml: `<p style="margin:0;">A new message was submitted through the public contact form.</p>`,
+    bodyHtml: `${renderDetailTable([
+      { label: "Name", value: input.contactName },
+      { label: "Email", value: input.contactEmail },
+      { label: "Organization", value: input.organization },
+      { label: "Subject", value: input.subject },
+    ])}${renderMessageBlock(input.message?.trim() || "")}`,
+    cta: { label: "Open in admin inbox", href: input.adminUrl },
+    footerNote: "Reply directly to this email to reach the submitter.",
+  });
 
   return {
     subject: subjectLine,
@@ -112,23 +117,28 @@ export function buildEnquiryConfirmationMail(input: {
   const greetingName = input.contactName.trim() || "there";
   const topic = input.subject?.trim() ? ` about “${input.subject.trim()}”` : "";
 
-  return {
-    subject: subjectLine,
-    text: [
-      `Dear ${greetingName},`,
-      "",
-      `Thank you for contacting Dr. Akin Akinpelu's office${topic}.`,
-      "Our team aims to respond within 3–5 business days.",
-      "",
-      "This is an automated confirmation — please reply to this email if you need to add anything.",
-    ].join("\n"),
-    html: [
-      `<p>Dear ${escapeHtml(greetingName)},</p>`,
-      `<p>Thank you for contacting Dr. Akin Akinpelu's office${escapeHtml(topic)}.</p>`,
-      "<p>Our team aims to respond within 3–5 business days.</p>",
-      "<p><em>This is an automated confirmation — please reply to this email if you need to add anything.</em></p>",
-    ].join(""),
-  };
+  const text = [
+    `Dear ${greetingName},`,
+    "",
+    `Thank you for contacting Dr. Akin Akinpelu's office${topic}.`,
+    "Our team aims to respond within 3–5 business days.",
+    "",
+    "This is an automated confirmation — please reply to this email if you need to add anything.",
+  ].join("\n");
+
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: "Your enquiry has been received.",
+    eyebrow: "Confirmation",
+    title: "We received your enquiry",
+    introHtml: `<p style="margin:0;">Dear ${escapeHtml(greetingName)},</p>`,
+    bodyHtml: `<p style="margin:0 0 16px;">Thank you for contacting Dr. Akin Akinpelu's office${escapeHtml(topic)}.</p>
+      <p style="margin:0 0 16px;">Our team aims to respond within 3–5 business days.</p>
+      <p style="margin:0;color:#8A8681;font-size:14px;">This is an automated confirmation. You can reply to this email if you need to add anything.</p>`,
+    footerNote: "Akin Akinpelu — Leadership, Governance & Enterprise",
+  });
+
+  return { subject: subjectLine, text, html };
 }
 
 export interface BookingMailInput {
@@ -150,6 +160,7 @@ export interface BookingMailInput {
 export function buildBookingAdminMail(input: BookingMailInput) {
   const headline = input.eventTitle?.trim() || "Booking request";
   const subjectLine = `[Booking ${input.reference}] ${headline}`;
+  const location = [input.city, input.country].filter(Boolean).join(", ") || null;
   const textLines = [
     "New booking request on the website.",
     "",
@@ -162,25 +173,31 @@ export function buildBookingAdminMail(input: BookingMailInput) {
     field("Event", input.eventTitle),
     field("Format", input.format),
     field("Preferred date", input.preferredDate),
-    field("Location", [input.city, input.country].filter(Boolean).join(", ") || null),
+    field("Location", location),
     "",
     `Open in admin: ${input.adminUrl}`,
   ].filter(Boolean);
 
-  const html = [
-    "<p>New booking request on the website.</p>",
-    fieldHtml("Reference", input.reference),
-    fieldHtml("Name", input.contactName),
-    fieldHtml("Email", input.contactEmail),
-    fieldHtml("Phone", input.contactPhone),
-    fieldHtml("Organization", input.organization),
-    fieldHtml("Engagement", input.engagementType),
-    fieldHtml("Event", input.eventTitle),
-    fieldHtml("Format", input.format),
-    fieldHtml("Preferred date", input.preferredDate),
-    fieldHtml("Location", [input.city, input.country].filter(Boolean).join(", ") || null),
-    `<p><a href="${escapeHtml(input.adminUrl)}">Open booking in admin</a></p>`,
-  ].join("");
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: `New booking request ${input.reference} from ${input.contactName}`,
+    eyebrow: "Admin alert",
+    title: headline,
+    introHtml: `${renderReferenceBadge(input.reference)}<p style="margin:0;">A new speaking or engagement request was submitted on the website.</p>`,
+    bodyHtml: renderDetailTable([
+      { label: "Name", value: input.contactName },
+      { label: "Email", value: input.contactEmail },
+      { label: "Phone", value: input.contactPhone },
+      { label: "Organization", value: input.organization },
+      { label: "Engagement", value: input.engagementType },
+      { label: "Event", value: input.eventTitle },
+      { label: "Format", value: input.format },
+      { label: "Preferred date", value: input.preferredDate },
+      { label: "Location", value: location },
+    ]),
+    cta: { label: "Open booking in admin", href: input.adminUrl },
+    footerNote: "Reply directly to this email to reach the organizer.",
+  });
 
   return {
     subject: subjectLine,
@@ -197,26 +214,31 @@ export function buildBookingConfirmationMail(input: {
 }) {
   const greetingName = input.contactName.trim() || "there";
 
-  return {
-    subject: `Booking request received — ${input.reference}`,
-    text: [
-      `Dear ${greetingName},`,
-      "",
-      "Thank you for submitting a booking request.",
-      `Your reference is ${input.reference}.`,
-      "",
-      `Track your request: ${input.trackerUrl}`,
-      "",
-      "Our team will review your request and respond within 3–5 business days.",
-    ].join("\n"),
-    html: [
-      `<p>Dear ${escapeHtml(greetingName)},</p>`,
-      "<p>Thank you for submitting a booking request.</p>",
-      `<p><strong>Reference:</strong> ${escapeHtml(input.reference)}</p>`,
-      `<p><a href="${escapeHtml(input.trackerUrl)}">Track your request</a></p>`,
-      "<p>Our team will review your request and respond within 3–5 business days.</p>",
-    ].join(""),
-  };
+  const text = [
+    `Dear ${greetingName},`,
+    "",
+    "Thank you for submitting a booking request.",
+    `Your reference is ${input.reference}.`,
+    "",
+    `Track your request: ${input.trackerUrl}`,
+    "",
+    "Our team will review your request and respond within 3–5 business days.",
+  ].join("\n");
+
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: `Booking request ${input.reference} received.`,
+    eyebrow: "Confirmation",
+    title: "Booking request received",
+    introHtml: `<p style="margin:0;">Dear ${escapeHtml(greetingName)},</p>`,
+    bodyHtml: `<p style="margin:0 0 16px;">Thank you for submitting a booking request with Dr. Akin Akinpelu's office.</p>
+      ${renderReferenceBadge(input.reference)}
+      <p style="margin:0 0 16px;">Our team will review your request and respond within 3–5 business days.</p>`,
+    cta: { label: "Track your request", href: input.trackerUrl },
+    footerNote: "Keep your reference number for future correspondence.",
+  });
+
+  return { subject: `Booking request received — ${input.reference}`, text, html };
 }
 
 export async function sendMail(
@@ -228,7 +250,7 @@ export async function sendMail(
     text: string;
     replyTo?: string;
   },
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const { data, error } = await config.resend.emails.send({
     from: config.from,
     to: message.to,
@@ -239,12 +261,14 @@ export async function sendMail(
   });
 
   if (error) {
+    console.error("[notifications] Resend send failed:", error);
     return { ok: false, error: error.message ?? "Resend send failed." };
   }
 
   if (!data?.id) {
+    console.error("[notifications] Resend returned no message id.");
     return { ok: false, error: "Resend did not return a message id." };
   }
 
-  return { ok: true };
+  return { ok: true, id: data.id };
 }

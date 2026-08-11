@@ -14,7 +14,13 @@ export function notifySubmission(payload: NotifySubmissionPayload): void {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  }).catch(() => {
-    /* notification is best-effort */
-  });
+  })
+    .then(async (response) => {
+      if (response.ok) return;
+      const detail = await response.text().catch(() => "");
+      console.warn("[notifications] notify-submission failed:", response.status, detail);
+    })
+    .catch((error) => {
+      console.warn("[notifications] notify-submission request failed:", error);
+    });
 }
