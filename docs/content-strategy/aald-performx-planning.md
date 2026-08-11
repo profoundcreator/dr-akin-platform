@@ -2,7 +2,7 @@
 
 Status key: **Approved direction** means recommended by source review. **Review** means awaiting interactive approval in the admin planning workspace. **Hold** means blocked until a decision is recorded.
 
-Interactive review: `/admin/planning/aald-performx`
+Interactive review: `/admin/planning/aald-performx` (shortcut: `/planning/aald-performx` redirects there)
 
 ## Route map
 

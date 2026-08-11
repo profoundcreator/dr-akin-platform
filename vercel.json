@@ -51,6 +51,11 @@
       "permanent": false
     },
     {
+      "source": "/planning/aald-performx",
+      "destination": "/admin/planning/aald-performx",
+      "permanent": false
+    },
+    {
       "source": "/insights/view",
       "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
       "destination": "/insights/$1",
