@@ -124,7 +124,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Invite Akin Akinpelu to speak", href: "/meet-akin/speaking" },
+    cta: { label: "Book a facilitation session", href: "/book-dr-akin" },
     secondaryCta: { label: "Discuss a partnership", href: "/contact" },
     relatedLinks: [
       { label: "PerformX Nexus", href: "/work/performx" },
@@ -167,7 +167,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "PerformX Nexus integrates convening, advisory council work and impact programmes into one ecosystem.",
         bullets: [
           "PerformX Summit — flagship leadership convening (delegates, speakers, sponsors)",
-          "Horizon Council — strategic advisory circle for sector leaders (teaser in v1; details on request)",
+          "Horizon Council — strategic advisory circle for sector leaders",
           "Impact Core — programmes that translate summit insights into sustained organisational performance",
         ],
       },
@@ -198,7 +198,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Book an advisory session", href: "/book-dr-akin" },
+    cta: { label: "Explore partnerships", href: "/contact" },
     secondaryCta: { label: "Register interest in the summit", href: "/events/performx-summit-2026" },
     relatedLinks: [
       { label: "Request partnership deck", href: "/contact" },
