@@ -9,7 +9,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { PageContent } from "@/data/site-content";
 import { SITE_IMAGES } from "@/lib/media/site-images";
 
-const MEET_PORTRAIT_URL = SITE_IMAGES.portrait;
+const MEET_PORTRAIT_URL = SITE_IMAGES.portraitApproachable;
 
 const SPHERES = [
   {

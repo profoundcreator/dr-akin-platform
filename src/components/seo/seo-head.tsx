@@ -1,3 +1,5 @@
+import { SITE_IMAGES } from "@/lib/media/site-images";
+
 export interface SeoProps {
   title: string;
   description: string;
@@ -9,7 +11,7 @@ export function buildSeoMeta({
   title,
   description,
   canonical,
-  ogImage = "/images/dr-akin-portrait.svg",
+  ogImage = SITE_IMAGES.portraitFormal,
 }: SeoProps) {
   return {
     title,

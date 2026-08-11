@@ -9,7 +9,7 @@ export const BRAND_ASSETS = {
   iconmark: "/brand/akin-iconmark.png",
   favicon: "/favicon.svg",
   appleTouchIcon: "/brand/akin-iconmark.png",
-  defaultSocialImage: SITE_IMAGES.portrait,
+  defaultSocialImage: SITE_IMAGES.portraitFormal,
 } as const;
 
 export function getBrandAsset(

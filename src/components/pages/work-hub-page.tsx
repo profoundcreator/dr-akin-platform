@@ -12,7 +12,7 @@ import { ECOSYSTEM_PILLARS, ECOSYSTEM_PLATFORMS } from "@/data/ecosystem";
 import { PUBLIC_NAME } from "@/data/person-identity";
 import type { PlatformWorkOrg } from "@/lib/work-orgs/types";
 
-const WORK_PORTRAIT_URL = SITE_IMAGES.portrait;
+const WORK_PORTRAIT_URL = SITE_IMAGES.portraitApproachable;
 
 interface WorkHubPageProps {
   content: PageContent;
