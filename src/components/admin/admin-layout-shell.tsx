@@ -1,9 +1,9 @@
 "use client";
 
-import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen } from "lucide-react";
+import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
-import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, formatAdminRole } from "@/lib/auth/permissions";
+import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, canReviewContentPlans, formatAdminRole } from "@/lib/auth/permissions";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { label: "Books", href: "/admin/books", icon: BookOpen },
   { label: "Insights", href: "/admin/insights", icon: FileText },
   { label: "Work", href: "/admin/work", icon: Briefcase },
+  { label: "Planning", href: "/admin/planning/aald-performx", icon: ClipboardList, requiresPlanningAccess: true },
   { label: "Resources", href: "/admin/resources", icon: PackageOpen, requiresResourceAccess: true },
   { label: "Team", href: "/admin/team", icon: Users, requiresTeamAccess: true },
   { label: "Audit Log", href: "/admin/audit-log", icon: ScrollText, requiresAuditAccess: true },
@@ -75,6 +76,9 @@ export function AdminLayoutShell({ children, title, subtitle }: AdminLayoutShell
                 return false;
               }
               if ("requiresResourceAccess" in item && item.requiresResourceAccess && !canManageResources(profile)) {
+                return false;
+              }
+              if ("requiresPlanningAccess" in item && item.requiresPlanningAccess && !canReviewContentPlans(profile)) {
                 return false;
               }
               return true;

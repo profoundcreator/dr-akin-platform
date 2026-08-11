@@ -59,7 +59,7 @@ export const ECOSYSTEM_PILLARS: readonly EcosystemPillar[] = [
         name: "PERFORMX",
         href: "/work/performx",
         summary:
-          "A leadership event and community where ideas, relationships and practical tools converge to help people and institutions perform at a higher level.",
+          "PerformX Nexus — a catalytic ecosystem where leaders, institutions and sectors converge to perform at a higher level.",
       },
     ],
   },

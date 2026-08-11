@@ -171,6 +171,10 @@ export function canApproveWorkOrgs(profile: AdminProfile | null): boolean {
   return canApproveEvents(profile);
 }
 
+export function canReviewContentPlans(profile: AdminProfile | null): boolean {
+  return canApproveWorkOrgs(profile);
+}
+
 export function canPermanentlyDeleteWorkOrgs(profile: AdminProfile | null): boolean {
   return canPermanentlyDeleteBooks(profile);
 }

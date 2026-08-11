@@ -83,11 +83,11 @@ export const SITE_PAGES: Record<string, PageContent> = {
     headline: "Building stronger African organisations—",
     headlineSecondary: "through consulting, training and research.",
     description:
-      "AALD partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
+      "Akin Akinpelu Learning & Development Company partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
     sections: [
       {
         title: "What we do",
-        body: "Akin Akinpelu Learning & Development Company delivers innovative consulting, executive training and applied research for organisations building across the continent and beyond.",
+        body: "AALD delivers innovative consulting, executive training and applied research for organisations building across the continent and beyond.",
         bullets: [
           "Strategic consulting and organisational diagnostics",
           "Executive training and leadership development",
@@ -95,8 +95,41 @@ export const SITE_PAGES: Record<string, PageContent> = {
           "Culture, performance and transformation support",
         ],
       },
+      {
+        title: "Who we serve",
+        body: "We work with African corporates, public institutions, NGOs and diaspora organisations that need practical leadership and performance systems—not generic playbooks.",
+        bullets: [
+          "Corporate leadership teams and boards",
+          "Public-sector and institutional leaders",
+          "NGOs and social-impact organisations",
+          "African institutions in the global diaspora",
+        ],
+      },
+      {
+        title: "Why AALD",
+        body: "Founded and led by Akin Akinpelu, Ph.D., Amb., FLPi, AALD combines continental perspective with disciplined execution—helping organisations turn ambition into measurable performance.",
+        bullets: [
+          "Continental reach across 20+ countries",
+          "1,000,000+ people reached through leadership work",
+          "26+ years of institutional leadership experience",
+          "Research-backed consulting and training methodologies",
+        ],
+      },
+      {
+        title: "Part of a broader ecosystem",
+        body: "AALD sits within the Enterprise pillar alongside PerformX Nexus—connecting organisational development with high-performance leadership convenings.",
+        bullets: [
+          "PerformX Nexus catalytic ecosystem",
+          "PerformX Summit 2026",
+        ],
+      },
     ],
     cta: { label: "Invite Akin Akinpelu to speak", href: "/meet-akin/speaking" },
+    secondaryCta: { label: "Discuss a partnership", href: "/contact" },
+    relatedLinks: [
+      { label: "PerformX Nexus", href: "/work/performx" },
+      { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },
+    ],
   },
   "work-erudio-hub": {
     slug: "work/erudio-hub",
@@ -122,25 +155,55 @@ export const SITE_PAGES: Record<string, PageContent> = {
   },
   "work-performx": {
     slug: "work/performx",
-    title: "PERFORMX — Execution Think Tank",
-    kicker: "PERFORMX · Execution Think Tank",
-    headline: "Turning strategy into",
-    headlineSecondary: "disciplined execution.",
+    title: "PerformX Nexus — The Catalytic Ecosystem",
+    kicker: "PerformX Nexus · Enterprise",
+    headline: "Building bold.",
+    headlineSecondary: "Executing smart. Performing beyond.",
     description:
-      "PERFORMX is a high-performance practice helping leaders and operating teams convert ambitious plans into measurable outcomes.",
+      "PerformX Nexus is a catalytic ecosystem where leaders, institutions and sectors converge to turn strategy into disciplined execution and measurable impact.",
     sections: [
       {
-        title: "Capabilities",
-        body: "Execution frameworks, operating rhythm design, and leadership coaching for teams under pressure.",
+        title: "Three pillars",
+        body: "PerformX Nexus integrates convening, advisory council work and impact programmes into one ecosystem.",
         bullets: [
-          "Strategy-to-execution diagnostics",
-          "OKR and accountability systems",
-          "Leadership team alignment",
-          "Performance culture design",
+          "PerformX Summit — flagship leadership convening (delegates, speakers, sponsors)",
+          "Horizon Council — strategic advisory circle for sector and institutional leaders",
+          "Impact Core — programmes that translate summit insights into sustained organisational performance",
+        ],
+      },
+      {
+        title: "Who it serves",
+        body: "PerformX Nexus is designed for leaders and institutions ready to move from ambition to accountable execution.",
+        bullets: [
+          "C-suite and senior operating leaders",
+          "Boards and institutional governing bodies",
+          "Sector conveners across eight strategic sectors",
+          "Partners seeking catalytic sponsorship and collaboration",
+        ],
+      },
+      {
+        title: "PerformX Summit 2026",
+        body: "The next edition convenes 20–21 November 2026 at Landmark Event Centre, Lagos, under the theme Leading Frontiers: Innovate, Integrate, Impact.",
+        bullets: [
+          "Eight sectors · Power Room sessions · Nexus Honors",
+          "Delegate, speaker and partnership pathways",
+        ],
+      },
+      {
+        title: "Partnerships",
+        body: "Sector ownership and sponsorship packages are available on request. Public pages do not list pricing—start a conversation with the team.",
+        bullets: [
+          "Request partnership deck via contact",
+          "Parent brand: AALD",
         ],
       },
     ],
     cta: { label: "Book an advisory session", href: "/book-dr-akin" },
+    secondaryCta: { label: "Register interest in the summit", href: "/events/performx-summit-2026" },
+    relatedLinks: [
+      { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },
+      { label: "AALD", href: "/work/aald" },
+    ],
   },
   "work-auctus-africa": {
     slug: "work/auctus-africa",
