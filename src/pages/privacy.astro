@@ -2,62 +2,316 @@
 import Layout from "@/layouts/Layout.astro";
 import { PageShell } from "@/components/layout/page-shell";
 import { PERSON_IDENTITY } from "@/data/person-identity";
+import { SITE_CONTACT } from "@/data/site-contact";
+
+const EFFECTIVE_DATE = "11 August 2026";
+const LAST_UPDATED = "11 August 2026";
 ---
 
 <Layout
   title={`Privacy Notice — ${PERSON_IDENTITY.publicName}`}
-  description={`How information submitted through the ${PERSON_IDENTITY.shortName} website is collected, used, protected, and retained.`}
+  description={`How ${PERSON_IDENTITY.shortName} collects, uses, protects, and retains personal data on theakinakinpelu.org — NDPA 2023 and GDPR.`}
 >
   <PageShell client:load>
     <article class="mx-auto w-full max-w-3xl space-y-10 px-6 py-16 lg:py-24">
       <header class="space-y-4">
         <p class="ploy-kicker">Privacy</p>
         <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Privacy notice</h1>
-        <p class="text-sm text-[var(--ploy-text-tertiary)]">Last updated: 2 August 2026</p>
+        <p class="text-sm text-[var(--ploy-text-tertiary)]">
+          Effective {EFFECTIVE_DATE} · Last updated {LAST_UPDATED}
+        </p>
       </header>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">Information we collect</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          We collect information you choose to provide through contact and booking forms, such as
-          your name, contact details, organization, event details, and message.
+          This Privacy Notice explains how Dr. Akin Akinpelu (“we”, “us”, or “our”) collects, uses,
+          discloses, and safeguards personal data obtained from visitors and users (“you”) of
+          <strong class="font-medium text-[var(--ploy-text-primary)]">theakinakinpelu.org</strong> (the
+          “Website”). The Website is the public platform for {PERSON_IDENTITY.publicName}, spanning
+          leadership, governance, professional keynotes, and strategic enterprise platforms,
+          including the African Academy for Leadership Development (AALD) and PerformX Nexus.
+        </p>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We process personal data in compliance with applicable data protection laws, including the
+          <strong class="font-medium text-[var(--ploy-text-primary)]">Nigeria Data Protection Act 2023 (NDPA)</strong>,
+          General Application and Implementation Directives (GAID) issued by the Nigeria Data
+          Protection Commission (NDPC), and the
+          <strong class="font-medium text-[var(--ploy-text-primary)]">General Data Protection Regulation (EU/UK GDPR)</strong>
+          for individuals visiting from or residing in the European Economic Area (EEA) or the United
+          Kingdom.
         </p>
       </section>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">How we use it</h2>
+        <h2 class="text-2xl font-semibold">1. Data controller and contact</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          We use submitted information to assess and respond to enquiries, coordinate engagements,
-          maintain appropriate records, secure the service, and meet legal obligations. We do not
-          sell personal information.
+          Dr. Akin Akinpelu is the data controller for personal data processed through this Website.
+          To ask about this notice, our processing activities, or to exercise your legal rights,
+          contact us:
+        </p>
+        <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+          <li><strong class="font-medium text-[var(--ploy-text-primary)]">Data controller:</strong> Dr. Akin Akinpelu</li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Email:</strong>
+            <a class="underline" href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Telephone:</strong>
+            {SITE_CONTACT.phone}
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Privacy requests:</strong>
+            email us with the subject line “Privacy request”, or use the
+            <a class="underline" href={SITE_CONTACT.contactPath}>contact form</a>
+            and select “Privacy or data request”.
+          </li>
+        </ul>
+        <aside
+          class="rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-4 text-sm leading-relaxed text-[var(--ploy-text-secondary)]"
+          aria-label="Legal review note"
+        >
+          <p>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">For legal review:</strong>
+            Confirm the registered business or postal address to publish here, and whether NDPC
+            registration applies under Section 5 and Section 65 of the NDPA 2023. If registered,
+            insert the official NDPC registration number in this section.
+          </p>
+        </aside>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">2. Personal data we collect</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We collect personal information when you interact with the Website, complete forms, request
+          bookings, opt in to updates, or (for authorized staff) access administrative features.
+        </p>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">2.1 Contact form</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            When you submit a general enquiry, we collect your name, email address, telephone number
+            (optional), organization, topic of interest, and message content.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">2.2 Booking and engagement requests</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            When you request a speaking engagement, keynote, workshop, or advisory session, we
+            collect your name, email, phone number, organization, time zone, engagement details,
+            preferred dates, location or format, audience size, budget range, and your acceptance of
+            the engagement terms.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">2.3 Marketing communications (opt-in only)</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            If you choose to receive updates via a separate, unselected-by-default checkbox, we
+            collect your name and email address to send newsletters, summit announcements, event
+            invitations, insights digests, and partner updates. Marketing is never bundled with
+            operational form submission.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">2.4 Internal administrative accounts</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            For authorized team members and platform administrators, we collect names and email
+            addresses to manage secure access and platform operations.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">2.5 Technical data and anti-spam security</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            To protect contact forms from abuse, we temporarily evaluate a cryptographically hashed
+            representation of email addresses for rate limiting. This token is used for infrastructure
+            protection only and is not stored as identifiable personal data or linked to user profiles.
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">3. Lawful bases and purposes</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Every processing activity rests on a documented lawful basis. Operational processing
+          (responding to enquiries and coordinating engagements) is separate from marketing
+          communications, which rely exclusively on explicit opt-in consent.
+        </p>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We do <strong class="font-medium text-[var(--ploy-text-primary)]">not</strong> sell, rent,
+          trade, or commercially monetize your personal data.
+        </p>
+
+        <div class="space-y-4 rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-5">
+          <div class="space-y-2 border-b border-[var(--ploy-border-subtle)] pb-4">
+            <p class="font-semibold text-[var(--ploy-text-primary)]">Inquiry resolution</p>
+            <p class="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+              Responding to enquiries and coordinating initial contact.
+            </p>
+            <p class="text-sm text-[var(--ploy-text-tertiary)]">
+              Data: name, email, phone (optional), organization, topic, message · NDPA s.26(1)(a)–(b)
+              · GDPR Art. 6(1)(b)
+            </p>
+          </div>
+
+          <div class="space-y-2 border-b border-[var(--ploy-border-subtle)] pb-4">
+            <p class="font-semibold text-[var(--ploy-text-primary)]">Booking and engagement delivery</p>
+            <p class="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+              Managing keynotes, advisory sessions, organizer resources, and scheduling.
+            </p>
+            <p class="text-sm text-[var(--ploy-text-tertiary)]">
+              Data: booking form fields · NDPA s.26(1)(b) · GDPR Art. 6(1)(b)
+            </p>
+          </div>
+
+          <div class="space-y-2 border-b border-[var(--ploy-border-subtle)] pb-4">
+            <p class="font-semibold text-[var(--ploy-text-primary)]">Marketing communications</p>
+            <p class="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+              Newsletters, summit and event announcements, insights digests, and partner updates.
+            </p>
+            <p class="text-sm text-[var(--ploy-text-tertiary)]">
+              Data: name, email · NDPA s.26(1)(a) consent · GDPR Art. 6(1)(a) consent
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <p class="font-semibold text-[var(--ploy-text-primary)]">System security and integrity</p>
+            <p class="text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
+              Anti-spam rate limiting, platform security, and administrator access control.
+            </p>
+            <p class="text-sm text-[var(--ploy-text-tertiary)]">
+              Data: hashed email tokens, admin credentials, security logs · NDPA s.26(1)(f) · GDPR
+              Art. 6(1)(f)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">4. Third-party processors</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          We use trusted service providers that process data on our instructions and under contractual
+          safeguards:
+        </p>
+        <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+          <li><strong class="font-medium text-[var(--ploy-text-primary)]">Supabase</strong> — database and authentication</li>
+          <li><strong class="font-medium text-[var(--ploy-text-primary)]">Vercel</strong> — website hosting and serverless API</li>
+          <li><strong class="font-medium text-[var(--ploy-text-primary)]">Resend</strong> — transactional email (confirmations and admin alerts)</li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Beehiiv or Kit (ConvertKit)</strong>
+            — marketing email lists (when enabled); every marketing email includes an unsubscribe link
+          </li>
+        </ul>
+        <aside
+          class="rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-4 text-sm leading-relaxed text-[var(--ploy-text-secondary)]"
+          aria-label="Legal review note"
+        >
+          <p>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">For legal review:</strong>
+            Confirm that data processing agreements with NDPA-compliant terms and, where required, EU
+            Standard Contractual Clauses are in place with each processor listed above.
+          </p>
+        </aside>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">5. International transfers</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Our providers may process data outside Nigeria or the EEA/UK, including in the United
+          States. Where transfers occur, we rely on mechanisms required under NDPA Sections 41–43 and
+          GDPR Chapter V, including adequacy decisions and standard contractual clauses, supported by
+          technical measures such as encryption in transit and at rest.
         </p>
       </section>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">Sharing and international processing</h2>
+        <h2 class="text-2xl font-semibold">6. Retention</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          Information may be processed by authorized team members and service providers that host
-          or operate this website. Those providers may process data in other countries subject to
-          their contractual and legal safeguards.
+          We retain personal data only as long as necessary for the purpose collected or as required
+          by law:
+        </p>
+        <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Contact enquiries:</strong>
+            up to twelve (12) months after final resolution, then deleted or anonymized
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Booking records:</strong>
+            up to six (6) years after engagement completion for accounting, tax, and contractual
+            limitation purposes
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Marketing subscriptions:</strong>
+            until you unsubscribe or withdraw consent; suppressed addresses are retained only to honour
+            your opt-out
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Security tokens and logs:</strong>
+            hashed rate-limit tokens purged within thirty (30) days; admin security logs retained up to
+            ninety (90) days
+          </li>
+        </ul>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">7. Your rights</h2>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          Under the NDPA and GDPR, you may have the right to:
+        </p>
+        <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+          <li>Access a copy of your personal data</li>
+          <li>Rectify inaccurate or incomplete data</li>
+          <li>Request erasure where processing is no longer necessary</li>
+          <li>Object to or restrict certain processing</li>
+          <li>Withdraw consent for marketing at any time (without affecting prior lawful processing)</li>
+          <li>Receive portable data you provided in a structured, machine-readable format</li>
+        </ul>
+        <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+          To exercise these rights, email
+          <a class="underline" href={`mailto:${SITE_CONTACT.email}?subject=Privacy%20request`}>{SITE_CONTACT.email}</a>
+          with the subject “Privacy request”, or use the
+          <a class="underline" href={SITE_CONTACT.contactPath}>contact form</a>.
+          We aim to acknowledge receipt within five (5) business days and respond fully within thirty
+          (30) days.
         </p>
       </section>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">Retention and security</h2>
+        <h2 class="text-2xl font-semibold">8. Children</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          We retain information only as long as reasonably necessary for the purpose for which it
-          was collected, legitimate operational records, and applicable legal requirements. We use
-          proportionate technical and organizational safeguards, but no online service is risk-free.
+          This Website is intended for adult professionals and organizations. We do not knowingly
+          collect personal data from children under sixteen (16). If we learn that a minor has
+          submitted data, we will delete it promptly.
         </p>
       </section>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">Your choices</h2>
+        <h2 class="text-2xl font-semibold">9. Complaints to supervisory authorities</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          Depending on applicable law, you may ask to access, correct, or delete your information,
-          or object to certain processing. Use the <a class="underline" href="/contact">contact form</a>
-          and include “Privacy request” in the subject.
+          If you believe our processing violates applicable law, you may lodge a complaint with:
         </p>
+        <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">Nigeria:</strong>
+            Nigeria Data Protection Commission (NDPC) —
+            <a class="underline" href="https://ndpc.gov.ng" target="_blank" rel="noopener noreferrer">ndpc.gov.ng</a>
+          </li>
+          <li>
+            <strong class="font-medium text-[var(--ploy-text-primary)]">EU / UK:</strong>
+            your local EU supervisory authority or the UK Information Commissioner’s Office —
+            <a class="underline" href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>
+          </li>
+        </ul>
       </section>
+
       <section class="space-y-3">
-        <h2 class="text-2xl font-semibold">Contact</h2>
+        <h2 class="text-2xl font-semibold">10. Changes to this notice</h2>
         <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
-          Questions about this notice can be sent through the <a class="underline" href="/contact">contact page</a>.
+          We may update this Privacy Notice to reflect legal, technical, or operational changes.
+          Revisions will be published on this page with an updated “Last updated” date. We encourage
+          you to review this notice periodically.
         </p>
       </section>
     </article>
