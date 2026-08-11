@@ -118,6 +118,22 @@ export async function getAdminInsights(): Promise<PlatformInsight[]> {
   return sortPublishedInsights((data ?? []).map(mapRow));
 }
 
+export async function getInsightById(id: string): Promise<PlatformInsight | null> {
+  if (!isSupabaseConfigured) return null;
+
+  const supabase = tryGetSupabaseClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("insights_articles")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapRow(data);
+}
+
 export async function getPendingInsights(): Promise<PlatformInsight[]> {
   if (!isSupabaseConfigured) return [];
 

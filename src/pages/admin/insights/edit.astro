@@ -1,0 +1,8 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AdminInsightEditorPage } from "@/components/pages/admin-insight-editor-page";
+---
+
+<Layout title="Admin — Write" noIndex>
+  <AdminInsightEditorPage client:only="react" />
+</Layout>
