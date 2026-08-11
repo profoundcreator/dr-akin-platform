@@ -382,6 +382,15 @@ export interface Database {
         };
         Returns: string;
       };
+      subscribe_audience_member: {
+        Args: {
+          p_email: string;
+          p_name?: string;
+          p_consent_source?: string;
+          p_engagement_context?: Record<string, unknown>;
+        };
+        Returns: string;
+      };
       get_booking_for_organizer: {
         Args: { p_reference: string; p_access_token: string };
         Returns: Record<string, unknown> | null;

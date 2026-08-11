@@ -1,3 +1,4 @@
+import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
 import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 
@@ -8,6 +9,7 @@ export interface GeneralEnquiryInput {
   subject: string;
   message: string;
   privacyAgreed: boolean;
+  marketingOptIn?: boolean;
   website?: string;
 }
 
@@ -31,5 +33,19 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
 
   const enquiryId = data as string;
   notifySubmission({ kind: "enquiry", enquiryId });
+
+  if (input.marketingOptIn) {
+    await subscribeAudienceMember({
+      email: input.email,
+      name: input.name,
+      consentSource: "contact",
+      engagementContext: {
+        enquiryId,
+        subject: input.subject,
+        organization: input.organization ?? null,
+      },
+    });
+  }
+
   return enquiryId;
 }

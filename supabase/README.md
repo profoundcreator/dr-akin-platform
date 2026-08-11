@@ -38,6 +38,8 @@ In the Supabase **SQL Editor**, run in order:
 17. `migrations/019_contact_geo_foundation.sql` — rate-limited contact enquiries and insight SEO metadata
 18. `migrations/020_continental_ecosystem.sql` — retires TC Resource, keeps PERFORMX destination-free, and publishes Future Africa/Auctus Africa CMS entries
 19. `migrations/021_restore_performx.sql` — republishes the PERFORMX work org page
+20. `migrations/022_submission_notifications.sql` — Resend notification tracking on enquiries and bookings
+21. `migrations/028_audience_members.sql` — marketing opt-in audience list (`subscribe_audience_member` RPC)
 
 Verify migration 015 after running:
 

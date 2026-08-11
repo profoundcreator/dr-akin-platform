@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MarketingOptInField } from "@/components/marketing/marketing-opt-in-field";
 import {
   AUDIENCE_SIZE_OPTIONS,
   BOOKING_STEPS,
@@ -594,6 +595,13 @@ export function BookingForm({
                   {errors.termsAgreed}
                 </p>
               )}
+              <div className="mt-4 border-t border-[var(--ploy-border-subtle)] pt-4">
+                <MarketingOptInField
+                  id="booking-marketing-opt-in"
+                  checked={form.marketingOptIn}
+                  onChange={(marketingOptIn) => updateField("marketingOptIn", marketingOptIn)}
+                />
+              </div>
             </div>
           </div>
         )}
