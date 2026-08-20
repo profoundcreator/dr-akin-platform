@@ -19,32 +19,94 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 ---
 
+## Launch summary (at a glance)
+
+| Area | Blockers remaining |
+| ---- | ------------------ |
+| **Automated form emails** | Resend domain + env vars; **brand routing not built yet**; production smoke test |
+| **Admin / EA access** | EA sign-in confirmed |
+| **Infrastructure** | Migrations, DNS (if custom domain), Auth URLs |
+| **Content & assets** | Copy sign-off, book covers, speaking photos |
+| **Legal** | Lawyer sign-off on privacy notice |
+| **Testing** | Full smoke test on live URL |
+
+---
+
 ## 1. Automated form emails (Blocker)
 
-**Requirement:** Everyone who submits a form gets an acknowledgement; the EA team gets a notification.
+### 1A. What must work at launch
 
-| # | Task | Built in code? | Ops / config | Owner |
-| --- | ---- | -------------- | ------------ | ----- |
-| 1.1 | **Contact form → EA notification** (`[Contact] …` to admin inbox) | ☑ Yes | ☐ Resend + env vars | Dev |
-| 1.2 | **Contact form → submitter acknowledgement** (“We received your enquiry”) | ☑ Yes | ☐ `SEND_SUBMITTER_CONFIRMATION=true` (default) | Dev |
-| 1.3 | **Booking form → EA notification** (`[Booking DAA-…] …` with admin link) | ☑ Yes | ☐ Same Resend setup | Dev |
-| 1.4 | **Booking form → submitter acknowledgement** (reference + tracker link) | ☑ Yes | ☐ Same Resend setup | Dev |
-| 1.5 | Apply migration **`022_submission_notifications.sql`** in production Supabase | — | ☐ Required for email send-once logic | Dev |
-| 1.6 | **Resend:** verify domain `theakinakinpelu.org` (SPF/DKIM; keep existing MX for `ea@` / `hello@`) | — | ☐ Blocker | Dev + domain |
-| 1.7 | **Vercel env vars:** `RESEND_API_KEY`, `NOTIFICATION_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `SUPABASE_SERVICE_ROLE_KEY` | — | ☐ Blocker | Dev |
-| 1.8 | Suggested values: `NOTIFICATION_FROM_EMAIL=notifications@theakinakinpelu.org`, `ADMIN_NOTIFICATION_EMAIL=ea@theakinakinpelu.org` | — | ☐ | Dev |
-| 1.9 | Redeploy production after env changes | — | ☐ | Dev |
-| 1.10 | **Smoke test:** contact + booking with real inboxes; confirm EA + submitter both receive mail | — | ☐ Blocker | EA + dev |
-| 1.11 | Config health check: `/api/notifications-status?key=…` (optional `NOTIFICATIONS_STATUS_KEY`) | — | ☐ Recommended | Dev |
+| # | Requirement | Built in code? | Status |
+| --- | ----------- | -------------- | ------ |
+| 1.1 | **Submitter acknowledgement** — contact form (“We received your enquiry”) | ☑ Yes | ☐ Verify in production |
+| 1.2 | **Submitter acknowledgement** — booking form (reference + tracker link) | ☑ Yes | ☐ Verify in production |
+| 1.3 | **Team notification** — contact submissions routed to correct brand inbox | ◐ Partial (single inbox only) | ☐ **Build + configure** |
+| 1.4 | **Team notification** — booking submissions to EA / organizer pipeline | ☑ Yes (single `ADMIN_NOTIFICATION_EMAIL`) | ☐ Verify in production |
+| 1.5 | Branded HTML templates (site colours, logo) | ☑ Yes | ☐ Logo loads in email (`/brand/akin-logo-mono.png`) |
+
+**Today:** all team alerts go to one address (`ADMIN_NOTIFICATION_EMAIL`, typically `ea@theakinakinpelu.org`). **Before launch:** route (or copy) notifications to brand inboxes below.
+
+### 1B. Brand notification routing (Blocker — engineering)
+
+**Required notification recipients:**
+
+| Brand / platform | Notification email | Typical triggers |
+| ---------------- | ------------------ | ---------------- |
+| **EA / core operations** | `ea@theakinakinpelu.org` | Booking requests, organizer support, general ops (recommend keep on all booking alerts) |
+| **AALD** | `hello@aaldcompany.org` | AALD partnerships, facilitation enquiries, AALD-related contact |
+| **PerformX Nexus** | `performx@aaldcompany.org` | PerformX partnerships, summit interest, PerformX contact |
+| **Erudio Hub** | `hello@erudiohub.org` | Erudio Hub partnerships, education/governance enquiries |
+| **Auctus Africa** | `info@auctusafrica.org` | Auctus Africa programmes, community/education enquiries |
+| **Public site (general)** | `hello@theakinakinpelu.org` | Media, general, privacy requests (optional CC to `ea@`) |
+
+**Engineering tasks (before Sunday):**
+
+| # | Task | Owner | Status |
+| --- | ---- | ----- | ------ |
+| 1.B.1 | Define routing rules: contact topic, referrer page (`/work/aald`, etc.), or new “Platform” field on contact form | Product + dev | ☐ |
+| 1.B.2 | Implement multi-recipient or per-brand routing in [`api/notify-submission.ts`](../../api/notify-submission.ts) / [`api/lib/notifications.ts`](../../api/lib/notifications.ts) | Dev | ☐ Blocker |
+| 1.B.3 | Env vars or config for each brand inbox (see §1C) | Dev | ☐ Blocker |
+| 1.B.4 | Submitter acknowledgement unchanged (always to person who filled the form) | Dev | ☑ |
+| 1.B.5 | Confirm external domains can **receive** mail (MX on `aaldcompany.org`, `erudiohub.org`, `auctusafrica.org` — no Resend verify needed for *receiving*) | Client / IT | ☐ |
+| 1.B.6 | Smoke test: one submission per brand path → correct inbox + submitter ack | EA + dev | ☐ Blocker |
+
+**Suggested routing (starting point — confirm with client):**
+
+| Form / source | Team notification goes to |
+| ------------- | --------------------------- |
+| Booking (`/book-dr-akin`, modal) | `ea@theakinakinpelu.org` |
+| Contact — from `/work/aald` or topic “AALD / partnership” | `hello@aaldcompany.org` (+ optional `ea@`) |
+| Contact — from `/work/performx`, summit, PerformX partnership | `performx@aaldcompany.org` (+ optional `ea@`) |
+| Contact — from `/work/erudio-hub` | `hello@erudiohub.org` |
+| Contact — from `/work/auctus-africa` | `info@auctusafrica.org` |
+| Contact — media, privacy, general, organizer | `ea@theakinakinpelu.org` or `hello@theakinakinpelu.org` |
+
+### 1C. Resend & Vercel configuration (Blocker)
+
+| # | Task | Status |
+| --- | ---- | ------ |
+| 1.C.1 | Apply migration **`022_submission_notifications.sql`** in production Supabase | ☐ |
+| 1.C.2 | **Resend:** verify sending domain `theakinakinpelu.org` (SPF/DKIM); **keep MX** for `ea@`, `hello@` | ☐ Blocker |
+| 1.C.3 | Vercel env: `RESEND_API_KEY` | ☐ Blocker |
+| 1.C.4 | Vercel env: `NOTIFICATION_FROM_EMAIL=notifications@theakinakinpelu.org` | ☐ Blocker |
+| 1.C.5 | Vercel env: `ADMIN_NOTIFICATION_EMAIL=ea@theakinakinpelu.org` (bookings + fallback) | ☐ Blocker |
+| 1.C.6 | Vercel env: brand routing (after build), e.g. `NOTIFY_AALD=hello@aaldcompany.org`, `NOTIFY_PERFORMX=performx@aaldcompany.org`, `NOTIFY_ERUDIO=hello@erudiohub.org`, `NOTIFY_AUCTUS=info@auctusafrica.org` | ☐ Blocker |
+| 1.C.7 | Vercel env: `SEND_SUBMITTER_CONFIRMATION=true` | ☐ |
+| 1.C.8 | Vercel env: `SUPABASE_SERVICE_ROLE_KEY` (required for `/api/notify-submission`) | ☐ Blocker |
+| 1.C.9 | Redeploy production after env changes | ☐ |
+| 1.C.10 | Optional: `/api/notifications-status?key=…` health check | ☐ Recommended |
 
 **Note:** Form data always saves to Supabase even if email fails — verify email separately before launch.
 
-**Not required for launch (defer):**
+### 1D. Explicitly post-launch (do not block Sunday)
 
-- Organizer status-update emails (Under Review → Confirmed, etc.)
-- Enquiry → booking conversion notification
-- Marketing/newsletter sends (Beehiiv/Kit — post-launch)
-- Admin email template editor
+| Item |
+| ---- |
+| Organizer status-update emails (Under Review → Confirmed) |
+| Enquiry → booking conversion notification |
+| Marketing ESP (Beehiiv/Kit) + newsletter campaigns |
+| Admin email template editor |
+| SMS / WhatsApp notifications |
 
 ---
 
@@ -53,7 +115,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | # | Task | Status |
 | --- | ---- | ------ |
 | 2.1 | Super Admin can sign in at `/admin/login` | ☐ |
-| 2.2 | EA account can sign in (repair with `npm run reset:admin-access` if invite failed) | ☐ |
+| 2.2 | EA account can sign in (`npm run reset:admin-access` if invite failed) | ☐ Blocker |
 | 2.3 | Resend SMTP in Supabase for **team invite** emails (removes 2/hour cap) | ☐ Recommended |
 | 2.4 | EA can open **Inbox**, **Requests**, and **Work** | ☐ |
 | 2.5 | `PUBLIC_SITE_URL` matches live site (invite links must not point to localhost) | ☐ |
@@ -64,7 +126,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | # | Task | Status |
 | --- | ---- | ------ |
-| 3.1 | Production Supabase migrations **018–028** applied (confirm in SQL Editor) | ☐ |
+| 3.1 | Production Supabase migrations **018–028** applied | ☐ |
 | 3.2 | `PUBLIC_SITE_URL` set to production URL in Vercel | ☐ |
 | 3.3 | Supabase Auth **Site URL** + **Redirect URLs** updated for live domain | ☐ |
 | 3.4 | DNS: `theakinakinpelu.org` → Vercel (A/CNAME); **preserve MX** for email | ☐ |
@@ -79,14 +141,14 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | # | Task | Status |
 | --- | ---- | ------ |
-| 4.1 | AALD + PerformX pages match approved plan (CTAs, copy, summit event) | ☑ (verify live) |
+| 4.1 | AALD + PerformX pages match approved plan (CTAs, copy, summit event) | ☑ Verify live |
 | 4.2 | Continental copy deck sign-off | ☐ |
 | 4.3 | Approved social URLs in footer (`site-contact.ts`) | ☐ |
-| 4.4 | Tier-1 portraits deployed (profile, Meet, Work — homepage can stay on current hero) | ◐ |
+| 4.4 | Tier-1 portraits deployed (profile, Meet, Work) | ◐ |
 | 4.5 | Speaking page stage photography (or accept interim) | ☐ |
 | 4.6 | Seven Star + publisher book covers (no SVG placeholders on library) | ☐ |
-| 4.7 | Brand logos present (`/brand/akin-logo-mono.png` — used in emails too) | ☐ Verify |
-| 4.8 | PerformX Summit 2026 event page loads (`/events/performx-summit-2026`) | ☐ |
+| 4.7 | Brand logos in `/brand/` (used in transactional emails) | ☐ Verify |
+| 4.8 | PerformX Summit 2026 event page (`/events/performx-summit-2026`) | ☐ |
 
 ---
 
@@ -98,6 +160,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | 5.2 | Lawyer sign-off (address, NDPC registration, DPAs) | ☐ |
 | 5.3 | Remove “For legal review” callouts after counsel approval | ☐ |
 | 5.4 | Marketing opt-in checkboxes align with privacy §2.3 | ☑ |
+| 5.5 | Privacy notice mentions brand/platform processors if routing to external org inboxes | ☐ After routing built |
 
 ---
 
@@ -108,24 +171,33 @@ Run [`production-smoke-checklist.md`](production-smoke-checklist.md) on the **li
 | # | Area | Status |
 | --- | ---- | ------ |
 | 6.1 | Automated: `npm run verify:smoke:production` | ☐ |
-| 6.2 | Contact form → appears in Admin Inbox | ☐ |
-| 6.3 | Booking form → appears in Admin Requests | ☐ |
-| 6.4 | Booking tracker lookup works | ☐ |
-| 6.5 | Insights, library, work pages, SEO (`robots.txt`, sitemap, RSS) | ☐ |
-| 6.6 | Facebook/LinkedIn link preview on one insight URL | ☐ |
-| 6.7 | Archive or delete test submissions after sign-off | ☐ |
+| 6.2 | Contact form → Admin Inbox | ☐ |
+| 6.3 | Booking form → Admin Requests | ☐ |
+| 6.4 | **Email:** submitter acknowledgement received (contact + booking) | ☐ Blocker |
+| 6.5 | **Email:** brand/EA notification received at correct inbox per route | ☐ Blocker |
+| 6.6 | Booking tracker lookup works | ☐ |
+| 6.7 | Insights, library, work pages, SEO (`robots.txt`, sitemap, RSS) | ☐ |
+| 6.8 | Link preview on one insight URL | ☐ |
+| 6.9 | Archive or delete test submissions after sign-off | ☐ |
 
 ---
 
-## 7. Launch-day sequence (Sunday 23 August)
+## 7. Countdown to Sunday 23 August 2026
 
-Suggested order:
+| When | Focus |
+| ---- | ----- |
+| **By Fri 21 Aug** | Brand email routing built + Resend domain verified + env vars set |
+| **Sat 22 Aug (eve)** | Full smoke test on production: every form × every inbox × submitter ack |
+| **Sun 23 Aug (am)** | DNS cutover (if ready) or confirm Vercel URL; Auth URLs updated |
+| **Sun 23 Aug** | EA live test submission; client sign-off; announce |
 
-1. **Saturday evening:** Final smoke test on production URL (forms + **both email paths**).
-2. **Sunday morning:** DNS cutover (if ready) or confirm Vercel URL is the public link.
-3. **Sunday:** Update Auth redirect URLs if domain changed.
-4. **Sunday:** EA submits one live contact + booking test; confirms inbox + acknowledgements.
-5. **Sunday:** Client sign-off on [`final-audit-report.md`](final-audit-report.md) checklist rows.
+### Launch-day sequence (Sunday 23 August)
+
+1. Final smoke test on production URL (forms + **all email paths**).
+2. DNS cutover (if ready) or confirm public URL.
+3. Update Auth redirect URLs if domain changed.
+4. EA submits one live contact + booking test; confirms **submitter ack + brand/EA notifications**.
+5. Client sign-off on [`final-audit-report.md`](final-audit-report.md).
 6. Announce / share live URL.
 
 ---
@@ -135,8 +207,7 @@ Suggested order:
 | Item |
 | ---- |
 | Marketing ESP (Beehiiv/Kit) + newsletter campaigns |
-| Footer newsletter signup + `/admin/audience` |
-| Organizer status-update emails |
+| Footer newsletter signup + ESP sync + `/admin/audience` |
 | Homepage hero portrait swap |
 | Admin calendar, travel workspace, PDF exports |
 | Full site photography shoot |
@@ -144,7 +215,7 @@ Suggested order:
 
 ---
 
-## Quick reference — email architecture at launch
+## 9. Email architecture — target at launch
 
 ```text
 Contact / Booking form
@@ -152,11 +223,17 @@ Contact / Booking form
    Supabase (always saves)
         ↓
 /api/notify-submission (Resend)
-        ├──→ ea@theakinakinpelu.org     (team alert)
-        └──→ submitter email             (acknowledgement)
+        ├──→ Submitter email          (acknowledgement — always)
+        └──→ Team notification(s)     (routed by brand / form type)
+                 ├── ea@theakinakinpelu.org      (bookings, ops)
+                 ├── hello@aaldcompany.org       (AALD)
+                 ├── performx@aaldcompany.org    (PerformX)
+                 ├── hello@erudiohub.org         (Erudio Hub)
+                 └── info@auctusafrica.org       (Auctus Africa)
 ```
 
-Team invites use a **separate** path: Supabase Auth + Resend SMTP (not the form notification API).
+**Sender (all outbound):** `notifications@theakinakinpelu.org` (Resend verified domain)  
+**Team invites:** separate path — Supabase Auth + Resend SMTP
 
 ---
 
