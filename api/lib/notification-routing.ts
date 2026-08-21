@@ -1,15 +1,19 @@
-import { readEnv, readEnvBool } from "./env";
+import { readEnv } from "./env";
 
-export const CONTACT_PLATFORMS = ["aald", "performx", "erudio-hub", "auctus-africa"] as const;
+/** Platforms whose contact enquiries go to a dedicated brand inbox — not ea@. */
+export const BRAND_ROUTED_PLATFORMS = ["aald", "erudio-hub", "auctus-africa", "future-africa"] as const;
+export type BrandRoutedPlatform = (typeof BRAND_ROUTED_PLATFORMS)[number];
+
+/** All platforms we detect on contact submissions (for context + admin email labels). */
+export const CONTACT_PLATFORMS = [...BRAND_ROUTED_PLATFORMS, "performx"] as const;
 export type ContactPlatform = (typeof CONTACT_PLATFORMS)[number];
 
 export interface BrandInboxes {
   admin: string;
-  general: string | null;
   aald: string | null;
-  performx: string | null;
   erudio: string | null;
   auctus: string | null;
+  futureAfrica: string | null;
 }
 
 const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[] = [
@@ -17,15 +21,25 @@ const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[
   { platform: "performx", prefixes: ["/work/performx", "/events/performx"] },
   { platform: "erudio-hub", prefixes: ["/work/erudio-hub"] },
   { platform: "auctus-africa", prefixes: ["/work/auctus-africa"] },
+  { platform: "future-africa", prefixes: ["/work/future-africa"] },
 ];
 
-const OPERATIONS_SUBJECTS = new Set(["Organizer support", "Privacy or data request"]);
-const GENERAL_SITE_SUBJECTS = new Set(["Media enquiry", "General enquiry"]);
+/** Enquiry topics that always route to ea@ regardless of platform context. */
+const EA_ONLY_SUBJECTS = new Set([
+  "Organizer support",
+  "Privacy or data request",
+  "Media enquiry",
+  "General enquiry",
+]);
 
 function normalizePlatform(value: string | null | undefined): ContactPlatform | null {
   const trimmed = (value ?? "").trim().toLowerCase();
   if (!trimmed) return null;
   return CONTACT_PLATFORMS.includes(trimmed as ContactPlatform) ? (trimmed as ContactPlatform) : null;
+}
+
+export function isBrandRoutedPlatform(platform: ContactPlatform | null): platform is BrandRoutedPlatform {
+  return platform !== null && (BRAND_ROUTED_PLATFORMS as readonly string[]).includes(platform);
 }
 
 export function inferPlatformFromPath(path: string | null | undefined): ContactPlatform | null {
@@ -51,76 +65,49 @@ export function resolveContactPlatform(input: {
 export function getBrandInboxes(): BrandInboxes {
   return {
     admin: readEnv("ADMIN_NOTIFICATION_EMAIL"),
-    general: readEnv("NOTIFY_GENERAL") || null,
     aald: readEnv("NOTIFY_AALD") || null,
-    performx: readEnv("NOTIFY_PERFORMX") || null,
     erudio: readEnv("NOTIFY_ERUDIO") || null,
     auctus: readEnv("NOTIFY_AUCTUS") || null,
+    futureAfrica: readEnv("NOTIFY_FUTURE_AFRICA") || null,
   };
 }
 
-export function shouldCcAdminOnBrandEnquiry(): boolean {
-  return readEnvBool("NOTIFY_EA_COPY_ON_BRAND", false);
-}
-
-function inboxForPlatform(platform: ContactPlatform, inboxes: BrandInboxes): string | null {
+function inboxForBrandPlatform(platform: BrandRoutedPlatform, inboxes: BrandInboxes): string | null {
   switch (platform) {
     case "aald":
       return inboxes.aald;
-    case "performx":
-      return inboxes.performx;
     case "erudio-hub":
       return inboxes.erudio;
     case "auctus-africa":
       return inboxes.auctus;
+    case "future-africa":
+      return inboxes.futureAfrica;
     default:
       return null;
   }
-}
-
-function uniqueRecipients(values: Array<string | null | undefined>): string[] {
-  const seen = new Set<string>();
-  const recipients: string[] = [];
-  for (const value of values) {
-    const trimmed = (value ?? "").trim();
-    if (!trimmed) continue;
-    const key = trimmed.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    recipients.push(trimmed);
-  }
-  return recipients;
 }
 
 export function resolveEnquiryNotificationRecipients(input: {
   platform: ContactPlatform | null;
   subject: string | null;
   inboxes: BrandInboxes;
-  ccAdminOnBrand: boolean;
 }): string[] {
-  const subject = (input.subject ?? "").trim();
   const admin = input.inboxes.admin.trim();
-
   if (!admin) return [];
 
-  if (OPERATIONS_SUBJECTS.has(subject)) {
+  const subject = (input.subject ?? "").trim();
+
+  if (EA_ONLY_SUBJECTS.has(subject)) {
     return [admin];
   }
 
-  if (GENERAL_SITE_SUBJECTS.has(subject)) {
-    return uniqueRecipients([input.inboxes.general, admin]);
+  if (input.platform && isBrandRoutedPlatform(input.platform)) {
+    const brandInbox = inboxForBrandPlatform(input.platform, input.inboxes)?.trim();
+    if (brandInbox) return [brandInbox];
+    return [];
   }
 
-  if (input.platform) {
-    const brandInbox = inboxForPlatform(input.platform, input.inboxes);
-    const primary = brandInbox || admin;
-    if (input.ccAdminOnBrand && brandInbox && brandInbox.toLowerCase() !== admin.toLowerCase()) {
-      return uniqueRecipients([primary, admin]);
-    }
-    return [primary];
-  }
-
-  return uniqueRecipients([input.inboxes.general, admin]);
+  return [admin];
 }
 
 export function resolveBookingNotificationRecipients(inboxes: BrandInboxes): string[] {
@@ -139,6 +126,8 @@ export function platformLabel(platform: ContactPlatform | null): string | null {
       return "Erudio Hub";
     case "auctus-africa":
       return "Auctus Africa";
+    case "future-africa":
+      return "Future Africa";
     default:
       return platform;
   }

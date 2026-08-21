@@ -1,4 +1,8 @@
-export const CONTACT_PLATFORMS = ["aald", "performx", "erudio-hub", "auctus-africa"] as const;
+/** Platforms whose contact enquiries go to a dedicated brand inbox — not ea@. */
+export const BRAND_ROUTED_PLATFORMS = ["aald", "erudio-hub", "auctus-africa", "future-africa"] as const;
+export type BrandRoutedPlatform = (typeof BRAND_ROUTED_PLATFORMS)[number];
+
+export const CONTACT_PLATFORMS = [...BRAND_ROUTED_PLATFORMS, "performx"] as const;
 export type ContactPlatform = (typeof CONTACT_PLATFORMS)[number];
 
 const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[] = [
@@ -6,6 +10,7 @@ const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[
   { platform: "performx", prefixes: ["/work/performx", "/events/performx"] },
   { platform: "erudio-hub", prefixes: ["/work/erudio-hub"] },
   { platform: "auctus-africa", prefixes: ["/work/auctus-africa"] },
+  { platform: "future-africa", prefixes: ["/work/future-africa"] },
 ];
 
 function normalizePlatform(value: string | null | undefined): ContactPlatform | null {
@@ -14,7 +19,11 @@ function normalizePlatform(value: string | null | undefined): ContactPlatform | 
   return CONTACT_PLATFORMS.includes(trimmed as ContactPlatform) ? (trimmed as ContactPlatform) : null;
 }
 
-export function contactPathForPlatform(platform: ContactPlatform): string {
+export function isBrandRoutedPlatform(platform: ContactPlatform | null): platform is BrandRoutedPlatform {
+  return platform !== null && (BRAND_ROUTED_PLATFORMS as readonly string[]).includes(platform);
+}
+
+export function contactPathForPlatform(platform: BrandRoutedPlatform): string {
   return `/contact?platform=${encodeURIComponent(platform)}`;
 }
 

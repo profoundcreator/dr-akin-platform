@@ -13,11 +13,11 @@ import {
 } from "./lib/notifications";
 import {
   getBrandInboxes,
+  isBrandRoutedPlatform,
   platformLabel,
   resolveBookingNotificationRecipients,
   resolveContactPlatform,
   resolveEnquiryNotificationRecipients,
-  shouldCcAdminOnBrandEnquiry,
 } from "./lib/notification-routing";
 
 type NotifyBody =
@@ -119,12 +119,15 @@ export async function POST(request: Request): Promise<Response> {
       platform,
       subject: enquiry.subject,
       inboxes: brandInboxes,
-      ccAdminOnBrand: shouldCcAdminOnBrandEnquiry(),
     });
 
     if (teamRecipients.length === 0) {
       await supabase.from("enquiries").update({ admin_notified_at: null }).eq("id", enquiry.id);
-      return json(503, { error: "ADMIN_NOTIFICATION_EMAIL is not configured." });
+      const missingBrand =
+        platform && isBrandRoutedPlatform(platform)
+          ? `Brand inbox for ${platformLabel(platform) ?? platform} is not configured.`
+          : "ADMIN_NOTIFICATION_EMAIL is not configured.";
+      return json(503, { error: missingBrand });
     }
 
     const adminUrl = `${baseUrl}/admin/inbox/detail?id=${enquiry.id}`;

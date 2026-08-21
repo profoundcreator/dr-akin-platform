@@ -8,8 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitGeneralEnquiry } from "@/lib/contact/enquiries";
+import {
+  isBrandRoutedPlatform,
+  readContactSubmissionContext,
+  type ContactPlatform,
+} from "@/lib/contact/platform-context";
 import { platformLabel } from "@/lib/contact/platform-labels";
-import { readContactSubmissionContext } from "@/lib/contact/platform-context";
 
 const CONTACT_TOPICS = [
   "Government & institutional partnership",
@@ -34,7 +38,7 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [platformContext, setPlatformContext] = useState<string | null>(null);
+  const [platformContext, setPlatformContext] = useState<ContactPlatform | null>(null);
 
   useEffect(() => {
     setPlatformContext(readContactSubmissionContext().platform);
@@ -78,7 +82,7 @@ export function ContactForm() {
 
   return (
     <form className="ploy-surface-elevated space-y-5 p-6" onSubmit={handleSubmit}>
-      {platformContext && (
+      {platformContext && isBrandRoutedPlatform(platformContext) && (
         <p className="rounded-md border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
           Your enquiry will be routed to the {platformLabel(platformContext)} team.
         </p>

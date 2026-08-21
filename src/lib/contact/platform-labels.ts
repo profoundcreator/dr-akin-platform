@@ -8,6 +8,8 @@ export function platformLabel(platform: string | null): string | null {
       return "Erudio Hub";
     case "auctus-africa":
       return "Auctus Africa";
+    case "future-africa":
+      return "Future Africa";
     default:
       return null;
   }
