@@ -8,7 +8,7 @@ export type ApprovedSocialLink = {
 export const SITE_CONTACT = {
   personName: PERSON_IDENTITY.publicName,
   organizationName: "Akin Akinpelu",
-  phone: "+234 706 589 5185",
+  phone: "+234 805 033 8853",
   email: "hello@theakinakinpelu.org",
   contactPath: "/contact",
   privacyPath: "/privacy",
