@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitGeneralEnquiry } from "@/lib/contact/enquiries";
+import { platformLabel } from "@/lib/contact/platform-labels";
+import { readContactSubmissionContext } from "@/lib/contact/platform-context";
 
 const CONTACT_TOPICS = [
   "Government & institutional partnership",
@@ -32,6 +34,11 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [platformContext, setPlatformContext] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPlatformContext(readContactSubmissionContext().platform);
+  }, []);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -71,6 +78,11 @@ export function ContactForm() {
 
   return (
     <form className="ploy-surface-elevated space-y-5 p-6" onSubmit={handleSubmit}>
+      {platformContext && (
+        <p className="rounded-md border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          Your enquiry will be routed to the {platformLabel(platformContext)} team.
+        </p>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="contact-name" required>Name</Label>

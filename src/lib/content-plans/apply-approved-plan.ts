@@ -1,4 +1,5 @@
 import { AALD_PERFORMX_PLAN_SEED } from "@/lib/content-plans/aald-performx-seed";
+import { contactPathForPlatform } from "@/lib/contact/platform-context";
 import type { ContentPlanData } from "@/lib/content-plans/types";
 import type { WorkOrgSection } from "@/lib/work-orgs/types";
 
@@ -30,7 +31,7 @@ export function planToWorkOrgContent(plan: ContentPlanData = AALD_PERFORMX_PLAN_
       ctaLabel: aaldPage.hero.ctaLabel ?? "",
       ctaHref: aaldPage.hero.ctaHref ?? "/contact",
       secondaryCtaLabel: aaldPage.hero.secondaryCtaLabel ?? "",
-      secondaryCtaHref: aaldPage.hero.secondaryCtaHref ?? "/contact",
+      secondaryCtaHref: aaldPage.hero.secondaryCtaHref ?? contactPathForPlatform("aald"),
       relatedLinks: [
         { label: "PerformX Nexus", href: "/work/performx" },
         { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },

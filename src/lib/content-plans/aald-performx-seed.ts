@@ -220,7 +220,7 @@ export const AALD_PERFORMX_PLAN_SEED: ContentPlanData = {
         ctaLabel: "Invite Akin Akinpelu to speak",
         ctaHref: "/meet-akin/speaking",
         secondaryCtaLabel: "Discuss a partnership",
-        secondaryCtaHref: "/contact",
+        secondaryCtaHref: "/contact?platform=aald",
       },
       sections: [
         {

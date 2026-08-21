@@ -66,6 +66,8 @@ export interface EnquiryMailInput {
   organization: string | null;
   subject: string | null;
   message: string | null;
+  platformLabel: string | null;
+  referrerPath: string | null;
   adminUrl: string;
 }
 
@@ -78,6 +80,8 @@ export function buildEnquiryAdminMail(input: EnquiryMailInput) {
     field("Email", input.contactEmail),
     field("Organization", input.organization),
     field("Subject", input.subject),
+    field("Platform", input.platformLabel),
+    field("Referrer", input.referrerPath),
     "",
     "Message:",
     input.message?.trim() || "(empty)",
@@ -96,6 +100,8 @@ export function buildEnquiryAdminMail(input: EnquiryMailInput) {
       { label: "Email", value: input.contactEmail },
       { label: "Organization", value: input.organization },
       { label: "Subject", value: input.subject },
+      { label: "Platform", value: input.platformLabel },
+      { label: "Referrer", value: input.referrerPath },
     ])}${renderMessageBlock(input.message?.trim() || "")}`,
     cta: { label: "Open in admin inbox", href: input.adminUrl },
     footerNote: "Reply directly to this email to reach the submitter.",

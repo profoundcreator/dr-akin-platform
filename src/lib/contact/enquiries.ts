@@ -1,4 +1,5 @@
 import { notifySubmission } from "@/lib/notifications/notify-submission";
+import { readContactSubmissionContext } from "@/lib/contact/platform-context";
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 
 export interface GeneralEnquiryInput {
@@ -17,6 +18,8 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
     throw new Error("Enquiries are temporarily unavailable. Please try again later.");
   }
 
+  const { platform, referrerPath } = readContactSubmissionContext();
+
   const { data, error } = await supabase.rpc("submit_general_enquiry", {
     p_name: input.name,
     p_email: input.email,
@@ -25,6 +28,8 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
     p_message: input.message,
     p_privacy_agreed: input.privacyAgreed,
     p_website: input.website || undefined,
+    p_referrer_path: referrerPath || undefined,
+    p_platform: platform || undefined,
   });
 
   if (error) throw new Error(error.message);

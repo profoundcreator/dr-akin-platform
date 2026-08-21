@@ -2,7 +2,7 @@
 
 **Target go-live:** Sunday, 23 August 2026  
 **Primary domain:** `theakinakinpelu.org` (or interim Vercel URL until DNS cutover)  
-**Last updated:** 20 August 2026
+**Last updated:** 21 August 2026
 
 Use this as the single launch gate list. Items marked **Blocker** must pass before public launch.
 
@@ -23,7 +23,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | Area | Blockers remaining |
 | ---- | ------------------ |
-| **Automated form emails** | Resend domain + env vars; **brand routing not built yet**; production smoke test |
+| **Automated form emails** | Resend domain + env vars (Saturday); **brand routing built**; production smoke test |
 | **Admin / EA access** | EA sign-in confirmed |
 | **Infrastructure** | Migrations, DNS (if custom domain), Auth URLs |
 | **Content & assets** | Copy sign-off, book covers, speaking photos |
@@ -40,7 +40,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | --- | ----------- | -------------- | ------ |
 | 1.1 | **Submitter acknowledgement** — contact form (“We received your enquiry”) | ☑ Yes | ☐ Verify in production |
 | 1.2 | **Submitter acknowledgement** — booking form (reference + tracker link) | ☑ Yes | ☐ Verify in production |
-| 1.3 | **Team notification** — contact submissions routed to correct brand inbox | ◐ Partial (single inbox only) | ☐ **Build + configure** |
+| 1.3 | **Team notification** — contact submissions routed to correct brand inbox | ☑ Yes | ☐ Configure env + smoke test |
 | 1.4 | **Team notification** — booking submissions to EA / organizer pipeline | ☑ Yes (single `ADMIN_NOTIFICATION_EMAIL`) | ☐ Verify in production |
 | 1.5 | Branded HTML templates (site colours, logo) | ☑ Yes | ☐ Logo loads in email (`/brand/akin-logo-mono.png`) |
 
@@ -63,9 +63,9 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | # | Task | Owner | Status |
 | --- | ---- | ----- | ------ |
-| 1.B.1 | Define routing rules: contact topic, referrer page (`/work/aald`, etc.), or new “Platform” field on contact form | Product + dev | ☐ |
-| 1.B.2 | Implement multi-recipient or per-brand routing in [`api/notify-submission.ts`](../../api/notify-submission.ts) / [`api/lib/notifications.ts`](../../api/lib/notifications.ts) | Dev | ☐ Blocker |
-| 1.B.3 | Env vars or config for each brand inbox (see §1C) | Dev | ☐ Blocker |
+| 1.B.1 | Define routing rules: contact topic, referrer page (`/work/aald`, etc.), or new “Platform” field on contact form | Product + dev | ☑ |
+| 1.B.2 | Implement multi-recipient or per-brand routing in [`api/notify-submission.ts`](../../api/notify-submission.ts) / [`api/lib/notification-routing.ts`](../../api/lib/notification-routing.ts) | Dev | ☑ |
+| 1.B.3 | Env vars or config for each brand inbox (see §1C) | Dev | ◐ `.env.example` updated; Vercel pending |
 | 1.B.4 | Submitter acknowledgement unchanged (always to person who filled the form) | Dev | ☑ |
 | 1.B.5 | Confirm external domains can **receive** mail (MX on `aaldcompany.org`, `erudiohub.org`, `auctusafrica.org` — no Resend verify needed for *receiving*) | Client / IT | ☐ |
 | 1.B.6 | Smoke test: one submission per brand path → correct inbox + submitter ack | EA + dev | ☐ Blocker |
@@ -126,7 +126,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | # | Task | Status |
 | --- | ---- | ------ |
-| 3.1 | Production Supabase migrations **018–028** applied | ☐ |
+| 3.1 | Production Supabase migrations **018–026** applied (`026` adds contact platform context) | ☐ |
 | 3.2 | `PUBLIC_SITE_URL` set to production URL in Vercel | ☐ |
 | 3.3 | Supabase Auth **Site URL** + **Redirect URLs** updated for live domain | ☐ |
 | 3.4 | DNS: `theakinakinpelu.org` → Vercel (A/CNAME); **preserve MX** for email | ☐ |
@@ -186,9 +186,10 @@ Run [`production-smoke-checklist.md`](production-smoke-checklist.md) on the **li
 
 | When | Focus |
 | ---- | ----- |
-| **By Fri 21 Aug** | Brand email routing built + Resend domain verified + env vars set |
+| **Fri 21 Aug (today)** | Brand email routing code + migration `026` + contact `?platform=` links (**no domain/DNS required**) |
+| **Sat 22 Aug** | DNS cutover, Resend domain verify on `theakinakinpelu.org`, Vercel env vars, apply migration `026` |
 | **Sat 22 Aug (eve)** | Full smoke test on production: every form × every inbox × submitter ack |
-| **Sun 23 Aug (am)** | DNS cutover (if ready) or confirm Vercel URL; Auth URLs updated |
+| **Sun 23 Aug (am)** | Auth URLs updated if domain changed |
 | **Sun 23 Aug** | EA live test submission; client sign-off; announce |
 
 ### Launch-day sequence (Sunday 23 August)

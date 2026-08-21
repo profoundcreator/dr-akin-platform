@@ -1,4 +1,5 @@
 import { SITE_IMAGES } from "@/lib/media/site-images";
+import { contactPathForPlatform } from "@/lib/contact/platform-context";
 import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
 
 export interface PageSection {
@@ -125,7 +126,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
     ],
     cta: { label: "Invite Akin Akinpelu to speak", href: "/meet-akin/speaking" },
-    secondaryCta: { label: "Discuss a partnership", href: "/contact" },
+    secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("aald") },
     relatedLinks: [
       { label: "PerformX Nexus", href: "/work/performx" },
       { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },
