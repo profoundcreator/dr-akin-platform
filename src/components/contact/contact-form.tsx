@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,12 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingOptInField } from "@/components/marketing/marketing-opt-in-field";
 import { submitGeneralEnquiry } from "@/lib/contact/enquiries";
+import {
+  isBrandRoutedPlatform,
+  readContactSubmissionContext,
+  type ContactPlatform,
+} from "@/lib/contact/platform-context";
+import { contactRoutingHint } from "@/lib/contact/platform-labels";
 
 const CONTACT_TOPICS = [
   "Government & institutional partnership",
@@ -34,6 +40,11 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [platformContext, setPlatformContext] = useState<ContactPlatform | null>(null);
+
+  useEffect(() => {
+    setPlatformContext(readContactSubmissionContext().platform);
+  }, []);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -56,6 +67,11 @@ export function ContactForm() {
     }
   }
 
+  const routingHint =
+    platformContext && isBrandRoutedPlatform(platformContext)
+      ? contactRoutingHint(platformContext)
+      : null;
+
   if (submitted) {
     return (
       <div className="ploy-surface-elevated space-y-4 p-6" role="status">
@@ -73,6 +89,11 @@ export function ContactForm() {
 
   return (
     <form className="ploy-surface-elevated space-y-5 p-6" onSubmit={handleSubmit}>
+      {routingHint && (
+        <p className="rounded-md border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
+          {routingHint}
+        </p>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="contact-name" required>Name</Label>

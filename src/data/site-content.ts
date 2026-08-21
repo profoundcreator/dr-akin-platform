@@ -1,5 +1,6 @@
 import { SITE_IMAGES } from "@/lib/media/site-images";
-import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
+import { contactPathForPlatform } from "@/lib/contact/platform-context";
+import { AU_TITLE, AALD_COMPANY_NAME, AALD_EXPANDED_NAME, PUBLIC_NAME } from "@/data/person-identity";
 
 export interface PageSection {
   title: string;
@@ -74,7 +75,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         body: "Future Africa mobilises today’s institutions and citizens through collaboration, leadership and strategic action to help build the Africa of tomorrow.",
       },
     ],
-    cta: { label: "Discuss a partnership", href: "/book-dr-akin" },
+    cta: { label: "Discuss a partnership", href: contactPathForPlatform("future-africa") },
   },
   "work-aald": {
     slug: "work/aald",
@@ -83,7 +84,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
     headline: "Building stronger African organisations—",
     headlineSecondary: "through consulting, training and research.",
     description:
-      "Akin Akinpelu Learning & Development Company partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
+      `${AALD_COMPANY_NAME} partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.`,
     sections: [
       {
         title: "What we do",
@@ -125,7 +126,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
     ],
     cta: { label: "Book a facilitation session", href: "/book-dr-akin" },
-    secondaryCta: { label: "Discuss a partnership", href: "/contact" },
+    secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("aald") },
     relatedLinks: [
       { label: "PerformX Nexus", href: "/work/performx" },
       { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },
@@ -152,6 +153,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
     ],
     cta: { label: "Start a conversation", href: "/book-dr-akin" },
+    secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("erudio-hub") },
   },
   "work-performx": {
     slug: "work/performx",
@@ -198,10 +200,10 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Explore partnerships", href: "/contact" },
+    cta: { label: "Explore partnerships", href: contactPathForPlatform("performx") },
     secondaryCta: { label: "Register interest in the summit", href: "/events/performx-summit-2026" },
     relatedLinks: [
-      { label: "Request partnership deck", href: "/contact" },
+      { label: "Request partnership deck", href: contactPathForPlatform("performx") },
       { label: "PerformX Summit 2026", href: "/events/performx-summit-2026" },
       { label: "AALD", href: "/work/aald" },
     ],
@@ -231,7 +233,8 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
     ],
     cta: { label: "Visit Auctus Africa", href: "https://auctusafrica.org/" },
-    secondaryCta: { label: "Explore the education pillar", href: "/work" },
+    secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("auctus-africa") },
+    relatedLinks: [{ label: "Explore the education pillar", href: "/work#education" }],
   },
   "meet-akin": {
     slug: "meet-akin",
@@ -263,7 +266,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         bullets: [
           "Executive coach and corporate strategist",
           "Author of nine published titles",
-          "Founder, Akin Akinpelu Learning & Development Company (AALD)",
+          `Founder, ${AALD_EXPANDED_NAME} (AALD)`,
           "Advisor to governments and enterprises",
         ],
       },

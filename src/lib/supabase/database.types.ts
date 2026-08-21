@@ -379,6 +379,8 @@ export interface Database {
           p_message: string;
           p_privacy_agreed: boolean;
           p_website?: string;
+          p_referrer_path?: string;
+          p_platform?: string;
         };
         Returns: string;
       };

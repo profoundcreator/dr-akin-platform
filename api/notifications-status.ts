@@ -1,4 +1,5 @@
 import { readEnv } from "./lib/env";
+import { getBrandInboxes } from "./lib/notification-routing";
 import { getNotificationMailConfig } from "./lib/notifications";
 import { hasValidStatusProbeKey } from "./lib/request-guard";
 import { createServiceSupabaseClient } from "./lib/supabase-service";
@@ -29,6 +30,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const mailConfig = getNotificationMailConfig();
   const supabase = createServiceSupabaseClient();
+  const brandInboxes = getBrandInboxes();
 
   const resendApiKey = readEnv("RESEND_API_KEY");
   const from = readEnv("NOTIFICATION_FROM_EMAIL");
@@ -45,16 +47,32 @@ export async function GET(request: Request): Promise<Response> {
     supabaseServiceClientReady: Boolean(supabase),
   };
 
+  const brandChecks = {
+    aald: Boolean(brandInboxes.aald),
+    performx: Boolean(brandInboxes.performx),
+    erudio: Boolean(brandInboxes.erudio),
+    auctus: Boolean(brandInboxes.auctus),
+    futureAfricaViaErudio: Boolean(brandInboxes.erudio),
+  };
+
   const ready = Object.values(checks).every(Boolean);
 
   return json(ready ? 200 : 503, {
     ok: ready,
     service: "submission-notifications",
     checks,
+    brandChecks,
     masked: {
       from: maskEmail(from),
       adminTo: maskEmail(adminTo),
       replyTo: replyTo ? maskEmail(replyTo) : maskEmail(adminTo),
+      aald: brandInboxes.aald ? maskEmail(brandInboxes.aald) : "(missing)",
+      performx: brandInboxes.performx ? maskEmail(brandInboxes.performx) : "(missing)",
+      erudio: brandInboxes.erudio ? maskEmail(brandInboxes.erudio) : "(missing)",
+      auctus: brandInboxes.auctus ? maskEmail(brandInboxes.auctus) : "(missing)",
+      futureAfricaViaErudio: brandInboxes.erudio
+        ? `${maskEmail(brandInboxes.erudio)} (Future Africa interim)`
+        : "(missing — required for Future Africa)",
     },
     resendSetupRequired: [
       "Add and verify theakinakinpelu.org (or your sending domain) in Resend → Domains.",

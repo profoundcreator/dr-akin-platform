@@ -125,6 +125,14 @@ After custom SMTP is saved:
 
 **Fallback if rate-limited again:** `node scripts/generate-invite-link.mjs "email@example.com" "Full Name" role_name` — sends no email; copy the link manually.
 
+**EA cannot sign in (repair without email):** with `SUPABASE_SERVICE_ROLE_KEY` in `.env`, run:
+
+```bash
+npm run reset:admin-access -- ea@theakinakinpelu.org "Executive Assistant"
+```
+
+This confirms the auth user, sets a **temporary password**, marks email confirmed, and sets `admin_profiles.account_state` to `active`. Share the printed password securely.
+
 Official guide: [Resend — Send with Supabase SMTP](https://resend.com/docs/send-with-supabase-smtp)
 
 ### Resend notifications (enquiry & booking → EA inbox)

@@ -11,6 +11,15 @@ import {
   NOTIFICATIONS_NOT_CONFIGURED,
   sendMail,
 } from "./lib/notifications";
+import {
+  getBrandInboxes,
+  isBrandRoutedPlatform,
+  missingBrandInboxMessage,
+  platformLabel,
+  resolveBookingNotificationRecipients,
+  resolveContactPlatform,
+  resolveEnquiryNotificationRecipients,
+} from "./lib/notification-routing";
 
 type NotifyBody =
   | { kind: "enquiry"; enquiryId?: string }
@@ -29,6 +38,12 @@ function readString(value: unknown): string {
 
 function readFormField(form: Record<string, unknown>, key: string): string | null {
   const value = form[key];
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function readPayloadString(payload: Record<string, unknown> | null, key: string): string | null {
+  if (!payload) return null;
+  const value = payload[key];
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
@@ -68,7 +83,7 @@ export async function POST(request: Request): Promise<Response> {
       .eq("id", enquiryId)
       .is("admin_notified_at", null)
       .eq("source", "Contact")
-      .select("id, source, contact_name, contact_email, organization, subject, message, created_at")
+      .select("id, source, contact_name, contact_email, organization, subject, message, payload, created_at")
       .maybeSingle();
 
     if (error) {
@@ -92,6 +107,30 @@ export async function POST(request: Request): Promise<Response> {
       return json(200, { ok: true, skipped: true, reason: "expired" });
     }
 
+    const payload =
+      enquiry.payload && typeof enquiry.payload === "object"
+        ? (enquiry.payload as Record<string, unknown>)
+        : null;
+    const platform = resolveContactPlatform({
+      platform: readPayloadString(payload, "platform"),
+      referrerPath: readPayloadString(payload, "referrerPath"),
+    });
+    const brandInboxes = getBrandInboxes();
+    const teamRecipients = resolveEnquiryNotificationRecipients({
+      platform,
+      subject: enquiry.subject,
+      inboxes: brandInboxes,
+    });
+
+    if (teamRecipients.length === 0) {
+      await supabase.from("enquiries").update({ admin_notified_at: null }).eq("id", enquiry.id);
+      const missingBrand =
+        platform && isBrandRoutedPlatform(platform)
+          ? missingBrandInboxMessage(platform)
+          : "ADMIN_NOTIFICATION_EMAIL is not configured.";
+      return json(503, { error: missingBrand });
+    }
+
     const adminUrl = `${baseUrl}/admin/inbox/detail?id=${enquiry.id}`;
     const adminMail = buildEnquiryAdminMail({
       id: enquiry.id,
@@ -100,11 +139,14 @@ export async function POST(request: Request): Promise<Response> {
       organization: enquiry.organization,
       subject: enquiry.subject,
       message: enquiry.message,
+      platformKey: platform,
+      platformLabel: platformLabel(platform),
+      referrerPath: readPayloadString(payload, "referrerPath"),
       adminUrl,
     });
 
     const adminResult = await sendMail(mailConfig, {
-      to: mailConfig.adminTo,
+      to: teamRecipients,
       subject: adminMail.subject,
       html: adminMail.html,
       text: adminMail.text,
@@ -194,8 +236,16 @@ export async function POST(request: Request): Promise<Response> {
       adminUrl,
     });
 
+    const brandInboxes = getBrandInboxes();
+    const teamRecipients = resolveBookingNotificationRecipients(brandInboxes);
+
+    if (teamRecipients.length === 0) {
+      await supabase.from("booking_requests").update({ admin_notified_at: null }).eq("id", booking.id);
+      return json(503, { error: "ADMIN_NOTIFICATION_EMAIL is not configured." });
+    }
+
     const adminResult = await sendMail(mailConfig, {
-      to: mailConfig.adminTo,
+      to: teamRecipients,
       subject: adminMail.subject,
       html: adminMail.html,
       text: adminMail.text,

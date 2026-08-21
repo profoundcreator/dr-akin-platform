@@ -9,6 +9,10 @@ export const PERSON_IDENTITY = {
     "Institution Builder",
   ],
   pillars: ["Governance", "Enterprise", "Education"],
+  /** Use when expanding the AALD acronym in public copy. */
+  aaldExpandedName: "Akin Akinpelu Learning & Development",
+  /** Full trading name in running prose (not the old “African Academy…” form). */
+  aaldCompanyName: "Akin Akinpelu Learning & Development Company",
   metrics: {
     peopleReached: "1,000,000+",
     yearsExperience: "26+",
@@ -18,3 +22,5 @@ export const PERSON_IDENTITY = {
 
 export const PUBLIC_NAME = PERSON_IDENTITY.publicName;
 export const AU_TITLE = PERSON_IDENTITY.auTitle;
+export const AALD_EXPANDED_NAME = PERSON_IDENTITY.aaldExpandedName;
+export const AALD_COMPANY_NAME = PERSON_IDENTITY.aaldCompanyName;
