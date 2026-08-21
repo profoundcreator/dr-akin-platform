@@ -2,10 +2,16 @@
 import Layout from "@/layouts/Layout.astro";
 import { MeetHubPage } from "@/components/pages/meet-hub-page";
 import { SITE_PAGES } from "@/data/site-content";
+import { SITE_IMAGES } from "@/lib/media/site-images";
 
 const content = SITE_PAGES["meet-akin"];
 ---
 
-<Layout title={content.title} description={content.description}>
+<Layout
+  title={content.title}
+  description={content.description}
+  ogImage={SITE_IMAGES.portraitApproachable}
+  preloadImage={SITE_IMAGES.portraitApproachable}
+>
   <MeetHubPage client:load content={content} />
 </Layout>

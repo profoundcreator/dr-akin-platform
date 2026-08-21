@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MarketingOptInField } from "@/components/marketing/marketing-opt-in-field";
 import { submitGeneralEnquiry } from "@/lib/contact/enquiries";
 import {
   isBrandRoutedPlatform,
@@ -31,6 +32,7 @@ const INITIAL = {
   message: "",
   website: "",
   privacyAgreed: false,
+  marketingOptIn: false,
 };
 
 export function ContactForm() {
@@ -134,11 +136,29 @@ export function ContactForm() {
         <Input id="contact-website" tabIndex={-1} autoComplete="off"
           value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
       </div>
-      <label className="flex items-start gap-3 text-sm text-[var(--ploy-text-secondary)]">
-        <input type="checkbox" className="mt-1" required checked={form.privacyAgreed}
-          onChange={(e) => setForm({ ...form, privacyAgreed: e.target.checked })} />
-        <span>I have read the <a className="underline" href="/privacy">privacy notice</a> and agree to the use of my information to respond to this enquiry.</span>
-      </label>
+      <div className="space-y-4 rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-4">
+        <label className="flex items-start gap-3 text-sm text-[var(--ploy-text-secondary)]">
+          <input
+            type="checkbox"
+            className="mt-1"
+            required
+            checked={form.privacyAgreed}
+            onChange={(e) => setForm({ ...form, privacyAgreed: e.target.checked })}
+          />
+          <span>
+            I have read the{" "}
+            <a className="underline" href="/privacy">
+              privacy notice
+            </a>{" "}
+            and agree to the use of my information to respond to this enquiry.
+          </span>
+        </label>
+        <MarketingOptInField
+          id="contact-marketing-opt-in"
+          checked={form.marketingOptIn}
+          onChange={(marketingOptIn) => setForm({ ...form, marketingOptIn })}
+        />
+      </div>
       {error && <p className="text-sm text-[var(--ploy-status-error)]" role="alert">{error}</p>}
       <Button type="submit" variant="primary" disabled={submitting}>
         {submitting ? "Sending…" : "Send enquiry"}

@@ -18,7 +18,8 @@
     "verify:admin-user": "node scripts/verify-admin-user.mjs",
     "audit:continental": "node scripts/final-audit.mjs --dist",
     "smoke:production": "node scripts/smoke-production.mjs",
-    "reset:admin-access": "node scripts/reset-admin-access.mjs"
+    "reset:admin-access": "node scripts/reset-admin-access.mjs",
+    "import:portraits": "node scripts/import-portraits.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",
@@ -40,6 +41,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.8.3"
   },

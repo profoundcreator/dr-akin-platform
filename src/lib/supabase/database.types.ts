@@ -26,8 +26,6 @@ export type InsightArticleStatus = "draft" | "pending_approval" | "published" | 
 
 export type WorkOrgStatus = "draft" | "pending_approval" | "published" | "hidden";
 
-export type ContentPlanStatus = "draft" | "pending_review" | "approved";
-
 export type HomepageHeroMode = "portrait" | "banner" | "minimal";
 
 export type AdminAccountState = "invited" | "active" | "suspended" | "revoked";
@@ -251,20 +249,6 @@ export interface DbWorkOrg {
   updated_at: string;
 }
 
-export interface DbContentPlan {
-  slug: string;
-  title: string;
-  variables: unknown;
-  decisions: unknown;
-  section_approvals: unknown;
-  checklist: unknown;
-  pages: unknown;
-  status: ContentPlanStatus;
-  approval_note: string;
-  updated_by: string | null;
-  updated_at: string;
-}
-
 export interface DbSiteSettings {
   id: boolean;
   homepage_events_enabled: boolean;
@@ -380,11 +364,6 @@ export interface Database {
           >;
         Update: Partial<DbWorkOrg>;
       };
-      content_plans: {
-        Row: DbContentPlan;
-        Insert: Partial<DbContentPlan> & Pick<DbContentPlan, "slug" | "title">;
-        Update: Partial<DbContentPlan>;
-      };
     };
     Functions: {
       create_booking_request: {
@@ -402,6 +381,15 @@ export interface Database {
           p_website?: string;
           p_referrer_path?: string;
           p_platform?: string;
+        };
+        Returns: string;
+      };
+      subscribe_audience_member: {
+        Args: {
+          p_email: string;
+          p_name?: string;
+          p_consent_source?: string;
+          p_engagement_context?: Record<string, unknown>;
         };
         Returns: string;
       };

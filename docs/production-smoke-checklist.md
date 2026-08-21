@@ -36,6 +36,21 @@ node scripts/smoke-production.mjs --with-supabase
 | Booking appears in **Admin → Requests** (if submitted) | ☐ |
 | `/track-booking` — lookup with reference + access token | ☐ |
 
+## 3B. Manual — Email routing (production only, after Resend + env vars)
+
+Submit one test per row using your own email. Confirm **submitter acknowledgement** and **team notification** inbox.
+
+| Source | Expected team inbox | Submitter ack | Pass? |
+|--------|---------------------|---------------|-------|
+| `/contact` — General enquiry | `ea@theakinakinpelu.org` | Your email | ☐ |
+| `/contact` — Privacy or data request | `ea@` | Your email | ☐ |
+| `/contact?platform=aald` — Government & institutional partnership | `hello@aaldcompany.org` | Your email | ☐ |
+| `/contact?platform=performx` | `performx@aaldcompany.org` | Your email | ☐ |
+| `/contact?platform=erudio-hub` | `hello@erudiohub.org` | Your email | ☐ |
+| `/contact?platform=auctus-africa` | `info@auctusafrica.org` | Your email | ☐ |
+| `/contact?platform=future-africa` | `hello@erudiohub.org` (subject/body labelled **Future Africa**) | Your email | ☐ |
+| `/book-dr-akin` — test booking | `ea@` | Organizer email | ☐ |
+
 ## 4. Manual — Content & SEO
 
 | Step | Pass? |

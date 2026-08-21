@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
   Check,
   Download,
   Eye,
   FileText,
-  ImagePlus,
-  Plus,
   Star,
   Trash2,
   X,
@@ -19,10 +17,6 @@ import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import {
   canApproveInsights,
@@ -35,31 +29,24 @@ import {
 } from "@/lib/events/publish-notice";
 import { INSIGHTS_ADMIN_COPY } from "@/lib/admin/plain-language-copy";
 import {
-  INSIGHT_CATEGORIES,
-  INSIGHT_HERO_IMAGE_HINT,
   INSIGHT_STATUS_LABELS,
   MAX_HOMEPAGE_FEATURED_INSIGHTS,
 } from "@/lib/insights/constants";
 import {
   clearInsightHomepageFeatured,
-  createInsight,
   deleteInsightPermanently,
   formatInsightDate,
   getAdminInsights,
-  getInsightHeroUrl,
   getPendingInsights,
   insightsToCsv,
   isInsightMediaSchemaReady,
   isInsightSeoSchemaReady,
   isPhase3SchemaReady,
-  isValidInsightSlug,
   logInsightAudit,
   setInsightHomepageFeatured,
-  slugifyInsightTitle,
   updateInsight,
 } from "@/lib/insights/articles";
-import { uploadInsightHeroImage } from "@/lib/insights/hero-image-upload";
-import type { InsightInput, PlatformInsight } from "@/lib/insights/types";
+import type { PlatformInsight } from "@/lib/insights/types";
 import type { LiveSiteInsight } from "@/lib/insights/public-insights";
 import {
   getHomepageFeaturedInsightsLiveOnSite,
@@ -74,22 +61,23 @@ import {
 } from "@/lib/content/preloaded-content";
 import type { InsightArticleStatus } from "@/lib/supabase/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
-const EMPTY_FORM = {
-  slug: "",
-  title: "",
-  category: INSIGHT_CATEGORIES[0],
-  summary: "",
-  seoDescription: "",
-  body: "",
-  socialImageAlt: "",
-  publishedAt: new Date().toISOString().slice(0, 10),
-  isHomepageFeatured: false,
-  sortOrder: 0,
-  sourceLabel: "",
-  sourceUrl: "",
-};
+function goToEditor(options?: { id?: string; prefill?: string }) {
+  if (options?.id) {
+    window.location.href = `/admin/insights/edit?id=${encodeURIComponent(options.id)}`;
+    return;
+  }
+  if (options?.prefill) {
+    window.location.href = `/admin/insights/edit?prefill=${encodeURIComponent(options.prefill)}`;
+    return;
+  }
+  window.location.href = "/admin/insights/edit";
+}
+
+function toDateInputValue(iso: string | null): string {
+  if (!iso) return "";
+  return iso.slice(0, 10);
+}
 
 function downloadCsv(filename: string, content: string) {
   const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
@@ -99,16 +87,6 @@ function downloadCsv(filename: string, content: string) {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
-}
-
-function toPublishedAtIso(dateValue: string): string | null {
-  if (!dateValue.trim()) return null;
-  return new Date(`${dateValue}T12:00:00`).toISOString();
-}
-
-function toDateInputValue(iso: string | null): string {
-  if (!iso) return "";
-  return iso.slice(0, 10);
 }
 
 export function InsightsDashboard() {
@@ -122,8 +100,6 @@ export function InsightsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -131,19 +107,8 @@ export function InsightsDashboard() {
   const [seoSchemaReady, setSeoSchemaReady] = useState(true);
   const [preloadedControlsReady, setPreloadedControlsReady] = useState(true);
   const [hiddenPreloadedSlugs, setHiddenPreloadedSlugs] = useState<string[]>([]);
-  const [livePrefillTitle, setLivePrefillTitle] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewArticle, setPreviewArticle] = useState<InsightPreviewData | null>(null);
-  const [heroFile, setHeroFile] = useState<File | null>(null);
-  const [heroPreview, setHeroPreview] = useState<string | null>(null);
-  const [existingHeroPath, setExistingHeroPath] = useState<string | null>(null);
-  const editorFormRef = useRef<HTMLElement>(null);
-
-  function scrollToEditorForm() {
-    requestAnimationFrame(() => {
-      editorFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
 
   async function loadInsights() {
     try {
@@ -184,67 +149,16 @@ export function InsightsDashboard() {
     [insights],
   );
 
-  function resetForm() {
-    setForm(EMPTY_FORM);
-    setEditingId(null);
-    setLivePrefillTitle(null);
-    setHeroFile(null);
-    setHeroPreview(null);
-    setExistingHeroPath(null);
-  }
-
   function startEdit(insight: PlatformInsight) {
-    setLivePrefillTitle(null);
-    setEditingId(insight.id);
-    setForm({
-      slug: insight.slug,
-      title: insight.title,
-      category: insight.category,
-      summary: insight.summary,
-      seoDescription: insight.seoDescription ?? "",
-      body: insight.body,
-      socialImageAlt: insight.socialImageAlt ?? "",
-      publishedAt: toDateInputValue(insight.publishedAt),
-      isHomepageFeatured: insight.isHomepageFeatured,
-      sortOrder: insight.sortOrder,
-      sourceLabel: insight.sourceLabel ?? "",
-      sourceUrl: insight.sourceUrl ?? "",
-    });
-    setExistingHeroPath(insight.heroImagePath);
-    setHeroFile(null);
-    setHeroPreview(insight.heroImageUrl);
-    scrollToEditorForm();
+    goToEditor({ id: insight.id });
   }
 
   function startFromLiveInsight(insight: LiveSiteInsight) {
-    const cmsInsight = insights.find((item) => item.slug === insight.slug);
-    if (cmsInsight) {
-      startEdit(cmsInsight);
+    if (insight.cmsId) {
+      goToEditor({ id: insight.cmsId });
       return;
     }
-
-    setError(null);
-    setNotice(INSIGHTS_ADMIN_COPY.startManagingReady(insight.title));
-    setEditingId(null);
-    setLivePrefillTitle(insight.title);
-    setForm({
-      slug: insight.slug,
-      title: insight.title,
-      category: insight.category,
-      summary: insight.summary,
-      seoDescription: insight.seoDescription ?? "",
-      body: insight.body,
-      socialImageAlt: insight.socialImageAlt ?? "",
-      publishedAt: toDateInputValue(insight.publishedAt),
-      isHomepageFeatured: insight.isHomepageFeatured,
-      sortOrder: insight.sortOrder,
-      sourceLabel: "",
-      sourceUrl: "",
-    });
-    setExistingHeroPath(null);
-    setHeroFile(null);
-    setHeroPreview(null);
-    scrollToEditorForm();
+    goToEditor({ prefill: insight.slug });
   }
 
   const homepageFeaturedSlugs = useMemo(
@@ -336,27 +250,6 @@ export function InsightsDashboard() {
     }
   }
 
-  function openPreviewFromForm() {
-    if (!form.title.trim() || !form.body.trim()) {
-      setError(INSIGHTS_ADMIN_COPY.previewMissingFields);
-      return;
-    }
-
-    setError(null);
-    setPreviewArticle({
-      title: form.title.trim(),
-      category: form.category,
-      summary: form.summary.trim(),
-      body: form.body,
-      publishedAt: form.publishedAt,
-      slug: form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title),
-      heroImageUrl: heroPreview,
-      sourceLabel: form.sourceLabel.trim() || null,
-      sourceUrl: form.sourceUrl.trim() || null,
-    });
-    setPreviewOpen(true);
-  }
-
   function openPreviewFromInsight(insight: PlatformInsight) {
     setPreviewArticle({
       title: insight.title,
@@ -370,149 +263,6 @@ export function InsightsDashboard() {
       sourceUrl: insight.sourceUrl,
     });
     setPreviewOpen(true);
-  }
-
-  async function buildInput(status?: InsightArticleStatus): Promise<InsightInput> {
-    const slug = form.slug.trim().toLowerCase() || slugifyInsightTitle(form.title);
-
-    if (!form.title.trim()) throw new Error("Article title is required.");
-    if (!form.summary.trim()) throw new Error("Summary is required.");
-    if (!form.body.trim()) throw new Error("Body is required.");
-    if (!isValidInsightSlug(slug)) {
-      throw new Error("Link name must use lowercase letters, numbers, and hyphens only.");
-    }
-
-    let heroImagePath = existingHeroPath;
-    if (heroFile && mediaSchemaReady) {
-      heroImagePath = await uploadInsightHeroImage(heroFile, slug);
-    }
-
-    return {
-      slug,
-      title: form.title,
-      category: form.category,
-      summary: form.summary,
-      body: form.body,
-      heroImagePath,
-      ...(seoSchemaReady
-        ? {
-            seoDescription: form.seoDescription.trim() || null,
-            socialImageAlt: form.socialImageAlt.trim() || null,
-          }
-        : {}),
-      sourceLabel: form.sourceLabel.trim() || null,
-      sourceUrl: form.sourceUrl.trim() || null,
-      publishedAt: toPublishedAtIso(form.publishedAt),
-      sortOrder: form.sortOrder,
-      status,
-    };
-  }
-
-  function handleHeroChange(file: File | null) {
-    setHeroFile(file);
-    setHeroPreview(
-      file ? URL.createObjectURL(file) : getInsightHeroUrl(existingHeroPath),
-    );
-  }
-
-  async function saveInsight(mode: "draft" | "submit" | "publish") {
-    setError(null);
-    setNotice(null);
-    setSaving(true);
-
-    try {
-      const input = await buildInput(
-        mode === "publish" ? "published" : mode === "submit" ? "pending_approval" : "draft",
-      );
-
-      let saved: PlatformInsight;
-
-      if (editingId) {
-        saved = await updateInsight(editingId, {
-          ...input,
-          ...(mode === "publish"
-            ? {
-                approvedBy: profile?.id ?? null,
-                approvedAt: new Date().toISOString(),
-                rejectionNote: null,
-                publishedAt: input.publishedAt ?? new Date().toISOString(),
-              }
-            : {}),
-          ...(mode === "submit"
-            ? {
-                submittedBy: profile?.id ?? null,
-                rejectionNote: null,
-              }
-            : {}),
-        });
-      } else if (mode === "publish" && isApprover) {
-        saved = await createInsight(input, {
-          createdBy: profile?.id,
-          publishDirectly: true,
-          approverId: profile?.id,
-        });
-      } else if (mode === "submit") {
-        saved = await createInsight(input, {
-          createdBy: profile?.id,
-          submitForApproval: true,
-        });
-      } else {
-        saved = await createInsight(input, { createdBy: profile?.id });
-      }
-
-      if (mode === "submit") {
-        await logInsightAudit("insight_submitted_for_approval", saved.id, {
-          title: saved.title,
-          slug: saved.slug,
-          submittedBy: profile?.full_name,
-        });
-        setNotice("Article submitted for approval. An approver will review it before it goes public.");
-      }
-
-      if (mode === "publish") {
-        await logInsightAudit("insight_published", saved.id, {
-          title: saved.title,
-          slug: saved.slug,
-          publishedBy: profile?.full_name,
-        });
-
-        let publishNotice: string | null = null;
-
-        if (isApprover && form.isHomepageFeatured) {
-          try {
-            await setInsightHomepageFeatured(saved.id);
-          } catch (featuredError) {
-            publishNotice =
-              featuredError instanceof Error
-                ? featuredError.message
-                : "Could not feature article on homepage.";
-          }
-        } else if (isApprover && editingId && !form.isHomepageFeatured && saved.isHomepageFeatured) {
-          try {
-            await clearInsightHomepageFeatured(saved.id);
-          } catch (featuredError) {
-            publishNotice =
-              featuredError instanceof Error
-                ? featuredError.message
-                : "Could not remove homepage feature.";
-          }
-        }
-
-        if (!publishNotice) {
-          const rebuild = await triggerSiteRebuild();
-          publishNotice = publishNoticeWithRebuild("Article published.", rebuild);
-        }
-
-        setNotice(publishNotice);
-      }
-
-      resetForm();
-      await loadInsights();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save article");
-    } finally {
-      setSaving(false);
-    }
   }
 
   async function approveInsight(insight: PlatformInsight) {
@@ -596,7 +346,6 @@ export function InsightsDashboard() {
     if (!window.confirm("Delete this article permanently? This cannot be undone.")) return;
     try {
       await deleteInsightPermanently(id);
-      if (editingId === id) resetForm();
       await loadInsights();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete article");
@@ -627,7 +376,7 @@ export function InsightsDashboard() {
   }
 
   return (
-    <AdminLayoutShell title="Insights" subtitle="Create articles, manage approvals, and feature on homepage">
+    <AdminLayoutShell title="Insights" subtitle="Your stories — write, review, and publish">
       {!schemaReady && <AdminSetupNotice variant="insights" />}
       {schemaReady && !preloadedControlsReady && (
         <div className="mb-6 rounded-[var(--ploy-radius-md)] border border-[oklch(0.72_0.14_75/0.35)] bg-[oklch(0.72_0.14_75/0.1)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
@@ -663,6 +412,9 @@ export function InsightsDashboard() {
       )}
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
+        <Button type="button" variant="primary" size="sm" onClick={() => goToEditor()}>
+          Write a story
+        </Button>
         <Button
           type="button"
           variant="secondary"
@@ -967,351 +719,78 @@ export function InsightsDashboard() {
         </div>
       )}
 
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <form
-          ref={editorFormRef}
-          className={cn(
-            "ploy-surface-elevated scroll-mt-6 space-y-5 p-6",
-            livePrefillTitle &&
-              "ring-2 ring-[var(--ploy-accent-primary)] ring-offset-2 ring-offset-[var(--ploy-background-secondary)]",
-          )}
-          onSubmit={(event) => {
-            event.preventDefault();
-            saveInsight(isApprover ? "publish" : "submit");
-          }}
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Plus className="size-4 text-[var(--ploy-accent-primary)]" />
-              <h2 className="text-lg font-semibold">
-                {editingId
-                  ? "Edit article"
-                  : livePrefillTitle
-                    ? `Start managing: ${livePrefillTitle}`
-                    : "Add article"}
-              </h2>
-            </div>
-            {(editingId || livePrefillTitle) && (
-              <Button type="button" variant="ghost" size="sm" onClick={resetForm}>
-                Cancel
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-title" required>
-              Title
-            </Label>
-            <Input
-              id="insight-title"
-              value={form.title}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  title: e.target.value,
-                  slug: prev.slug || slugifyInsightTitle(e.target.value),
-                }))
-              }
-              placeholder="Culture as a Strategic Asset"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-slug" required>
-              Link name
-            </Label>
-            <Input
-              id="insight-slug"
-              value={form.slug}
-              onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value.toLowerCase() }))}
-              placeholder="culture-as-strategic-asset"
-            />
-            <p className="text-xs text-[var(--ploy-text-tertiary)]">
-              Public URL: /insights/{form.slug || "your-link"}
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="insight-category" required>
-                Category
-              </Label>
-              <select
-                id="insight-category"
-                value={form.category}
-                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full rounded-[var(--ploy-radius-input)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-3 py-2 text-sm"
-              >
-                {INSIGHT_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="insight-date">Publish date</Label>
-              <Input
-                id="insight-date"
-                type="date"
-                value={form.publishedAt}
-                onChange={(e) => setForm((prev) => ({ ...prev, publishedAt: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-summary" required>
-              Summary
-            </Label>
-            <textarea
-              id="insight-summary"
-              value={form.summary}
-              onChange={(e) => setForm((prev) => ({ ...prev, summary: e.target.value }))}
-              rows={3}
-              className="w-full rounded-[var(--ploy-radius-input)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-3 py-2 text-sm"
-              placeholder="Short teaser shown on cards and search results"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-seo-description">Search description</Label>
-            <textarea
-              id="insight-seo-description"
-              value={form.seoDescription}
-              onChange={(e) => setForm((prev) => ({ ...prev, seoDescription: e.target.value }))}
-              rows={2}
-              maxLength={320}
-              disabled={!seoSchemaReady}
-              className="w-full rounded-[var(--ploy-radius-input)] border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-3 py-2 text-sm"
-              placeholder="Optional search and social description; summary is used when blank"
-            />
-          </div>
-
-          {mediaSchemaReady && (
-            <div className="space-y-2">
-              <Label htmlFor="insight-hero">{INSIGHTS_ADMIN_COPY.heroImageLabel}</Label>
-              <div className="flex flex-wrap items-center gap-4">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                  <ImagePlus className="size-4" />
-                  Upload header image
-                  <input
-                    id="insight-hero"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="sr-only"
-                    onChange={(e) => handleHeroChange(e.target.files?.[0] ?? null)}
-                  />
-                </label>
-                {heroPreview && (
-                  <img
-                    src={heroPreview}
-                    alt=""
-                    className="h-24 w-40 rounded-md border border-[var(--ploy-border-primary)] object-cover"
-                  />
-                )}
-              </div>
-              <ImageUploadHint hint={INSIGHT_HERO_IMAGE_HINT} />
-              <Label htmlFor="insight-social-image-alt">Social image description</Label>
-              <Input
-                id="insight-social-image-alt"
-                value={form.socialImageAlt}
-                onChange={(e) => setForm((prev) => ({ ...prev, socialImageAlt: e.target.value }))}
-                maxLength={300}
-                disabled={!seoSchemaReady}
-                placeholder="Describe the image for accessible social previews"
-              />
-            </div>
-          )}
-
-          <div className="overflow-hidden rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)]">
-            {heroPreview && <img src={heroPreview} alt="" className="aspect-[1.91/1] w-full object-cover" />}
-            <div className="space-y-1 p-4">
-              <p className="text-xs uppercase tracking-wide text-[var(--ploy-text-tertiary)]">Social preview</p>
-              <p className="font-semibold">{form.title || "Article title"}</p>
-              <p className="line-clamp-2 text-sm text-[var(--ploy-text-secondary)]">
-                {form.seoDescription || form.summary || "Article description"}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="insight-source-label">{INSIGHTS_ADMIN_COPY.sourceLabel}</Label>
-                <AdminHelpTip text={INSIGHTS_ADMIN_COPY.sourceLabelHelp} />
-              </div>
-              <Input
-                id="insight-source-label"
-                value={form.sourceLabel}
-                onChange={(e) => setForm((prev) => ({ ...prev, sourceLabel: e.target.value }))}
-                placeholder="Forbes Business Council"
-                disabled={!mediaSchemaReady}
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="insight-source-url">{INSIGHTS_ADMIN_COPY.sourceUrlLabel}</Label>
-                <AdminHelpTip text={INSIGHTS_ADMIN_COPY.sourceUrlHelp} />
-              </div>
-              <Input
-                id="insight-source-url"
-                type="url"
-                value={form.sourceUrl}
-                onChange={(e) => setForm((prev) => ({ ...prev, sourceUrl: e.target.value }))}
-                placeholder="https://..."
-                disabled={!mediaSchemaReady}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-body" required>
-              Body
-            </Label>
-            <RichTextEditor
-              id="insight-body"
-              value={form.body}
-              onChange={(body) => setForm((prev) => ({ ...prev, body }))}
-            />
-            <p className="text-xs text-[var(--ploy-text-tertiary)]">
-              Use bold, headings, bullet lists, numbered lists, and links. Select lines first, then
-              click Bullets or Numbers. Content is sanitized before publishing.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="insight-sort">Sort order</Label>
-            <Input
-              id="insight-sort"
-              type="number"
-              value={form.sortOrder}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, sortOrder: Number(e.target.value) || 0 }))
-              }
-            />
-          </div>
-
-          {isApprover && (
-            <label className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4">
-              <input
-                type="checkbox"
-                checked={form.isHomepageFeatured}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, isHomepageFeatured: e.target.checked }))
-                }
-                className="mt-1"
-              />
-              <span>
-                <span className="block text-sm font-medium">Feature on homepage</span>
-                <span className="mt-1 block text-xs text-[var(--ploy-text-tertiary)]">
-                  Shows in the homepage Insights section. Up to {MAX_HOMEPAGE_FEATURED_INSIGHTS}{" "}
-                  articles can be featured at once.
-                </span>
-              </span>
-            </label>
-          )}
-
-          <div className="flex flex-wrap gap-3">
-            <Button type="button" variant="secondary" disabled={saving} onClick={() => saveInsight("draft")}>
-              Save draft
-            </Button>
-            <div className="inline-flex items-center gap-1">
-              <Button type="button" variant="ghost" disabled={saving} onClick={openPreviewFromForm}>
-                <Eye className="size-4" />
-                {INSIGHTS_ADMIN_COPY.previewArticle}
-              </Button>
-              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.previewHelp} />
-            </div>
-            {isApprover ? (
-              <Button type="submit" variant="primary" disabled={saving}>
-                {saving ? "Saving…" : editingId ? "Publish changes" : "Publish article"}
-              </Button>
-            ) : (
-              <Button type="submit" variant="primary" disabled={saving}>
-                {saving ? "Submitting…" : "Submit for approval"}
-              </Button>
-            )}
-          </div>
-        </form>
-
-        <div className="ploy-surface-elevated space-y-6 p-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">{INSIGHTS_ADMIN_COPY.managedSectionTitle}</h2>
-              <AdminHelpTip text={INSIGHTS_ADMIN_COPY.managedSectionHelp} />
-            </div>
-          </div>
-          {loading ? (
-            <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading articles…</p>
-          ) : sortedInsights.length === 0 ? (
-            <p className="text-sm text-[var(--ploy-text-secondary)]">
-              {INSIGHTS_ADMIN_COPY.noManagedYet}
-            </p>
-          ) : (
-            <ul className="space-y-4">
-              {sortedInsights.map((insight) => (
-                <li
-                  key={insight.id}
-                  className="rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 space-y-1">
-                      <p className="font-medium">{insight.title}</p>
-                      <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                        /insights/{insight.slug} · {INSIGHT_STATUS_LABELS[insight.status]}
-                        {insight.manuallyHidden ? " · Hidden" : ""}
-                        {insight.isHomepageFeatured
-                          ? ` · Homepage #${insight.homepageFeatureOrder ?? "?"}`
-                          : ""}
-                      </p>
-                      <p className="text-sm text-[var(--ploy-text-secondary)]">
-                        {insight.category}
-                        {insight.publishedAt ? ` · ${formatInsightDate(insight.publishedAt)}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-col gap-2">
-                      <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(insight)}>
-                        Edit
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openPreviewFromInsight(insight)}
-                      >
-                        <Eye className="size-4" />
-                        Preview
-                      </Button>
-                      {isApprover && insight.status === "published" && !insight.manuallyHidden && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleHomepageFeatured(insight)}
-                          disabled={saving}
-                        >
-                          {insight.isHomepageFeatured ? "Unfeature" : "Feature on homepage"}
-                        </Button>
-                      )}
-                      {isApprover && insight.status === "published" && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => toggleHidden(insight)}>
-                          {insight.manuallyHidden ? "Show" : "Hide"}
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => handleDelete(insight.id)}>
-                          <Trash2 className="size-4" />
-                          Delete
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+      <div className="ploy-surface-elevated space-y-6 p-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold">{INSIGHTS_ADMIN_COPY.managedSectionTitle}</h2>
+          <AdminHelpTip text={INSIGHTS_ADMIN_COPY.managedSectionHelp} />
         </div>
+        {loading ? (
+          <p className="text-sm text-[var(--ploy-text-tertiary)]">Loading articles…</p>
+        ) : sortedInsights.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-[var(--ploy-border-primary)] px-6 py-12 text-center">
+            <p className="text-sm text-[var(--ploy-text-secondary)]">{INSIGHTS_ADMIN_COPY.noManagedYet}</p>
+            <Button type="button" variant="primary" size="sm" className="mt-4" onClick={() => goToEditor()}>
+              Write your first story
+            </Button>
+          </div>
+        ) : (
+          <ul className="divide-y divide-[var(--ploy-border-primary)]">
+            {sortedInsights.map((insight) => (
+              <li key={insight.id} className="flex flex-wrap items-start justify-between gap-4 py-5 first:pt-0">
+                <button
+                  type="button"
+                  onClick={() => startEdit(insight)}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <p className="font-serif text-xl font-semibold leading-snug hover:underline">
+                    {insight.title}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm text-[var(--ploy-text-secondary)]">
+                    {insight.summary}
+                  </p>
+                  <p className="mt-2 text-xs text-[var(--ploy-text-tertiary)]">
+                    {INSIGHT_STATUS_LABELS[insight.status]}
+                    {insight.manuallyHidden ? " · Hidden" : ""}
+                    {insight.isHomepageFeatured ? " · Homepage featured" : ""}
+                    {insight.publishedAt ? ` · ${formatInsightDate(insight.publishedAt)}` : ""}
+                    {" · "}
+                    {insight.category}
+                  </p>
+                </button>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(insight)}>
+                    Edit
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => openPreviewFromInsight(insight)}>
+                    <Eye className="size-4" />
+                    Preview
+                  </Button>
+                  {isApprover && insight.status === "published" && !insight.manuallyHidden && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleHomepageFeatured(insight)}
+                      disabled={saving}
+                    >
+                      {insight.isHomepageFeatured ? "Unfeature" : "Feature"}
+                    </Button>
+                  )}
+                  {isApprover && insight.status === "published" && (
+                    <Button type="button" variant="ghost" size="sm" onClick={() => toggleHidden(insight)}>
+                      {insight.manuallyHidden ? "Show" : "Hide"}
+                    </Button>
+                  )}
+                  {canDelete && (
+                    <Button type="button" variant="ghost" size="sm" onClick={() => handleDelete(insight.id)}>
+                      <Trash2 className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <AdminInsightPreviewModal

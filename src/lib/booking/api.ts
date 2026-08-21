@@ -12,6 +12,7 @@ import {
 } from "@/lib/booking/storage";
 import { getMockBookingRequests } from "@/lib/booking/mock-demo-data";
 import { getBookingLookupStrategy } from "@/lib/booking/tracker-access";
+import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
 import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { tryGetSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { DbBookingRequest } from "@/lib/supabase/database.types";
@@ -64,6 +65,7 @@ function normalizeBookingForm(raw: unknown): BookingFormData {
     recordingPermission: form.recordingPermission ?? "",
     vipProtocol: form.vipProtocol ?? "",
     termsAgreed: Boolean(form.termsAgreed),
+    marketingOptIn: Boolean(form.marketingOptIn),
   };
 }
 
@@ -123,6 +125,20 @@ export async function createBookingRequest(
     const result = data as { id: string; reference: string; access_token: string };
     saveAccessToken(result.reference, result.access_token);
     notifySubmission({ kind: "booking", bookingId: result.id });
+
+    if (form.marketingOptIn) {
+      await subscribeAudienceMember({
+        email: form.email,
+        name: form.name,
+        consentSource: "booking",
+        engagementContext: {
+          bookingId: result.id,
+          reference: result.reference,
+          engagementType: form.engagementType,
+          eventTitle: form.eventTitle,
+        },
+      });
+    }
 
     return {
       id: result.id,

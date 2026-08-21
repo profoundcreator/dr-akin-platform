@@ -130,7 +130,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | # | Task | Status |
 | --- | ---- | ------ |
-| 3.1 | Production Supabase migrations **018–027** applied (`026`–`027` add contact platform context) | ☐ |
+| 3.1 | Production Supabase migrations **018–031** applied (`029`–`031` = contact platform routing + work CTAs) | ☐ |
 | 3.2 | `PUBLIC_SITE_URL` set to production URL in Vercel | ☐ |
 | 3.3 | Supabase Auth **Site URL** + **Redirect URLs** updated for live domain | ☐ |
 | 3.4 | DNS: `theakinakinpelu.org` → Vercel (A/CNAME); **preserve MX** for email | ☐ |
@@ -164,7 +164,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | 5.2 | Lawyer sign-off (address, NDPC registration, DPAs) | ☐ |
 | 5.3 | Remove “For legal review” callouts after counsel approval | ☐ |
 | 5.4 | Marketing opt-in checkboxes align with privacy §2.3 | ☑ |
-| 5.5 | Privacy notice mentions brand/platform processors if routing to external org inboxes | ☐ After routing built |
+| 5.5 | Privacy notice mentions brand/platform routing to external org inboxes | ☑ §4.1 added |
 
 ---
 

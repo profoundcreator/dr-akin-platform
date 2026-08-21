@@ -5,7 +5,7 @@ import { PERSON_IDENTITY, AALD_EXPANDED_NAME } from "@/data/person-identity";
 import { SITE_CONTACT } from "@/data/site-contact";
 
 const EFFECTIVE_DATE = "11 August 2026";
-const LAST_UPDATED = "11 August 2026";
+const LAST_UPDATED = "21 August 2026";
 ---
 
 <Layout
@@ -204,6 +204,46 @@ const LAST_UPDATED = "11 August 2026";
             — marketing email lists (when enabled); every marketing email includes an unsubscribe link
           </li>
         </ul>
+
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold">4.1 Platform and brand teams</h3>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            When you submit a contact enquiry from a specific platform page (or a link that includes
+            a platform context), we may route your message to the relevant brand team so they can
+            respond. Booking requests, media enquiries, general enquiries, privacy requests, and
+            organizer support are handled by the core operations team at
+            <a class="underline" href="mailto:ea@theakinakinpelu.org">ea@theakinakinpelu.org</a>.
+          </p>
+          <ul class="list-disc space-y-2 pl-5 leading-relaxed text-[var(--ploy-text-secondary)]">
+            <li>
+              <strong class="font-medium text-[var(--ploy-text-primary)]">{AALD_EXPANDED_NAME} (AALD)</strong>
+              — hello@aaldcompany.org
+            </li>
+            <li>
+              <strong class="font-medium text-[var(--ploy-text-primary)]">PerformX Nexus</strong>
+              — performx@aaldcompany.org
+            </li>
+            <li>
+              <strong class="font-medium text-[var(--ploy-text-primary)]">Erudio Hub</strong>
+              — hello@erudiohub.org
+            </li>
+            <li>
+              <strong class="font-medium text-[var(--ploy-text-primary)]">Auctus Africa</strong>
+              — info@auctusafrica.org
+            </li>
+            <li>
+              <strong class="font-medium text-[var(--ploy-text-primary)]">Future Africa</strong>
+              — hello@erudiohub.org (interim; enquiries are clearly labelled as Future Africa and
+              handled on behalf of Future Africa until a dedicated inbox is available)
+            </li>
+          </ul>
+          <p class="leading-relaxed text-[var(--ploy-text-secondary)]">
+            Each brand team processes enquiries under instructions from Dr. Akin Akinpelu and
+            applicable data protection agreements. We use Resend to deliver notifications; brand
+            inboxes receive email only—they are not website processors unless separately contracted.
+          </p>
+        </div>
+
         <aside
           class="rounded-[var(--ploy-radius-lg)] border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] p-4 text-sm leading-relaxed text-[var(--ploy-text-secondary)]"
           aria-label="Legal review note"

@@ -1,5 +1,5 @@
--- Allow future-africa platform context on contact submissions.
--- Run after 026_enquiry_notification_context.sql.
+-- Store contact form platform/referrer context for brand notification routing.
+-- Run after 028_audience_members.sql.
 
 CREATE OR REPLACE FUNCTION submit_general_enquiry(
   p_name TEXT,
@@ -46,9 +46,7 @@ BEGIN
   IF p_privacy_agreed IS NOT TRUE THEN
     RAISE EXCEPTION 'Privacy acknowledgement is required.';
   END IF;
-  IF v_platform <> '' AND v_platform NOT IN (
-    'aald', 'performx', 'erudio-hub', 'auctus-africa', 'future-africa'
-  ) THEN
+  IF v_platform <> '' AND v_platform NOT IN ('aald', 'performx', 'erudio-hub', 'auctus-africa') THEN
     RAISE EXCEPTION 'Invalid platform context.';
   END IF;
   IF v_referrer IS NOT NULL AND length(v_referrer) > 500 THEN

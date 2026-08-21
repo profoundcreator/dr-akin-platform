@@ -1,6 +1,11 @@
 /** Self-hosted marketing assets (formerly on storage.googleapis.com/ployai). */
 export const SITE_IMAGES = {
+  /** Homepage hero — unchanged until client approves swap. */
   portrait: "/images/marketing/dr-akin-portrait.webp",
+  /** Formal studio portrait (blue suit) — profile hero + default OG/social. */
+  portraitFormal: "/images/marketing/dr-akin-portrait-formal.webp",
+  /** Approachable studio portrait (navy suit) — Meet hub + Work hub. */
+  portraitApproachable: "/images/marketing/dr-akin-portrait-approachable.webp",
   ecosystemVisual: "/images/marketing/ecosystem-visual.webp",
   books: {
     "the-agenda": "/images/marketing/books/the-agenda.webp",

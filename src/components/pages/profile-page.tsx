@@ -11,7 +11,7 @@ import { SITE_IMAGES } from "@/lib/media/site-images";
 import { ECOSYSTEM_PLATFORMS } from "@/data/ecosystem";
 import { AU_TITLE, PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
 
-const PORTRAIT_URL = SITE_IMAGES.portrait;
+const PORTRAIT_URL = SITE_IMAGES.portraitFormal;
 
 const STATS = [
   { value: PERSON_IDENTITY.metrics.peopleReached, label: "People reached through talks, training and coaching" },

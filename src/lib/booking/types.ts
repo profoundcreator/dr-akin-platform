@@ -54,6 +54,7 @@ export interface BookingFormData {
   recordingPermission: string;
   vipProtocol: string;
   termsAgreed: boolean;
+  marketingOptIn: boolean;
 }
 
 export interface StatusEvent {
@@ -107,4 +108,5 @@ export const EMPTY_BOOKING_FORM: BookingFormData = {
   recordingPermission: "",
   vipProtocol: "",
   termsAgreed: false,
+  marketingOptIn: false,
 };
