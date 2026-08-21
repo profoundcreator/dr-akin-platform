@@ -344,7 +344,7 @@ export const AALD_PERFORMX_PLAN_SEED: ContentPlanData = {
         description:
           "A two-day leadership convening at Landmark Event Centre, Lagos—where sector leaders, institutions and partners converge to perform at a higher level.",
         ctaLabel: "Register interest",
-        ctaHref: "/contact",
+        ctaHref: "/contact?platform=performx",
         secondaryCtaLabel: "Explore PerformX Nexus",
         secondaryCtaHref: "/work/performx",
       },
