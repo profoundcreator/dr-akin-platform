@@ -1,6 +1,6 @@
 import { SITE_IMAGES } from "@/lib/media/site-images";
 import { contactPathForPlatform } from "@/lib/contact/platform-context";
-import { AU_TITLE, PUBLIC_NAME } from "@/data/person-identity";
+import { AU_TITLE, AALD_COMPANY_NAME, AALD_EXPANDED_NAME, PUBLIC_NAME } from "@/data/person-identity";
 
 export interface PageSection {
   title: string;
@@ -84,7 +84,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
     headline: "Building stronger African organisations—",
     headlineSecondary: "through consulting, training and research.",
     description:
-      "Akin Akinpelu Learning & Development Company partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
+      `${AALD_COMPANY_NAME} partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.`,
     sections: [
       {
         title: "What we do",
@@ -263,7 +263,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         bullets: [
           "Executive coach and corporate strategist",
           "Author of nine published titles",
-          "Founder, Akin Akinpelu Learning & Development Company (AALD)",
+          `Founder, ${AALD_EXPANDED_NAME} (AALD)`,
           "Advisor to governments and enterprises",
         ],
       },

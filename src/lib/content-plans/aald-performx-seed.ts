@@ -1,4 +1,4 @@
-import { PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
+import { AALD_COMPANY_NAME, PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
 import type { ContentPlanData } from "@/lib/content-plans/types";
 
 export const AALD_PERFORMX_PLAN_SLUG = "aald-performx";
@@ -216,7 +216,7 @@ export const AALD_PERFORMX_PLAN_SEED: ContentPlanData = {
         headline: "Building stronger African organisations—",
         headlineSecondary: "through consulting, training and research.",
         description:
-          "Akin Akinpelu Learning & Development Company partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.",
+          `${AALD_COMPANY_NAME} partners with corporates across Africa and African institutions in the diaspora to strengthen leadership, sharpen strategy and build cultures that perform at scale.`,
         ctaLabel: "Invite Akin Akinpelu to speak",
         ctaHref: "/meet-akin/speaking",
         secondaryCtaLabel: "Discuss a partnership",
