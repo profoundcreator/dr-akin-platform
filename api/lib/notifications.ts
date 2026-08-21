@@ -66,21 +66,45 @@ export interface EnquiryMailInput {
   organization: string | null;
   subject: string | null;
   message: string | null;
+  platformKey: string | null;
   platformLabel: string | null;
   referrerPath: string | null;
   adminUrl: string;
 }
 
+function futureAfricaRoutingCalloutHtml(): string {
+  return `<div style="margin:0 0 20px;padding:14px 16px;background:#F5F0E8;border-left:4px solid #B8860B;border-radius:4px;">
+      <p style="margin:0 0 8px;font-size:15px;font-weight:600;color:#1A1A1A;">Future Africa enquiry</p>
+      <p style="margin:0;font-size:14px;line-height:1.5;color:#3D3A36;">This message is <strong>for Future Africa</strong>, not Erudio Hub. Future Africa does not yet have its own inbox, so it was delivered to Erudio Hub for interim handling. Please respond on behalf of Future Africa.</p>
+    </div>`;
+}
+
+function futureAfricaRoutingCalloutText(): string {
+  return [
+    "FUTURE AFRICA ENQUIRY",
+    "This message is FOR FUTURE AFRICA, not Erudio Hub.",
+    "Future Africa does not yet have its own inbox — delivered to Erudio Hub for interim handling.",
+    "Please respond on behalf of Future Africa.",
+    "",
+  ].join("\n");
+}
+
 export function buildEnquiryAdminMail(input: EnquiryMailInput) {
-  const subjectLine = `[Contact] ${input.subject?.trim() || "New enquiry"}`;
+  const isFutureAfrica = input.platformKey === "future-africa";
+  const topic = input.subject?.trim() || "New enquiry";
+  const subjectLine = isFutureAfrica
+    ? `[Future Africa enquiry] ${topic}`
+    : `[Contact] ${topic}`;
+
   const textLines = [
-    "New contact enquiry on the website.",
+    isFutureAfrica ? futureAfricaRoutingCalloutText() : "New contact enquiry on the website.",
     "",
     field("Name", input.contactName),
     field("Email", input.contactEmail),
     field("Organization", input.organization),
     field("Subject", input.subject),
     field("Platform", input.platformLabel),
+    ...(isFutureAfrica ? [field("Delivered to", "Erudio Hub (interim inbox for Future Africa)")] : []),
     field("Referrer", input.referrerPath),
     "",
     "Message:",
@@ -89,22 +113,35 @@ export function buildEnquiryAdminMail(input: EnquiryMailInput) {
     `Open in admin: ${input.adminUrl}`,
   ].filter(Boolean);
 
+  const introHtml = isFutureAfrica
+    ? futureAfricaRoutingCalloutHtml()
+    : `<p style="margin:0;">A new message was submitted through the public contact form.</p>`;
+
+  const detailRows = [
+    { label: "Name", value: input.contactName },
+    { label: "Email", value: input.contactEmail },
+    { label: "Organization", value: input.organization },
+    { label: "Subject", value: input.subject },
+    { label: "Platform", value: input.platformLabel },
+    ...(isFutureAfrica
+      ? [{ label: "Delivered to", value: "Erudio Hub (interim inbox for Future Africa)" }]
+      : []),
+    { label: "Referrer", value: input.referrerPath },
+  ];
+
   const html = renderBrandedEmail({
     siteUrl: siteUrl(),
-    preheader: `New contact enquiry from ${input.contactName}`,
-    eyebrow: "Admin alert",
-    title: input.subject?.trim() || "New contact enquiry",
-    introHtml: `<p style="margin:0;">A new message was submitted through the public contact form.</p>`,
-    bodyHtml: `${renderDetailTable([
-      { label: "Name", value: input.contactName },
-      { label: "Email", value: input.contactEmail },
-      { label: "Organization", value: input.organization },
-      { label: "Subject", value: input.subject },
-      { label: "Platform", value: input.platformLabel },
-      { label: "Referrer", value: input.referrerPath },
-    ])}${renderMessageBlock(input.message?.trim() || "")}`,
+    preheader: isFutureAfrica
+      ? `Future Africa enquiry from ${input.contactName} — handle on behalf of Future Africa`
+      : `New contact enquiry from ${input.contactName}`,
+    eyebrow: isFutureAfrica ? "Future Africa enquiry" : "Admin alert",
+    title: isFutureAfrica ? `Future Africa — ${topic}` : topic,
+    introHtml,
+    bodyHtml: `${renderDetailTable(detailRows)}${renderMessageBlock(input.message?.trim() || "")}`,
     cta: { label: "Open in admin inbox", href: input.adminUrl },
-    footerNote: "Reply directly to this email to reach the submitter.",
+    footerNote: isFutureAfrica
+      ? "Reply to the submitter on behalf of Future Africa."
+      : "Reply directly to this email to reach the submitter.",
   });
 
   return {

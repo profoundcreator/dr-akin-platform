@@ -57,7 +57,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | **PerformX Nexus** | `performx@aaldcompany.org` | Contact from `/work/performx`, summit pages, or `?platform=performx` |
 | **Erudio Hub** | `hello@erudiohub.org` | Contact from `/work/erudio-hub` |
 | **Auctus Africa** | `info@auctusafrica.org` | Contact from `/work/auctus-africa` |
-| **Future Africa** | `NOTIFY_FUTURE_AFRICA` env | Contact from `/work/future-africa` |
+| **Future Africa** | `hello@erudiohub.org` (interim) | Contact from `/work/future-africa` — email clearly labelled **Future Africa**, not Erudio Hub |
 
 **Not routed to ea@:** AALD, PerformX, Erudio Hub, Auctus Africa, Future Africa partnership enquiries.  
 **Always routed to ea@:** Bookings, media, general, privacy, organizer support.
@@ -82,7 +82,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | Contact — from `/work/performx`, summit, or `?platform=performx` | `performx@aaldcompany.org` |
 | Contact — from `/work/erudio-hub` | `hello@erudiohub.org` |
 | Contact — from `/work/auctus-africa` | `info@auctusafrica.org` |
-| Contact — from `/work/future-africa` | `NOTIFY_FUTURE_AFRICA` |
+| Contact — from `/work/future-africa` | `hello@erudiohub.org` (labelled Future Africa) |
 | Contact — media, general, privacy, organizer | `ea@theakinakinpelu.org` |
 
 ### 1C. Resend & Vercel configuration (Blocker)
@@ -94,7 +94,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | 1.C.3 | Vercel env: `RESEND_API_KEY` | ☐ Blocker |
 | 1.C.4 | Vercel env: `NOTIFICATION_FROM_EMAIL=notifications@theakinakinpelu.org` | ☐ Blocker |
 | 1.C.5 | Vercel env: `ADMIN_NOTIFICATION_EMAIL=ea@theakinakinpelu.org` (bookings + fallback) | ☐ Blocker |
-| 1.C.6 | Vercel env: brand routing — `NOTIFY_AALD`, `NOTIFY_PERFORMX`, `NOTIFY_ERUDIO`, `NOTIFY_AUCTUS`, `NOTIFY_FUTURE_AFRICA` | ☐ Blocker |
+| 1.C.6 | Vercel env: brand routing — `NOTIFY_AALD`, `NOTIFY_PERFORMX`, `NOTIFY_ERUDIO`, `NOTIFY_AUCTUS` | ☐ Blocker |
 | 1.C.7 | Vercel env: `SEND_SUBMITTER_CONFIRMATION=true` | ☐ |
 | 1.C.8 | Vercel env: `SUPABASE_SERVICE_ROLE_KEY` (required for `/api/notify-submission`) | ☐ Blocker |
 | 1.C.9 | Redeploy production after env changes | ☐ |
@@ -235,7 +235,7 @@ Contact / Booking form
                  ├── performx@aaldcompany.org    (PerformX)
                  ├── hello@erudiohub.org         (Erudio Hub)
                  ├── info@auctusafrica.org       (Auctus Africa)
-                 └── NOTIFY_FUTURE_AFRICA        (Future Africa)
+                 └── hello@erudiohub.org         (Erudio Hub; Future Africa interim)
 ```
 
 **Sender (all outbound):** `notifications@theakinakinpelu.org` (Resend verified domain)  

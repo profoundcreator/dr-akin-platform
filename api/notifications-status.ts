@@ -52,7 +52,7 @@ export async function GET(request: Request): Promise<Response> {
     performx: Boolean(brandInboxes.performx),
     erudio: Boolean(brandInboxes.erudio),
     auctus: Boolean(brandInboxes.auctus),
-    futureAfrica: Boolean(brandInboxes.futureAfrica),
+    futureAfricaViaErudio: Boolean(brandInboxes.erudio),
   };
 
   const ready = Object.values(checks).every(Boolean);
@@ -70,7 +70,9 @@ export async function GET(request: Request): Promise<Response> {
       performx: brandInboxes.performx ? maskEmail(brandInboxes.performx) : "(missing)",
       erudio: brandInboxes.erudio ? maskEmail(brandInboxes.erudio) : "(missing)",
       auctus: brandInboxes.auctus ? maskEmail(brandInboxes.auctus) : "(missing)",
-      futureAfrica: brandInboxes.futureAfrica ? maskEmail(brandInboxes.futureAfrica) : "(missing)",
+      futureAfricaViaErudio: brandInboxes.erudio
+        ? `${maskEmail(brandInboxes.erudio)} (Future Africa interim)`
+        : "(missing — required for Future Africa)",
     },
     resendSetupRequired: [
       "Add and verify theakinakinpelu.org (or your sending domain) in Resend → Domains.",

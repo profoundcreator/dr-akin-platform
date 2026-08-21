@@ -13,7 +13,7 @@ import {
   readContactSubmissionContext,
   type ContactPlatform,
 } from "@/lib/contact/platform-context";
-import { platformLabel } from "@/lib/contact/platform-labels";
+import { contactRoutingHint } from "@/lib/contact/platform-labels";
 
 const CONTACT_TOPICS = [
   "Government & institutional partnership",
@@ -65,6 +65,11 @@ export function ContactForm() {
     }
   }
 
+  const routingHint =
+    platformContext && isBrandRoutedPlatform(platformContext)
+      ? contactRoutingHint(platformContext)
+      : null;
+
   if (submitted) {
     return (
       <div className="ploy-surface-elevated space-y-4 p-6" role="status">
@@ -82,9 +87,9 @@ export function ContactForm() {
 
   return (
     <form className="ploy-surface-elevated space-y-5 p-6" onSubmit={handleSubmit}>
-      {platformContext && isBrandRoutedPlatform(platformContext) && (
+      {routingHint && (
         <p className="rounded-md border border-[var(--ploy-border-subtle)] bg-[var(--ploy-background-secondary)] px-4 py-3 text-sm text-[var(--ploy-text-secondary)]">
-          Your enquiry will be routed to the {platformLabel(platformContext)} team.
+          {routingHint}
         </p>
       )}
       <div className="grid gap-5 sm:grid-cols-2">

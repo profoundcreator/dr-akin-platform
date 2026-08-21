@@ -14,6 +14,7 @@ import {
 import {
   getBrandInboxes,
   isBrandRoutedPlatform,
+  missingBrandInboxMessage,
   platformLabel,
   resolveBookingNotificationRecipients,
   resolveContactPlatform,
@@ -125,7 +126,7 @@ export async function POST(request: Request): Promise<Response> {
       await supabase.from("enquiries").update({ admin_notified_at: null }).eq("id", enquiry.id);
       const missingBrand =
         platform && isBrandRoutedPlatform(platform)
-          ? `Brand inbox for ${platformLabel(platform) ?? platform} is not configured.`
+          ? missingBrandInboxMessage(platform)
           : "ADMIN_NOTIFICATION_EMAIL is not configured.";
       return json(503, { error: missingBrand });
     }
@@ -138,6 +139,7 @@ export async function POST(request: Request): Promise<Response> {
       organization: enquiry.organization,
       subject: enquiry.subject,
       message: enquiry.message,
+      platformKey: platform,
       platformLabel: platformLabel(platform),
       referrerPath: readPayloadString(payload, "referrerPath"),
       adminUrl,

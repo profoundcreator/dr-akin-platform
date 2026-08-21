@@ -19,7 +19,6 @@ export interface BrandInboxes {
   performx: string | null;
   erudio: string | null;
   auctus: string | null;
-  futureAfrica: string | null;
 }
 
 const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[] = [
@@ -75,8 +74,12 @@ export function getBrandInboxes(): BrandInboxes {
     performx: readEnv("NOTIFY_PERFORMX") || null,
     erudio: readEnv("NOTIFY_ERUDIO") || null,
     auctus: readEnv("NOTIFY_AUCTUS") || null,
-    futureAfrica: readEnv("NOTIFY_FUTURE_AFRICA") || null,
   };
+}
+
+/** Future Africa has no dedicated inbox yet — enquiries go to Erudio Hub with explicit labelling. */
+export function routesFutureAfricaViaErudio(platform: ContactPlatform | null): boolean {
+  return platform === "future-africa";
 }
 
 function inboxForBrandPlatform(platform: BrandRoutedPlatform, inboxes: BrandInboxes): string | null {
@@ -90,7 +93,7 @@ function inboxForBrandPlatform(platform: BrandRoutedPlatform, inboxes: BrandInbo
     case "auctus-africa":
       return inboxes.auctus;
     case "future-africa":
-      return inboxes.futureAfrica;
+      return inboxes.erudio;
     default:
       return null;
   }
@@ -117,6 +120,13 @@ export function resolveEnquiryNotificationRecipients(input: {
   }
 
   return [admin];
+}
+
+export function missingBrandInboxMessage(platform: BrandRoutedPlatform): string {
+  if (platform === "future-africa") {
+    return "NOTIFY_ERUDIO is not configured (required to receive Future Africa enquiries).";
+  }
+  return `Brand inbox for ${platformLabel(platform) ?? platform} is not configured.`;
 }
 
 export function resolveBookingNotificationRecipients(inboxes: BrandInboxes): string[] {
