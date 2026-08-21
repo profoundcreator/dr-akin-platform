@@ -49,6 +49,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const brandChecks = {
     aald: Boolean(brandInboxes.aald),
+    performx: Boolean(brandInboxes.performx),
     erudio: Boolean(brandInboxes.erudio),
     auctus: Boolean(brandInboxes.auctus),
     futureAfrica: Boolean(brandInboxes.futureAfrica),
@@ -66,6 +67,7 @@ export async function GET(request: Request): Promise<Response> {
       adminTo: maskEmail(adminTo),
       replyTo: replyTo ? maskEmail(replyTo) : maskEmail(adminTo),
       aald: brandInboxes.aald ? maskEmail(brandInboxes.aald) : "(missing)",
+      performx: brandInboxes.performx ? maskEmail(brandInboxes.performx) : "(missing)",
       erudio: brandInboxes.erudio ? maskEmail(brandInboxes.erudio) : "(missing)",
       auctus: brandInboxes.auctus ? maskEmail(brandInboxes.auctus) : "(missing)",
       futureAfrica: brandInboxes.futureAfrica ? maskEmail(brandInboxes.futureAfrica) : "(missing)",

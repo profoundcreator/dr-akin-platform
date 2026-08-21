@@ -44,7 +44,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | 1.4 | **Team notification** — booking submissions to EA / organizer pipeline | ☑ Yes (single `ADMIN_NOTIFICATION_EMAIL`) | ☐ Verify in production |
 | 1.5 | Branded HTML templates (site colours, logo) | ☑ Yes | ☐ Logo loads in email (`/brand/akin-logo-mono.png`) |
 
-**Today:** `ea@` receives all notifications **except** partnership-style contact enquiries for AALD, Erudio Hub, Auctus Africa, and Future Africa (those go to brand inboxes). PerformX, bookings, media, general, privacy, and organizer support always go to `ea@`.
+**Today:** `ea@` receives all notifications **except** partnership-style contact enquiries for AALD, PerformX, Erudio Hub, Auctus Africa, and Future Africa (those go to brand inboxes). Bookings, media, general, privacy, and organizer support always go to `ea@`.
 
 ### 1B. Brand notification routing (Blocker — engineering)
 
@@ -52,14 +52,15 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 
 | Destination | Notification email | Triggers |
 | ----------- | ------------------ | -------- |
-| **EA / core operations** | `ea@theakinakinpelu.org` | Bookings, PerformX, media, general, privacy, organizer support, and all contact without brand context |
-| **AALD** | `hello@aaldcompany.org` | Contact from `/work/aald` or `?platform=aald` (partnership / institutional topics) |
+| **EA / core operations** | `ea@theakinakinpelu.org` | Bookings, media, general, privacy, organizer support, and contact without brand context |
+| **AALD** | `hello@aaldcompany.org` | Contact from `/work/aald` or `?platform=aald` |
+| **PerformX Nexus** | `performx@aaldcompany.org` | Contact from `/work/performx`, summit pages, or `?platform=performx` |
 | **Erudio Hub** | `hello@erudiohub.org` | Contact from `/work/erudio-hub` |
 | **Auctus Africa** | `info@auctusafrica.org` | Contact from `/work/auctus-africa` |
 | **Future Africa** | `NOTIFY_FUTURE_AFRICA` env | Contact from `/work/future-africa` |
 
-**Not routed to ea@:** AALD, Erudio Hub, Auctus Africa, Future Africa partnership enquiries.  
-**Always routed to ea@:** PerformX, bookings, media, general, privacy, organizer support.
+**Not routed to ea@:** AALD, PerformX, Erudio Hub, Auctus Africa, Future Africa partnership enquiries.  
+**Always routed to ea@:** Bookings, media, general, privacy, organizer support.
 
 **Engineering tasks (before Sunday):**
 
@@ -78,10 +79,11 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | ------------- | --------------------------- |
 | Booking (`/book-dr-akin`, modal) | `ea@theakinakinpelu.org` |
 | Contact — from `/work/aald` or `?platform=aald` | `hello@aaldcompany.org` |
+| Contact — from `/work/performx`, summit, or `?platform=performx` | `performx@aaldcompany.org` |
 | Contact — from `/work/erudio-hub` | `hello@erudiohub.org` |
 | Contact — from `/work/auctus-africa` | `info@auctusafrica.org` |
 | Contact — from `/work/future-africa` | `NOTIFY_FUTURE_AFRICA` |
-| Contact — PerformX, summit, media, general, privacy, organizer | `ea@theakinakinpelu.org` |
+| Contact — media, general, privacy, organizer | `ea@theakinakinpelu.org` |
 
 ### 1C. Resend & Vercel configuration (Blocker)
 
@@ -92,7 +94,7 @@ Use this as the single launch gate list. Items marked **Blocker** must pass befo
 | 1.C.3 | Vercel env: `RESEND_API_KEY` | ☐ Blocker |
 | 1.C.4 | Vercel env: `NOTIFICATION_FROM_EMAIL=notifications@theakinakinpelu.org` | ☐ Blocker |
 | 1.C.5 | Vercel env: `ADMIN_NOTIFICATION_EMAIL=ea@theakinakinpelu.org` (bookings + fallback) | ☐ Blocker |
-| 1.C.6 | Vercel env: brand routing — `NOTIFY_AALD`, `NOTIFY_ERUDIO`, `NOTIFY_AUCTUS`, `NOTIFY_FUTURE_AFRICA` | ☐ Blocker |
+| 1.C.6 | Vercel env: brand routing — `NOTIFY_AALD`, `NOTIFY_PERFORMX`, `NOTIFY_ERUDIO`, `NOTIFY_AUCTUS`, `NOTIFY_FUTURE_AFRICA` | ☐ Blocker |
 | 1.C.7 | Vercel env: `SEND_SUBMITTER_CONFIRMATION=true` | ☐ |
 | 1.C.8 | Vercel env: `SUPABASE_SERVICE_ROLE_KEY` (required for `/api/notify-submission`) | ☐ Blocker |
 | 1.C.9 | Redeploy production after env changes | ☐ |
@@ -228,8 +230,9 @@ Contact / Booking form
 /api/notify-submission (Resend)
         ├──→ Submitter email          (acknowledgement — always)
         └──→ Team notification(s)     (routed by platform / form type)
-                 ├── ea@theakinakinpelu.org      (bookings, PerformX, ops, general)
+                 ├── ea@theakinakinpelu.org      (bookings, ops, general)
                  ├── hello@aaldcompany.org       (AALD)
+                 ├── performx@aaldcompany.org    (PerformX)
                  ├── hello@erudiohub.org         (Erudio Hub)
                  ├── info@auctusafrica.org       (Auctus Africa)
                  └── NOTIFY_FUTURE_AFRICA        (Future Africa)

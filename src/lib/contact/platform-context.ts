@@ -1,9 +1,15 @@
 /** Platforms whose contact enquiries go to a dedicated brand inbox — not ea@. */
-export const BRAND_ROUTED_PLATFORMS = ["aald", "erudio-hub", "auctus-africa", "future-africa"] as const;
+export const BRAND_ROUTED_PLATFORMS = [
+  "aald",
+  "performx",
+  "erudio-hub",
+  "auctus-africa",
+  "future-africa",
+] as const;
 export type BrandRoutedPlatform = (typeof BRAND_ROUTED_PLATFORMS)[number];
 
-export const CONTACT_PLATFORMS = [...BRAND_ROUTED_PLATFORMS, "performx"] as const;
-export type ContactPlatform = (typeof CONTACT_PLATFORMS)[number];
+export const CONTACT_PLATFORMS = BRAND_ROUTED_PLATFORMS;
+export type ContactPlatform = BrandRoutedPlatform;
 
 const PLATFORM_PATH_PREFIXES: { platform: ContactPlatform; prefixes: string[] }[] = [
   { platform: "aald", prefixes: ["/work/aald"] },

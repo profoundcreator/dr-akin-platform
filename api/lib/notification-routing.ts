@@ -1,16 +1,22 @@
 import { readEnv } from "./env";
 
 /** Platforms whose contact enquiries go to a dedicated brand inbox — not ea@. */
-export const BRAND_ROUTED_PLATFORMS = ["aald", "erudio-hub", "auctus-africa", "future-africa"] as const;
+export const BRAND_ROUTED_PLATFORMS = [
+  "aald",
+  "performx",
+  "erudio-hub",
+  "auctus-africa",
+  "future-africa",
+] as const;
 export type BrandRoutedPlatform = (typeof BRAND_ROUTED_PLATFORMS)[number];
 
-/** All platforms we detect on contact submissions (for context + admin email labels). */
-export const CONTACT_PLATFORMS = [...BRAND_ROUTED_PLATFORMS, "performx"] as const;
-export type ContactPlatform = (typeof CONTACT_PLATFORMS)[number];
+export const CONTACT_PLATFORMS = BRAND_ROUTED_PLATFORMS;
+export type ContactPlatform = BrandRoutedPlatform;
 
 export interface BrandInboxes {
   admin: string;
   aald: string | null;
+  performx: string | null;
   erudio: string | null;
   auctus: string | null;
   futureAfrica: string | null;
@@ -66,6 +72,7 @@ export function getBrandInboxes(): BrandInboxes {
   return {
     admin: readEnv("ADMIN_NOTIFICATION_EMAIL"),
     aald: readEnv("NOTIFY_AALD") || null,
+    performx: readEnv("NOTIFY_PERFORMX") || null,
     erudio: readEnv("NOTIFY_ERUDIO") || null,
     auctus: readEnv("NOTIFY_AUCTUS") || null,
     futureAfrica: readEnv("NOTIFY_FUTURE_AFRICA") || null,
@@ -76,6 +83,8 @@ function inboxForBrandPlatform(platform: BrandRoutedPlatform, inboxes: BrandInbo
   switch (platform) {
     case "aald":
       return inboxes.aald;
+    case "performx":
+      return inboxes.performx;
     case "erudio-hub":
       return inboxes.erudio;
     case "auctus-africa":
