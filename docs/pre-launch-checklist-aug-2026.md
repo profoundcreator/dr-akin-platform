@@ -190,7 +190,7 @@ Run [`production-smoke-checklist.md`](production-smoke-checklist.md) on the **li
 
 | When | Focus |
 | ---- | ----- |
-| **Fri 21 Aug (today)** | Brand email routing code + migration `026` + contact `?platform=` links (**no domain/DNS required**) |
+| **Fri 21 Aug (today)** | Brand routing merged; evening runbook + migration helper; EA/forms smoke (**no domain/DNS required**) |
 | **Sat 22 Aug** | DNS cutover, Resend domain verify on `theakinakinpelu.org`, Vercel env vars, apply migration `026` |
 | **Sat 22 Aug (eve)** | Full smoke test on production: every form × every inbox × submitter ack |
 | **Sun 23 Aug (am)** | Auth URLs updated if domain changed |
