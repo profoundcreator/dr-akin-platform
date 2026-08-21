@@ -36,7 +36,15 @@ Open **Supabase → SQL Editor**. Run **only migrations you have not already app
 | 4 | `026_aald_performx_upsert.sql` | Content upsert pass |
 | 5 | `027_aald_performx_cta_copy.sql` | CTA copy tweaks |
 | 6 | `028_audience_members.sql` | Marketing opt-in list |
-| 7 | **Combined:** `supabase/scripts/apply-migrations-029-031.sql` | Contact platform routing + work CTAs |
+| 7 | Run migrations **029 → 031** (three files or one combined paste) | Contact platform routing + work CTAs |
+
+**Option A — three files (safest if anything errors):** open each on GitHub → copy all → paste into Supabase SQL Editor → Run, in order:
+
+1. [029_enquiry_notification_context.sql](https://github.com/profoundcreator/dr-akin-platform/blob/main/supabase/migrations/029_enquiry_notification_context.sql)
+2. [030_enquiry_future_africa_platform.sql](https://github.com/profoundcreator/dr-akin-platform/blob/main/supabase/migrations/030_enquiry_future_africa_platform.sql)
+3. [031_work_org_platform_contact_links.sql](https://github.com/profoundcreator/dr-akin-platform/blob/main/supabase/migrations/031_work_org_platform_contact_links.sql)
+
+**Option B — one combined paste:** [apply-migrations-029-031.sql](https://github.com/profoundcreator/dr-akin-platform/blob/main/supabase/scripts/apply-migrations-029-031.sql) (same three migrations in one script; run after 022 and 028).
 
 **Skip** `024_content_plans.sql` unless you use the content-planning admin feature — it is optional.
 
