@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { siteUrl } from "./env";
 
@@ -31,9 +30,16 @@ export interface AdminAccessResetResult {
   createdAuthUser: boolean;
 }
 
+function bytesToBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
 function generateTempPassword(): string {
-  const word = randomBytes(9).toString("base64url");
-  return `Akin-${word}!`;
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return `Akin-${bytesToBase64Url(bytes)}!`;
 }
 
 async function findAuthUserByEmail(
