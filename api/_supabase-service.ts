@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { readEnv } from "./env";
+import { readEnv } from "./_env.js";
 
 export function createServiceSupabaseClient(): SupabaseClient | null {
   const supabaseUrl = readEnv("PUBLIC_SUPABASE_URL");

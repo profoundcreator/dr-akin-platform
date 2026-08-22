@@ -1,4 +1,4 @@
-import { siteUrl } from "./env";
+import { siteUrl } from "./_env.js";
 
 function normalizeHost(url: string): string | null {
   try {
