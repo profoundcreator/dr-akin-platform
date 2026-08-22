@@ -1,5 +1,12 @@
 -- Combined migration helper — contact platform routing (029 → 031)
 -- Paste into Supabase SQL Editor AFTER 022 and 028 are applied.
+--
+-- If contact submit fails with "Could not choose the best candidate function",
+-- run fix-submit-general-enquiry-overload.sql (or migration 032) first.
+
+DROP FUNCTION IF EXISTS public.submit_general_enquiry(
+  TEXT, TEXT, TEXT, TEXT, TEXT, BOOLEAN, TEXT
+);
 
 -- ========== BEGIN 029 ==========
 -- Store contact form platform/referrer context for brand notification routing.
