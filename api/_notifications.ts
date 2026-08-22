@@ -5,8 +5,8 @@ import {
   renderDetailTable,
   renderMessageBlock,
   renderReferenceBadge,
-} from "./email-layout";
-import { readEnv, readEnvBool, siteUrl } from "./env";
+} from "./_email-layout.js";
+import { readEnv, readEnvBool, siteUrl } from "./_env.js";
 
 export interface NotificationMailConfig {
   resend: Resend;

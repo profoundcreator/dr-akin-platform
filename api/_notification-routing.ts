@@ -1,4 +1,4 @@
-import { readEnv } from "./env";
+import { readEnv } from "./_env.js";
 
 /** Platforms whose contact enquiries go to a dedicated brand inbox — not ea@. */
 export const BRAND_ROUTED_PLATFORMS = [

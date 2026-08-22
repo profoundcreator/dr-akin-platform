@@ -6,9 +6,9 @@ import {
   buildBookingStatusUpdateMail,
   buildEnquiryAdminMail,
   buildEnquiryConfirmationMail,
-} from "./_lib/notifications";
-import { siteUrl } from "./_lib/env";
-import { isSameSiteRequest } from "./_lib/request-guard";
+} from "./_notifications.js";
+import { siteUrl } from "./_env.js";
+import { isSameSiteRequest } from "./_request-guard.js";
 
 const SAMPLE = {
   enquiry: {
