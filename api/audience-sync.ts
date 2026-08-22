@@ -1,6 +1,6 @@
-import { createServiceSupabaseClient } from "../server/lib/supabase-service";
-import { readEnv } from "../server/lib/env";
-import { isSameSiteRequest } from "../server/lib/request-guard";
+import { createServiceSupabaseClient } from "./_lib/supabase-service";
+import { readEnv } from "./_lib/env";
+import { isSameSiteRequest } from "./_lib/request-guard";
 
 interface SyncBody {
   email: string;
