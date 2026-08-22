@@ -24,23 +24,25 @@ const FORMAL_PORTRAIT = path.join(OUTPUT_DIR, "dr-akin-portrait-formal.webp");
 
 const SOURCE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 
-/** @typedef {{ basename: string; output: string; width: number; height: number; position: import("sharp").Position }} Target */
+/** @typedef {{ basename: string; output: string; width: number; height: number; position: import("sharp").Position; format: "jpeg" | "webp" }} Target */
 
 /** @type {Target[]} */
 const TARGETS = [
   {
     basename: "dr-akin-social-og-source",
-    output: "dr-akin-social-og.webp",
+    output: "dr-akin-social-og.jpg",
     width: 1200,
     height: 630,
     position: "right",
+    format: "jpeg",
   },
   {
     basename: "dr-akin-speaking-og-source",
-    output: "dr-akin-speaking-og.webp",
+    output: "dr-akin-speaking-og.jpg",
     width: 1200,
     height: 630,
     position: "centre",
+    format: "jpeg",
   },
   {
     basename: "dr-akin-speaking-hero-source",
@@ -48,13 +50,15 @@ const TARGETS = [
     width: 960,
     height: 1200,
     position: "centre",
+    format: "webp",
   },
   {
     basename: "performx-summit-og-source",
-    output: "performx-summit-og.webp",
+    output: "performx-summit-og.jpg",
     width: 1200,
     height: 630,
     position: "centre",
+    format: "jpeg",
   },
 ];
 
@@ -73,11 +77,21 @@ async function findSource(basename) {
 
 async function convertOne(source, target) {
   const dest = path.join(OUTPUT_DIR, target.output);
-  await sharp(source)
+  let pipeline = sharp(source)
     .rotate()
-    .resize(target.width, target.height, { fit: "cover", position: target.position })
-    .webp({ quality: 82 })
-    .toFile(dest);
+    .resize(target.width, target.height, { fit: "cover", position: target.position });
+
+  if (target.format === "jpeg") {
+    pipeline = pipeline.sharpen({ sigma: 0.8, m1: 0.5, m2: 0.3 }).jpeg({
+      quality: 92,
+      mozjpeg: true,
+      chromaSubsampling: "4:4:4",
+    });
+  } else {
+    pipeline = pipeline.webp({ quality: 88, effort: 6, smartSubsample: false });
+  }
+
+  await pipeline.toFile(dest);
   console.log(`✓ ${path.basename(source)} → public/images/marketing/${target.output}`);
 }
 

@@ -9,14 +9,14 @@ export const SITE_IMAGES = {
   portraitFormal: "/images/marketing/dr-akin-portrait-formal.webp",
   /** Approachable studio portrait (navy suit) — Meet hub + Work hub. */
   portraitApproachable: "/images/marketing/dr-akin-portrait-approachable.webp",
-  /** Default link-preview card — stage side profile (1200×630). */
-  socialOg: "/images/marketing/dr-akin-social-og.webp",
+  /** Default link-preview card — stage side profile (1200×630 JPEG). */
+  socialOg: "/images/marketing/dr-akin-social-og.jpg",
   /** Speaking page OG — keynote on stage with theme screen. */
-  speakingOg: "/images/marketing/dr-akin-speaking-og.webp",
+  speakingOg: "/images/marketing/dr-akin-speaking-og.jpg",
   /** Speaking page in-browser hero — wide hall shot. */
   speakingHero: "/images/marketing/dr-akin-speaking-hero.webp",
   /** PerformX Summit 2026 event cover / OG. */
-  performxSummitOg: "/images/marketing/performx-summit-og.webp",
+  performxSummitOg: "/images/marketing/performx-summit-og.jpg",
   ecosystemVisual: "/images/marketing/ecosystem-visual.webp",
   books: {
     "the-agenda": "/images/marketing/books/the-agenda.webp",
