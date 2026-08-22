@@ -434,13 +434,13 @@ export function BookingForm({
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="eventTitle" required>
-                Event title
+                Engagement title
               </Label>
               <Input
                 id="eventTitle"
                 value={form.eventTitle}
                 onChange={(e) => updateField("eventTitle", e.target.value)}
-                placeholder="Name of the event or session"
+                placeholder="Name of the engagement, session, or programme"
               />
               {errors.eventTitle && (
                 <p className="text-xs text-[var(--ploy-status-error)]">{errors.eventTitle}</p>

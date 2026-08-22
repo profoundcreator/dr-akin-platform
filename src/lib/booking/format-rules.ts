@@ -30,7 +30,7 @@ export function stepDescriptionForFormat(step: number, format: string): string {
   if (step === 4) {
     return isVirtualFormat(format) ? "Commercial terms" : "Terms & event protocol";
   }
-  const defaults = ["Organizer details", "Event overview", "Date & location", "Terms & protocol"];
+  const defaults = ["Organizer details", "Engagement overview", "Date & location", "Terms & protocol"];
   return defaults[step - 1] ?? "";
 }
 
@@ -119,7 +119,7 @@ export function validateStepForFormat(
   if (step === 2) {
     if (!form.engagementType) errors.engagementType = "Engagement type is required";
     if (!form.eventTitle || form.eventTitle.trim().length < 3) {
-      errors.eventTitle = "Event title is required";
+      errors.eventTitle = "Engagement title is required";
     }
     if (!form.audienceSize) errors.audienceSize = "Audience size is required";
     if (!form.format) errors.format = "Format is required";

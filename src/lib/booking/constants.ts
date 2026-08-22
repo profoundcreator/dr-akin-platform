@@ -54,7 +54,7 @@ export const AUDIENCE_SIZE_OPTIONS = [
 
 export const BOOKING_STEPS = [
   { id: 1, label: "Contact", description: "Organizer details" },
-  { id: 2, label: "Engagement", description: "Event overview" },
+  { id: 2, label: "Engagement", description: "Engagement overview" },
   { id: 3, label: "Schedule", description: "Date & location" },
   { id: 4, label: "Requirements", description: "Terms & protocol" },
 ] as const;

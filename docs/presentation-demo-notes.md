@@ -166,7 +166,7 @@ Email requires **both**:
 
 **Steps in the form (for reference if asked):**
 1. Contact — name, org, email, phone, timezone  
-2. Engagement — type, event title, audience, format  
+2. Engagement — type, engagement title, audience, format  
 3. Schedule — dates, city/country, travel notes  
 4. Requirements — budget range, recording, VIP protocol, terms  
 
