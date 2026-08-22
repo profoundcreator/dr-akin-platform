@@ -56,7 +56,7 @@ export function Footer() {
               <p><a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a></p>
             </div>
             {APPROVED_SOCIAL_LINKS.length > 0 && (
-              <ul className="mt-5 flex flex-wrap gap-4 text-sm">
+              <ul className="mt-5 grid max-w-xs grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 {APPROVED_SOCIAL_LINKS.map((link) => (
                   <li key={link.href}>
                     <a
