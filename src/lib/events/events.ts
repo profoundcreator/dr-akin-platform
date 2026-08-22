@@ -132,6 +132,9 @@ export function getEventCoverUrl(coverImagePath: string | null): string | null {
   if (coverImagePath.startsWith("http://") || coverImagePath.startsWith("https://")) {
     return coverImagePath;
   }
+  if (coverImagePath.startsWith("/")) {
+    return coverImagePath;
+  }
 
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? "";
   if (!supabaseUrl) return null;

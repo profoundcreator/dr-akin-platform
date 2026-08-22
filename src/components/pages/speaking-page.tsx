@@ -10,7 +10,7 @@ import { openEnquiryModal } from "@/lib/enquiry";
 import { SITE_IMAGES } from "@/lib/media/site-images";
 import { PERSON_IDENTITY, PUBLIC_NAME } from "@/data/person-identity";
 
-const PORTRAIT_URL = SITE_IMAGES.portrait;
+const PORTRAIT_URL = SITE_IMAGES.speakingHero;
 
 const STATS = [
   { value: PERSON_IDENTITY.metrics.peopleReached, label: "People reached through talks, training and coaching" },

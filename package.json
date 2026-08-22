@@ -21,7 +21,8 @@
     "verify:smoke:production": "node scripts/smoke-production.mjs",
     "check:vercel:functions": "node scripts/check-vercel-function-count.mjs",
     "reset:admin-access": "node scripts/reset-admin-access.mjs",
-    "import:portraits": "node scripts/import-portraits.mjs"
+    "import:portraits": "node scripts/import-portraits.mjs",
+    "import:social-images": "node scripts/import-social-images.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",

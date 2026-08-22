@@ -11,7 +11,7 @@ export function buildSeoMeta({
   title,
   description,
   canonical,
-  ogImage = SITE_IMAGES.portraitFormal,
+  ogImage = SITE_IMAGES.socialOg,
 }: SeoProps) {
   return {
     title,

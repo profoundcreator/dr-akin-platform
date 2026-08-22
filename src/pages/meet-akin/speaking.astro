@@ -2,10 +2,18 @@
 import Layout from "@/layouts/Layout.astro";
 import { SpeakingPage } from "@/components/pages/speaking-page";
 import { SITE_PAGES } from "@/data/site-content";
+import { SITE_IMAGES } from "@/lib/media/site-images";
+import { PERSON_IDENTITY } from "@/data/person-identity";
 
 const content = SITE_PAGES["meet-speaking"];
 ---
 
-<Layout title={content.title} description={content.description}>
+<Layout
+  title={content.title}
+  description={content.description}
+  ogImage={SITE_IMAGES.speakingOg}
+  ogImageAlt={`${PERSON_IDENTITY.publicName} — keynote speaker on stage`}
+  preloadImage={SITE_IMAGES.speakingHero}
+>
   <SpeakingPage client:load />
 </Layout>
