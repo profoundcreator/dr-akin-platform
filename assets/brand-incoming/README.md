@@ -25,3 +25,14 @@ npm run import:brand
 | `akin-wordmark-email-dark.png` | Notification emails (dark mode) |
 
 **Email display size:** 200×auto px (44 px max height), linking to your site home URL.
+
+### Favicon / Apple touch icon
+
+Attach in Cursor chat or save locally, then run `npm run import:favicon`:
+
+| File | Purpose |
+| --- | --- |
+| `akin-iconmark-cream-512.png` | 512×512 cream `#FAFAF8` square (preferred master) |
+| `akin-iconmark-cream-180.png` | Optional 180×180; 512 is resized if this is all you have |
+
+**Outputs:** `public/favicon.svg`, `public/brand/akin-iconmark.png` (180×180), `public/brand/akin-iconmark-512.png`
