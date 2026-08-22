@@ -145,10 +145,25 @@ function checkVercelRedirect() {
       match: `content slug rewrite still present: ${r.source}`,
     })));
   }
+  return failures;
+}
+
+function checkLegacyViewRedirects() {
+  const vercel = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
+  const failures = [];
   for (const source of ["/insights/view", "/events/view", "/library/view", "/work/view"]) {
+    const section = source.split("/")[1];
     const viewRedirect = vercel.redirects?.find((r) => r.source === source);
-    if (!viewRedirect?.has?.some((h) => h.type === "query" && h.key === "slug")) {
-      failures.push({ id: "view-redirect", file: "vercel.json", match: `missing slug query redirect for ${source}` });
+    const hasSlugCapture = viewRedirect?.has?.some(
+      (h) => h.type === "query" && h.key === "slug" && String(h.value).includes("?<slug>"),
+    );
+    const destination = viewRedirect?.destination ?? "";
+    if (!hasSlugCapture || destination !== `/${section}/:slug`) {
+      failures.push({
+        id: "view-redirect",
+        file: "vercel.json",
+        match: `expected /${section}/view?slug=… → /${section}/:slug redirect`,
+      });
     }
   }
   return failures;
@@ -236,6 +251,7 @@ const sections = [
   { name: "Ecosystem work slugs", fn: checkWorkStaticSlugs },
   { name: "Legacy reference scan (src/api)", fn: scanLegacyReferences },
   { name: "Vercel routing", fn: checkVercelRedirect },
+  { name: "Legacy /view redirects", fn: checkLegacyViewRedirects },
 ];
 
 if (SCAN_DIST) {

@@ -42,6 +42,7 @@ async function fetchRedirectCheck({ name, path, finalPath, status = 200 }) {
 const REDIRECT_CHECKS = [
   { name: "TC Resource retired redirect", path: "/work/tc-resource-technology", finalPath: "/work" },
   { name: "Insights view canonical redirect", path: "/insights/view?slug=culture-as-strategic-asset", finalPath: "/insights/culture-as-strategic-asset" },
+  { name: "Events view canonical redirect", path: "/events/view?slug=performx-summit-2026", finalPath: "/events/performx-summit-2026" },
 ];
 
 /** @type {{ name: string; path: string; expect?: RegExp; status?: number; manual?: boolean }[]} */
@@ -66,6 +67,7 @@ const CHECKS = [
   { name: "robots.txt", path: "/robots.txt", expect: /User-agent|Sitemap/i },
   { name: "sitemap index", path: "/sitemap-index.xml", expect: /sitemap|urlset|loc/i },
   { name: "RSS feed", path: "/rss.xml", expect: /rss|channel|item/i },
+  { name: "Brand logo (email asset)", path: "/brand/akin-logo-mono.png", status: 200 },
 ];
 
 async function fetchCheck({ name, path, expect, status = 200 }) {

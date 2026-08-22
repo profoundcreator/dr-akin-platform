@@ -39,7 +39,17 @@ In the Supabase **SQL Editor**, run in order:
 18. `migrations/020_continental_ecosystem.sql` — retires TC Resource, keeps PERFORMX destination-free, and publishes Future Africa/Auctus Africa CMS entries
 19. `migrations/021_restore_performx.sql` — republishes the PERFORMX work org page
 20. `migrations/022_submission_notifications.sql` — Resend notification tracking on enquiries and bookings
-21. `migrations/028_audience_members.sql` — marketing opt-in audience list (`subscribe_audience_member` RPC)
+21. `migrations/023_admin_session_reliability.sql` — clears session revoke on admin re-activation
+22. `migrations/024_content_plans.sql` — optional content-planning admin tables (skip if unused)
+23. `migrations/025_aald_performx_content.sql` — AALD, PerformX, and PerformX Summit 2026 event seed
+24. `migrations/026_aald_performx_upsert.sql` — content upsert pass for AALD/PerformX
+25. `migrations/027_aald_performx_cta_copy.sql` — CTA copy alignment
+26. `migrations/028_audience_members.sql` — marketing opt-in audience list (`subscribe_audience_member` RPC)
+27. `migrations/029_enquiry_notification_context.sql` — platform/referrer on contact submissions (brand routing)
+28. `migrations/030_enquiry_future_africa_platform.sql` — allows `future-africa` platform value
+29. `migrations/031_work_org_platform_contact_links.sql` — work page CTAs → `/contact?platform=…`
+
+**Quick paste:** `scripts/apply-migrations-029-031.sql` combines steps 27–29 for contact routing only (run after 022 and 028).
 
 Verify migration 015 after running:
 
@@ -162,7 +172,11 @@ Add in **Vercel → Project → Settings → Environment Variables** (Production
 |----------|---------|---------|
 | `RESEND_API_KEY` | `re_…` | Resend API key from step B |
 | `NOTIFICATION_FROM_EMAIL` | `notifications@theakinakinpelu.org` | Must be on the **verified** Resend domain |
-| `ADMIN_NOTIFICATION_EMAIL` | `ea@theakinakinpelu.org` | EA shared inbox |
+| `ADMIN_NOTIFICATION_EMAIL` | `ea@theakinakinpelu.org` | EA shared inbox (bookings + ops contact) |
+| `NOTIFY_AALD` | `hello@aaldcompany.org` | AALD partnership enquiries |
+| `NOTIFY_PERFORMX` | `performx@aaldcompany.org` | PerformX partnership enquiries |
+| `NOTIFY_ERUDIO` | `hello@erudiohub.org` | Erudio Hub + Future Africa (labelled) enquiries |
+| `NOTIFY_AUCTUS` | `info@auctusafrica.org` | Auctus Africa partnership enquiries |
 | `NOTIFICATION_REPLY_TO` | `ea@theakinakinpelu.org` | Submitter auto-reply address (optional; defaults to admin inbox) |
 | `SEND_SUBMITTER_CONFIRMATION` | `true` | Optional — send “we received your request” to the submitter (default `true`) |
 

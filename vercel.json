@@ -52,26 +52,26 @@
     },
     {
       "source": "/insights/view",
-      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
-      "destination": "/insights/$1",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
+      "destination": "/insights/:slug",
       "permanent": true
     },
     {
       "source": "/events/view",
-      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
-      "destination": "/events/$1",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
+      "destination": "/events/:slug",
       "permanent": true
     },
     {
       "source": "/library/view",
-      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
-      "destination": "/library/$1",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
+      "destination": "/library/:slug",
       "permanent": true
     },
     {
       "source": "/work/view",
-      "has": [{ "type": "query", "key": "slug", "value": "(.+)" }],
-      "destination": "/work/$1",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
+      "destination": "/work/:slug",
       "permanent": true
     }
   ],
