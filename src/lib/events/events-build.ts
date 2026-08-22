@@ -1,5 +1,6 @@
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
 import type { PlatformEvent } from "@/lib/events/events";
+import { applyStaticEventCoverFallback } from "@/lib/events/events";
 import { isEventPubliclyVisible } from "@/lib/events/event-visibility";
 import type { DbEvent } from "@/lib/supabase/database.types";
 import {
@@ -8,7 +9,7 @@ import {
 } from "@/lib/build/supabase-build-env";
 
 function mapBuildRow(row: DbEvent): PlatformEvent {
-  return {
+  return applyStaticEventCoverFallback({
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -36,7 +37,7 @@ function mapBuildRow(row: DbEvent): PlatformEvent {
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-  };
+  });
 }
 
 export async function fetchPublishedEventsForBuild(): Promise<PlatformEvent[]> {

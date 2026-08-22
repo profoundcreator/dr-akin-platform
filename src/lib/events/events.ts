@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, tryGetSupabaseClient } from "@/lib/supabase/client";
+import { SITE_IMAGES } from "@/lib/media/site-images";
 import type {
   DbEvent,
   EventBrand,
@@ -60,8 +61,19 @@ export interface EventInput {
   isHomepageFeatured?: boolean;
 }
 
+/** Self-hosted covers when Supabase `cover_image_path` is null (build + runtime). */
+export const STATIC_EVENT_COVER_PATHS: Partial<Record<string, string>> = {
+  "performx-summit-2026": SITE_IMAGES.performxSummitOg,
+};
+
+export function applyStaticEventCoverFallback(event: PlatformEvent): PlatformEvent {
+  if (event.coverImagePath?.trim()) return event;
+  const fallback = STATIC_EVENT_COVER_PATHS[event.slug];
+  return fallback ? { ...event, coverImagePath: fallback } : event;
+}
+
 function mapRow(row: DbEvent): PlatformEvent {
-  return {
+  return applyStaticEventCoverFallback({
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -89,7 +101,7 @@ function mapRow(row: DbEvent): PlatformEvent {
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-  };
+  });
 }
 
 function buildInsertPayload(

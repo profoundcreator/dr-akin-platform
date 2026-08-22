@@ -2,7 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { EventDetailBySlug } from "@/components/pages/event-detail-by-slug";
 import { fetchPublishedEventsForBuild } from "@/lib/events/events-build";
-import { getEventCoverUrl, getEventMetaDescription } from "@/lib/events/events";
+import { applyStaticEventCoverFallback, getEventCoverUrl, getEventMetaDescription } from "@/lib/events/events";
 import { breadcrumbSchema, eventSchema } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
@@ -14,7 +14,8 @@ export async function getStaticPaths() {
   }));
 }
 
-const { event } = Astro.props;
+const { event: rawEvent } = Astro.props;
+const event = applyStaticEventCoverFallback(rawEvent);
 const description = getEventMetaDescription(event);
 const coverUrl = getEventCoverUrl(event.coverImagePath);
 const site = Astro.site ?? Astro.url.origin;
