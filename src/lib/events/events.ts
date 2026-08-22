@@ -66,8 +66,22 @@ export const STATIC_EVENT_COVER_PATHS: Partial<Record<string, string>> = {
   "performx-summit-2026": SITE_IMAGES.performxSummitOg,
 };
 
+const LEGACY_EVENT_COVER_PATHS: Record<string, string> = {
+  "/images/marketing/performx-summit-og.webp": SITE_IMAGES.performxSummitOg,
+};
+
+function normalizeEventCoverPath(coverImagePath: string | null): string | null {
+  const trimmed = coverImagePath?.trim();
+  if (!trimmed) return null;
+  return LEGACY_EVENT_COVER_PATHS[trimmed] ?? trimmed;
+}
+
 export function applyStaticEventCoverFallback(event: PlatformEvent): PlatformEvent {
-  if (event.coverImagePath?.trim()) return event;
+  const normalizedPath = normalizeEventCoverPath(event.coverImagePath);
+  if (normalizedPath !== event.coverImagePath) {
+    return { ...event, coverImagePath: normalizedPath };
+  }
+  if (normalizedPath) return event;
   const fallback = STATIC_EVENT_COVER_PATHS[event.slug];
   return fallback ? { ...event, coverImagePath: fallback } : event;
 }
