@@ -1,6 +1,6 @@
-import { createServiceSupabaseClient } from "./lib/supabase-service";
-import { siteUrl } from "./lib/env";
-import { isSameSiteRequest } from "./lib/request-guard";
+import { createServiceSupabaseClient } from "../server/lib/supabase-service";
+import { siteUrl } from "../server/lib/env";
+import { isSameSiteRequest } from "../server/lib/request-guard";
 import {
   buildBookingAdminMail,
   buildBookingConfirmationMail,
@@ -10,7 +10,7 @@ import {
   isRecentSubmission,
   NOTIFICATIONS_NOT_CONFIGURED,
   sendMail,
-} from "./lib/notifications";
+} from "../server/lib/notifications";
 import {
   getBrandInboxes,
   isBrandRoutedPlatform,
@@ -19,7 +19,7 @@ import {
   resolveBookingNotificationRecipients,
   resolveContactPlatform,
   resolveEnquiryNotificationRecipients,
-} from "./lib/notification-routing";
+} from "../server/lib/notification-routing";
 
 type NotifyBody =
   | { kind: "enquiry"; enquiryId?: string }

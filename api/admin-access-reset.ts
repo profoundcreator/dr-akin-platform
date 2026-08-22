@@ -1,7 +1,17 @@
-import { readEnv } from "./lib/env";
-import { resetAdminAccess, type AdminAccessRole } from "./lib/admin-access-reset";
-import { hasValidStatusProbeKey } from "./lib/request-guard";
-import { createServiceSupabaseClient } from "./lib/supabase-service";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { readEnv, siteUrl } from "../server/lib/env";
+import { hasValidStatusProbeKey } from "../server/lib/request-guard";
+import { createServiceSupabaseClient } from "../server/lib/supabase-service";
+
+type AdminAccessRole =
+  | "super_admin"
+  | "technical_admin"
+  | "admin_manager"
+  | "executive_assistant"
+  | "executive_reviewer"
+  | "inbox_manager"
+  | "resource_manager"
+  | "read_only_auditor";
 
 interface ResetRequestBody {
   email?: string;
@@ -23,6 +33,130 @@ function readResetKey(): string {
 function isInvalidApiKeyError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return message.toLowerCase().includes("invalid api key");
+}
+
+function bytesToBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function generateTempPassword(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return `Akin-${bytesToBase64Url(bytes)}!`;
+}
+
+async function findAuthUserByEmail(
+  adminClient: SupabaseClient,
+  targetEmail: string,
+): Promise<User | null> {
+  let page = 1;
+  while (page <= 20) {
+    const { data, error } = await adminClient.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw error;
+    const match = data.users.find((user) => user.email?.toLowerCase() === targetEmail);
+    if (match) return match;
+    if (data.users.length < 200) break;
+    page += 1;
+  }
+  return null;
+}
+
+async function resetAdminAccess(
+  adminClient: SupabaseClient,
+  input: { email: string; fullName?: string; role?: AdminAccessRole },
+) {
+  const email = input.email.trim().toLowerCase();
+  const fullName = (input.fullName ?? "Executive Assistant").trim();
+  const role = input.role ?? "executive_assistant";
+
+  if (!email) throw new Error("Email is required.");
+
+  const tempPassword = generateTempPassword();
+  const loginUrl = `${siteUrl()}/admin/login`;
+
+  let authUser = await findAuthUserByEmail(adminClient, email);
+  let createdAuthUser = false;
+
+  if (!authUser) {
+    const { data, error } = await adminClient.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: fullName ? { full_name: fullName } : undefined,
+    });
+    if (error) throw error;
+    authUser = data.user;
+    createdAuthUser = true;
+  } else {
+    const { data, error } = await adminClient.auth.admin.updateUserById(authUser.id, {
+      password: tempPassword,
+      email_confirm: true,
+    });
+    if (error) throw error;
+    authUser = data.user;
+  }
+
+  const { data: profile, error: profileError } = await adminClient
+    .from("admin_profiles")
+    .select("id, email, full_name, role, account_state, session_revoked_at")
+    .eq("id", authUser.id)
+    .maybeSingle();
+
+  if (profileError) throw profileError;
+
+  if (!profile) {
+    const { data: inviter } = await adminClient
+      .from("admin_profiles")
+      .select("id")
+      .eq("role", "super_admin")
+      .eq("account_state", "active")
+      .limit(1)
+      .maybeSingle();
+
+    const { error: insertError } = await adminClient.from("admin_profiles").insert({
+      id: authUser.id,
+      email,
+      full_name: fullName,
+      role,
+      account_state: "active",
+      invited_by: inviter?.id ?? null,
+      invited_at: new Date().toISOString(),
+      session_revoked_at: null,
+    });
+    if (insertError) throw insertError;
+  } else {
+    const { error: updateError } = await adminClient
+      .from("admin_profiles")
+      .update({
+        email,
+        full_name: profile.full_name || fullName,
+        role: profile.role || role,
+        account_state: "active",
+        session_revoked_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", authUser.id);
+    if (updateError) throw updateError;
+  }
+
+  const { data: finalProfile, error: finalError } = await adminClient
+    .from("admin_profiles")
+    .select("role, account_state")
+    .eq("id", authUser.id)
+    .single();
+
+  if (finalError) throw finalError;
+
+  return {
+    loginUrl,
+    email,
+    password: tempPassword,
+    role: finalProfile?.role ?? role,
+    state: finalProfile?.account_state ?? "active",
+    createdAuthUser,
+  };
 }
 
 /**
