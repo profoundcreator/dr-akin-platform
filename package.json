@@ -22,7 +22,8 @@
     "check:vercel:functions": "node scripts/check-vercel-function-count.mjs",
     "reset:admin-access": "node scripts/reset-admin-access.mjs",
     "import:portraits": "node scripts/import-portraits.mjs",
-    "import:social-images": "node scripts/import-social-images.mjs"
+    "import:social-images": "node scripts/import-social-images.mjs",
+    "import:brand": "node scripts/import-brand-logo.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",

@@ -34,8 +34,11 @@ export interface BrandedEmailOptions {
   footerNote?: string;
 }
 
+import { renderEmailLogoBlock } from "./_email-logo.js";
+
 export function renderBrandedEmail(options: BrandedEmailOptions): string {
-  const logoUrl = `${options.siteUrl.replace(/\/$/, "")}/brand/akin-logo-mono.png`;
+  const siteBase = options.siteUrl.replace(/\/$/, "");
+  const logoBlock = renderEmailLogoBlock(siteBase);
   const preheader = escapeHtml(options.preheader);
   const eyebrow = options.eyebrow ? escapeHtml(options.eyebrow) : "";
   const title = escapeHtml(options.title);
@@ -58,8 +61,8 @@ export function renderBrandedEmail(options: BrandedEmailOptions): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light" />
-  <meta name="supported-color-schemes" content="light" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
   <title>${title}</title>
 </head>
 <body style="margin:0;padding:0;background:${EMAIL_THEME.canvas};">
@@ -70,7 +73,7 @@ export function renderBrandedEmail(options: BrandedEmailOptions): string {
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;border-collapse:collapse;background:${EMAIL_THEME.surface};border:1px solid ${EMAIL_THEME.border};border-radius:16px;overflow:hidden;">
           <tr>
             <td style="padding:28px 32px 20px;border-bottom:1px solid ${EMAIL_THEME.border};background:${EMAIL_THEME.surfaceMuted};">
-              <img src="${escapeHtml(logoUrl)}" alt="Akin Akinpelu" width="168" height="40" style="display:block;height:40px;width:auto;max-width:168px;border:0;" />
+              ${logoBlock}
               ${eyebrow ? `<p style="margin:18px 0 0;font-family:Inter,Arial,sans-serif;font-size:12px;line-height:1.4;letter-spacing:0.08em;text-transform:uppercase;color:${EMAIL_THEME.accent};font-weight:600;">${eyebrow}</p>` : ""}
               <h1 style="margin:${eyebrow ? "10px" : "18px"} 0 0;font-family:Inter,Arial,sans-serif;font-size:28px;line-height:1.2;font-weight:700;color:${EMAIL_THEME.textPrimary};">${title}</h1>
             </td>
