@@ -1,5 +1,5 @@
 import { SITE_IMAGES } from "@/lib/media/site-images";
-import { contactPathForPlatform } from "@/lib/contact/platform-context";
+import { bookingPathForPlatform, contactPathForPlatform } from "@/lib/contact/platform-context";
 import { AU_TITLE, AALD_COMPANY_NAME, AALD_EXPANDED_NAME, PUBLIC_NAME } from "@/data/person-identity";
 
 export interface PageSection {
@@ -125,7 +125,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Book a facilitation session", href: "/book-dr-akin" },
+    cta: { label: "Book a facilitation session", href: bookingPathForPlatform("aald") },
     secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("aald") },
     relatedLinks: [
       { label: "PerformX Nexus", href: "/work/performx" },
@@ -152,7 +152,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
         ],
       },
     ],
-    cta: { label: "Start a conversation", href: "/book-dr-akin" },
+    cta: { label: "Start a conversation", href: bookingPathForPlatform("erudio-hub") },
     secondaryCta: { label: "Discuss a partnership", href: contactPathForPlatform("erudio-hub") },
   },
   "work-performx": {

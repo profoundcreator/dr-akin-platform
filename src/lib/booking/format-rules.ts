@@ -105,6 +105,7 @@ export function validateStepForFormat(
 
   if (step === 1) {
     if (!form.name || form.name.trim().length < 2) errors.name = "Full name is required";
+    if (!form.requestArea) errors.requestArea = "Please select which area this request is for";
     if (!form.organization || form.organization.trim().length < 2) {
       errors.organization = "Organization is required";
     }

@@ -129,9 +129,48 @@ export function missingBrandInboxMessage(platform: BrandRoutedPlatform): string 
   return `Brand inbox for ${platformLabel(platform) ?? platform} is not configured.`;
 }
 
-export function resolveBookingNotificationRecipients(inboxes: BrandInboxes): string[] {
-  const admin = inboxes.admin.trim();
-  return admin ? [admin] : [];
+export interface RoutedMailRecipients {
+  to: string[];
+  cc: string[];
+}
+
+function normalizeBookingRequestArea(value: string | null | undefined): ContactPlatform | null {
+  const trimmed = (value ?? "").trim().toLowerCase();
+  if (!trimmed || trimmed === "speaking-office") return null;
+  return normalizePlatform(trimmed);
+}
+
+/** Read request area from booking form_data (supports legacy `platform` key). */
+export function resolveBookingPlatformFromForm(form: Record<string, unknown>): ContactPlatform | null {
+  const requestArea = typeof form.requestArea === "string" ? form.requestArea : null;
+  const legacyPlatform = typeof form.platform === "string" ? form.platform : null;
+  return normalizeBookingRequestArea(requestArea ?? legacyPlatform);
+}
+
+/** Brand inbox as primary recipient; ea@ copied when a brand team owns the request. */
+export function resolveBookingNotificationRecipients(input: {
+  platform: ContactPlatform | null;
+  inboxes: BrandInboxes;
+}): RoutedMailRecipients {
+  const admin = input.inboxes.admin.trim();
+  if (!admin) return { to: [], cc: [] };
+
+  if (input.platform && isBrandRoutedPlatform(input.platform)) {
+    const brandInbox = inboxForBrandPlatform(input.platform, input.inboxes)?.trim();
+    if (brandInbox) {
+      const cc =
+        admin.toLowerCase() !== brandInbox.toLowerCase() ? [admin] : [];
+      return { to: [brandInbox], cc };
+    }
+  }
+
+  return { to: [admin], cc: [] };
+}
+
+export function bookingRequestAreaLabel(area: string | null | undefined): string {
+  const platform = normalizeBookingRequestArea(area);
+  if (!platform) return "Dr. Akin Akinpelu — speaking & advisory";
+  return platformLabel(platform) ?? area ?? "Speaking & advisory";
 }
 
 export function platformLabel(platform: ContactPlatform | null): string | null {

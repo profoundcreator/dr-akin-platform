@@ -31,6 +31,8 @@ export const INTERNAL_STATUSES = [
 
 export type InternalStatus = (typeof INTERNAL_STATUSES)[number];
 
+import type { BookingRequestArea } from "@/lib/contact/platform-context";
+
 export interface BookingFormData {
   // Step 1 — Contact
   name: string;
@@ -38,6 +40,8 @@ export interface BookingFormData {
   email: string;
   phone: string;
   timezone: string;
+  /** Which org or office this booking is for (stored as `platform` in form_data). */
+  requestArea: BookingRequestArea;
   // Step 2 — Engagement
   engagementType: string;
   eventTitle: string;
@@ -95,6 +99,7 @@ export const EMPTY_BOOKING_FORM: BookingFormData = {
   email: "",
   phone: "",
   timezone: "",
+  requestArea: "speaking-office",
   engagementType: "",
   eventTitle: "",
   audienceSize: "",

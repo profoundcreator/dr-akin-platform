@@ -4,6 +4,7 @@ import type { BookingFormData } from "@/lib/booking/types";
 
 export const step1Schema = z.object({
   name: z.string().min(2, "Full name is required"),
+  requestArea: z.string().min(1, "Please select which area this request is for"),
   organization: z.string().min(2, "Organization is required"),
   email: z.string().email("Valid email is required"),
   phone: z.string().min(6, "Phone or WhatsApp is required"),

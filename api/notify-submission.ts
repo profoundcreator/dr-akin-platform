@@ -17,8 +17,10 @@ import {
   missingBrandInboxMessage,
   platformLabel,
   resolveBookingNotificationRecipients,
+  resolveBookingPlatformFromForm,
   resolveContactPlatform,
   resolveEnquiryNotificationRecipients,
+  bookingRequestAreaLabel,
 } from "./_notification-routing.js";
 
 type NotifyBody =
@@ -219,6 +221,10 @@ export async function POST(request: Request): Promise<Response> {
         ? (booking.form_data as Record<string, unknown>)
         : {};
 
+    const bookingPlatform = resolveBookingPlatformFromForm(form);
+    const requestAreaRaw =
+      readFormField(form, "requestArea") ?? readFormField(form, "platform") ?? "speaking-office";
+
     const adminUrl = `${baseUrl}/admin/requests/detail?id=${booking.id}`;
     const adminMail = buildBookingAdminMail({
       id: booking.id,
@@ -234,18 +240,25 @@ export async function POST(request: Request): Promise<Response> {
       city: readFormField(form, "city"),
       country: readFormField(form, "country"),
       adminUrl,
+      requestAreaLabel: bookingRequestAreaLabel(requestAreaRaw),
+      platformKey: bookingPlatform,
+      platformLabel: platformLabel(bookingPlatform),
     });
 
     const brandInboxes = getBrandInboxes();
-    const teamRecipients = resolveBookingNotificationRecipients(brandInboxes);
+    const teamRecipients = resolveBookingNotificationRecipients({
+      platform: bookingPlatform,
+      inboxes: brandInboxes,
+    });
 
-    if (teamRecipients.length === 0) {
+    if (teamRecipients.to.length === 0) {
       await supabase.from("booking_requests").update({ admin_notified_at: null }).eq("id", booking.id);
       return json(503, { error: "ADMIN_NOTIFICATION_EMAIL is not configured." });
     }
 
     const adminResult = await sendMail(mailConfig, {
-      to: teamRecipients,
+      to: teamRecipients.to,
+      cc: teamRecipients.cc.length > 0 ? teamRecipients.cc : undefined,
       subject: adminMail.subject,
       html: adminMail.html,
       text: adminMail.text,
