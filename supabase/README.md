@@ -40,6 +40,12 @@ In the Supabase **SQL Editor**, run in order:
 19. `migrations/021_restore_performx.sql` — republishes the PERFORMX work org page
 20. `migrations/022_submission_notifications.sql` — Resend notification tracking on enquiries and bookings
 21. `migrations/028_audience_members.sql` — marketing opt-in audience list (`subscribe_audience_member` RPC)
+22. `migrations/029_enquiry_notification_context.sql` — contact referrer/platform context for notifications
+23. `migrations/030_enquiry_future_africa_platform.sql` — Future Africa platform slug on contact submissions
+24. `migrations/031_work_org_platform_contact_links.sql` — work org contact page links
+25. **`migrations/032_drop_legacy_submit_general_enquiry.sql`** — **required if 019 was applied before 029**; drops the old 7-parameter `submit_general_enquiry` overload that breaks the contact form
+
+**Contact form RPC error?** If submit shows *Could not choose the best candidate function between … submit_general_enquiry*, paste and run `scripts/fix-submit-general-enquiry-overload.sql` in the SQL Editor, then retry `/contact`.
 
 Verify migration 015 after running:
 

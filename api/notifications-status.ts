@@ -1,8 +1,8 @@
-import { readEnv } from "../server/lib/env";
-import { getBrandInboxes } from "../server/lib/notification-routing";
-import { getNotificationMailConfig } from "../server/lib/notifications";
-import { hasValidStatusProbeKey } from "../server/lib/request-guard";
-import { createServiceSupabaseClient } from "../server/lib/supabase-service";
+import { readEnv } from "./_lib/env";
+import { getBrandInboxes } from "./_lib/notification-routing";
+import { getNotificationMailConfig } from "./_lib/notifications";
+import { hasValidStatusProbeKey } from "./_lib/request-guard";
+import { createServiceSupabaseClient } from "./_lib/supabase-service";
 
 function json(status: number, body: unknown): Response {
   return Response.json(body, {

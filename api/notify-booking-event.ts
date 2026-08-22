@@ -1,6 +1,6 @@
-import { createServiceSupabaseClient } from "../server/lib/supabase-service";
-import { siteUrl } from "../server/lib/env";
-import { isSameSiteRequest } from "../server/lib/request-guard";
+import { createServiceSupabaseClient } from "./_lib/supabase-service";
+import { siteUrl } from "./_lib/env";
+import { isSameSiteRequest } from "./_lib/request-guard";
 import {
   buildBookingConversionAdminMail,
   buildBookingConversionConfirmationMail,
@@ -8,11 +8,11 @@ import {
   getNotificationMailConfig,
   NOTIFICATIONS_NOT_CONFIGURED,
   sendMail,
-} from "../server/lib/notifications";
+} from "./_lib/notifications";
 import {
   getBrandInboxes,
   resolveBookingNotificationRecipients,
-} from "../server/lib/notification-routing";
+} from "./_lib/notification-routing";
 
 type BookingEventBody =
   | { kind: "conversion"; bookingId: string; enquiryId?: string }
