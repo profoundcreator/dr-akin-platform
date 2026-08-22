@@ -13,7 +13,7 @@ export const step1Schema = z.object({
 
 export const step2Schema = z.object({
   engagementType: z.string().min(1, "Engagement type is required"),
-  eventTitle: z.string().min(3, "Event title is required"),
+  eventTitle: z.string().min(3, "Engagement title is required"),
   audienceSize: z.string().min(1, "Audience size is required"),
   format: z.string().min(1, "Format is required"),
 });
