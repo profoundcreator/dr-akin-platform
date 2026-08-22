@@ -1,7 +1,7 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import { readEnv, siteUrl } from "./lib/env";
-import { hasValidStatusProbeKey } from "./lib/request-guard";
-import { createServiceSupabaseClient } from "./lib/supabase-service";
+import { readEnv, siteUrl } from "../server/lib/env";
+import { hasValidStatusProbeKey } from "../server/lib/request-guard";
+import { createServiceSupabaseClient } from "../server/lib/supabase-service";
 
 type AdminAccessRole =
   | "super_admin"
