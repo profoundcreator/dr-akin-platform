@@ -10,14 +10,15 @@ type BrandLogoProps = {
 };
 
 const LOCKUP_HEIGHT = {
-  header: "h-9 sm:h-10",
+  /** ~35–40% of the 80px header bar — wide lockup width scales from height. */
+  header: "h-7 sm:h-8",
   footer: "h-10 sm:h-11",
   mark: "h-9 w-9",
 } as const;
 
-/** Wide lockup ~5.5:1 — width follows height via w-auto (do not cap max-width). */
+/** Wide lockup ~6.7:1 — width follows height via w-auto. */
 const LOCKUP_WIDTH = {
-  header: { width: 240, height: 40 },
+  header: { width: 187, height: 28 },
   footer: { width: 280, height: 48 },
   mark: { width: 36, height: 36 },
 } as const;
