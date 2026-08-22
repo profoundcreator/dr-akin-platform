@@ -10,14 +10,15 @@ type BrandLogoProps = {
 };
 
 const LOCKUP_HEIGHT = {
-  header: "h-8 sm:h-9",
+  header: "h-9 sm:h-10",
   footer: "h-10 sm:h-11",
   mark: "h-9 w-9",
 } as const;
 
+/** Wide lockup ~5.5:1 — width follows height via w-auto (do not cap max-width). */
 const LOCKUP_WIDTH = {
-  header: { width: 200, height: 36 },
-  footer: { width: 240, height: 44 },
+  header: { width: 240, height: 40 },
+  footer: { width: 280, height: 48 },
   mark: { width: 36, height: 36 },
 } as const;
 
@@ -46,7 +47,7 @@ export function BrandLogo({ variant = "header", className, priority = false }: B
       alt=""
       width={dimensions.width}
       height={dimensions.height}
-      className={cn("w-auto max-w-[min(100%,12.5rem)] shrink-0 object-contain object-left sm:max-w-none", heightClass, className)}
+      className={cn("w-auto shrink-0 object-contain object-left", heightClass, className)}
       decoding="async"
       fetchPriority={priority ? "high" : undefined}
       loading={priority ? "eager" : "lazy"}
