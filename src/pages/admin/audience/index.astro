@@ -1,0 +1,8 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AdminAudiencePage } from "@/components/pages/admin-audience-page";
+---
+
+<Layout title="Admin — Audience" noIndex>
+  <AdminAudiencePage client:only="react" />
+</Layout>

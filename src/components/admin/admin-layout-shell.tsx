@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen } from "lucide-react";
+import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen, Mail, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, formatAdminRole } from "@/lib/auth/permissions";
@@ -17,6 +17,8 @@ const NAV_ITEMS = [
   { label: "Insights", href: "/admin/insights", icon: FileText },
   { label: "Work", href: "/admin/work", icon: Briefcase },
   { label: "Resources", href: "/admin/resources", icon: PackageOpen, requiresResourceAccess: true },
+  { label: "Audience", href: "/admin/audience", icon: Megaphone },
+  { label: "Email preview", href: "/admin/settings/email-preview", icon: Mail },
   { label: "Team", href: "/admin/team", icon: Users, requiresTeamAccess: true },
   { label: "Audit Log", href: "/admin/audit-log", icon: ScrollText, requiresAuditAccess: true },
   { label: "Featured Episodes", href: "/admin/audio", icon: Headphones },

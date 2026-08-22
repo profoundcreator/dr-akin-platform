@@ -1,5 +1,6 @@
 "use client";
 
+import { SummitInterestForm } from "@/components/marketing/summit-interest-form";
 import { ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -150,6 +151,10 @@ export function EventDetailPage({ event }: EventDetailPageProps) {
             </Reveal>
           </div>
         </section>
+      )}
+
+      {event.slug === "performx-summit-2026" && (
+        <SummitInterestForm eventSlug={event.slug} eventTitle={event.title} />
       )}
     </PageShell>
   );

@@ -1,4 +1,5 @@
 import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
+import { syncAudienceToEsp } from "@/lib/marketing/sync-audience-esp";
 import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { readContactSubmissionContext } from "@/lib/contact/platform-context";
 import { tryGetSupabaseClient } from "@/lib/supabase/client";
@@ -40,16 +41,25 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
   notifySubmission({ kind: "enquiry", enquiryId });
 
   if (input.marketingOptIn) {
-    await subscribeAudienceMember({
-      email: input.email,
-      name: input.name,
-      consentSource: "contact",
-      engagementContext: {
-        enquiryId,
-        subject: input.subject,
-        organization: input.organization ?? null,
-      },
-    });
+    try {
+      await subscribeAudienceMember({
+        email: input.email,
+        name: input.name,
+        consentSource: "contact",
+        engagementContext: {
+          enquiryId,
+          subject: input.subject,
+          organization: input.organization ?? null,
+        },
+      });
+      syncAudienceToEsp({
+        email: input.email,
+        name: input.name,
+        consentSource: "contact",
+      });
+    } catch (err) {
+      console.warn("[marketing] contact opt-in failed:", err);
+    }
   }
 
   return enquiryId;
