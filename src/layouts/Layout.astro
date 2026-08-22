@@ -47,7 +47,7 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.favicon} />
-    <link rel="apple-touch-icon" href={BRAND_ASSETS.appleTouchIcon} />
+    <link rel="apple-touch-icon" sizes="180x180" href={BRAND_ASSETS.appleTouchIcon} />
     {preloadImage && (
       <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
     )}
