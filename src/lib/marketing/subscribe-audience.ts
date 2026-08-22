@@ -23,5 +23,6 @@ export async function subscribeAudienceMember(input: SubscribeAudienceInput): Pr
 
   if (error) {
     console.warn("[marketing] audience subscribe failed:", error.message);
+    throw new Error(error.message);
   }
 }

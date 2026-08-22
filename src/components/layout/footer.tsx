@@ -1,5 +1,6 @@
 "use client";
 
+import { FooterNewsletterSignup } from "@/components/marketing/footer-newsletter-signup";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
@@ -34,7 +35,7 @@ export function Footer() {
       </section>
 
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-14 md:px-10 lg:px-14 xl:px-20">
-        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)]">
+        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)_1fr]">
           <div>
             <a
               href="/"
@@ -92,6 +93,8 @@ export function Footer() {
               </ul>
             </div>
           ))}
+
+          <FooterNewsletterSignup />
         </div>
       </div>
 

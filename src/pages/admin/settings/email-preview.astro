@@ -1,0 +1,8 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AdminEmailPreviewPage } from "@/components/pages/admin-email-preview-page";
+---
+
+<Layout title="Admin — Email Preview" noIndex>
+  <AdminEmailPreviewPage client:only="react" />
+</Layout>

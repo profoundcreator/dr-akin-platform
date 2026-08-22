@@ -13,6 +13,8 @@ import {
 import { getMockBookingRequests } from "@/lib/booking/mock-demo-data";
 import { getBookingLookupStrategy } from "@/lib/booking/tracker-access";
 import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
+import { syncAudienceToEsp } from "@/lib/marketing/sync-audience-esp";
+import { notifyBookingEvent } from "@/lib/notifications/notify-booking-event";
 import { notifySubmission } from "@/lib/notifications/notify-submission";
 import { tryGetSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { DbBookingRequest } from "@/lib/supabase/database.types";
@@ -127,17 +129,26 @@ export async function createBookingRequest(
     notifySubmission({ kind: "booking", bookingId: result.id });
 
     if (form.marketingOptIn) {
-      await subscribeAudienceMember({
-        email: form.email,
-        name: form.name,
-        consentSource: "booking",
-        engagementContext: {
-          bookingId: result.id,
-          reference: result.reference,
-          engagementType: form.engagementType,
-          eventTitle: form.eventTitle,
-        },
-      });
+      try {
+        await subscribeAudienceMember({
+          email: form.email,
+          name: form.name,
+          consentSource: "booking",
+          engagementContext: {
+            bookingId: result.id,
+            reference: result.reference,
+            engagementType: form.engagementType,
+            eventTitle: form.eventTitle,
+          },
+        });
+        syncAudienceToEsp({
+          email: form.email,
+          name: form.name,
+          consentSource: "booking",
+        });
+      } catch (err) {
+        console.warn("[marketing] booking opt-in failed:", err);
+      }
     }
 
     return {
@@ -354,6 +365,15 @@ export async function updateBookingStatus(
     internalStatus: updates.internalStatus,
   });
 
+  if (updates.status || updates.organizerMessage) {
+    notifyBookingEvent({
+      kind: "status_update",
+      bookingId: requestId,
+      newStatus: updates.status ?? (existing.status as OrganizerStatus),
+      organizerMessage: updates.organizerMessage,
+    });
+  }
+
   return getBookingRequestById(requestId);
 }
 
@@ -509,6 +529,12 @@ export async function convertEnquiryToBooking(
   await logAuditEvent("enquiry.converted_to_booking", "enquiry", enquiryId, {
     bookingRequestId: result.booking_request_id,
     reference: result.reference,
+  });
+
+  notifyBookingEvent({
+    kind: "conversion",
+    bookingId: result.booking_request_id,
+    enquiryId,
   });
 
   return {

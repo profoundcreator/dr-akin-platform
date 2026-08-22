@@ -18,6 +18,7 @@
     "verify:admin-user": "node scripts/verify-admin-user.mjs",
     "audit:continental": "node scripts/final-audit.mjs --dist",
     "smoke:production": "node scripts/smoke-production.mjs",
+    "verify:smoke:production": "node scripts/smoke-production.mjs",
     "reset:admin-access": "node scripts/reset-admin-access.mjs",
     "import:portraits": "node scripts/import-portraits.mjs"
   },

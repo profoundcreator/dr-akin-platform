@@ -250,6 +250,121 @@ export function buildBookingAdminMail(input: BookingMailInput) {
   };
 }
 
+export function buildBookingConversionAdminMail(
+  input: BookingMailInput & { enquirySubject: string | null },
+) {
+  const base = buildBookingAdminMail(input);
+  const enquiryNote = input.enquirySubject?.trim()
+    ? `Converted from inbox enquiry: “${input.enquirySubject.trim()}”.`
+    : "Converted from an inbox enquiry.";
+
+  return {
+    ...base,
+    subject: base.subject.replace("[Booking", "[Booking conversion"),
+    text: [enquiryNote, "", base.text].join("\n"),
+    html: base.html.replace(
+      "A new speaking or engagement request was submitted on the website.",
+      `${enquiryNote} A booking request was created from the admin inbox.`,
+    ),
+  };
+}
+
+export function buildBookingConversionConfirmationMail(input: {
+  contactName: string;
+  reference: string;
+  trackerUrl: string;
+}) {
+  const greetingName = input.contactName.trim() || "there";
+
+  const text = [
+    `Dear ${greetingName},`,
+    "",
+    "Your enquiry has been converted into a formal booking request.",
+    `Your reference is ${input.reference}.`,
+    "",
+    `Track your request: ${input.trackerUrl}`,
+    "",
+    "Our team will continue reviewing the details and respond within 3–5 business days.",
+  ].join("\n");
+
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: `Booking request ${input.reference} created from your enquiry.`,
+    eyebrow: "Confirmation",
+    title: "Your enquiry is now a booking request",
+    introHtml: `<p style="margin:0;">Dear ${escapeHtml(greetingName)},</p>`,
+    bodyHtml: `<p style="margin:0 0 16px;">Thank you for your patience. We have converted your enquiry into a formal booking request with Dr. Akin Akinpelu's office.</p>
+      ${renderReferenceBadge(input.reference)}
+      <p style="margin:0 0 16px;">Our team will continue reviewing the details and respond within 3–5 business days.</p>`,
+    cta: { label: "Track your request", href: input.trackerUrl },
+    footerNote: "Keep your reference number for future correspondence.",
+  });
+
+  return {
+    subject: `Booking request created — ${input.reference}`,
+    text,
+    html,
+  };
+}
+
+const STATUS_HEADLINES: Record<string, string> = {
+  Received: "We received your booking request",
+  "Under Review": "Your request is under review",
+  "Information Required": "We need more information",
+  "Tentatively Available": "Tentatively available for your dates",
+  Confirmed: "Your engagement is confirmed",
+  Declined: "Update on your booking request",
+  Cancelled: "Your booking request was cancelled",
+  Completed: "Engagement completed",
+};
+
+export function buildBookingStatusUpdateMail(input: {
+  contactName: string;
+  reference: string;
+  status: string;
+  organizerMessage?: string | null;
+  trackerUrl: string;
+}) {
+  const greetingName = input.contactName.trim() || "there";
+  const headline = STATUS_HEADLINES[input.status] ?? `Status update: ${input.status}`;
+  const messageBlock = input.organizerMessage?.trim()
+    ? `\n\nMessage from our team:\n${input.organizerMessage.trim()}`
+    : "";
+
+  const text = [
+    `Dear ${greetingName},`,
+    "",
+    `Your booking request ${input.reference} is now: ${input.status}.`,
+    messageBlock,
+    "",
+    `Track your request: ${input.trackerUrl}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const bodyParts = [
+    `<p style="margin:0 0 16px;">Your booking request status has been updated to <strong>${escapeHtml(input.status)}</strong>.</p>`,
+    renderReferenceBadge(input.reference),
+  ];
+
+  if (input.organizerMessage?.trim()) {
+    bodyParts.push(renderMessageBlock(input.organizerMessage.trim()));
+  }
+
+  const html = renderBrandedEmail({
+    siteUrl: siteUrl(),
+    preheader: `${input.reference} — ${input.status}`,
+    eyebrow: "Status update",
+    title: headline,
+    introHtml: `<p style="margin:0;">Dear ${escapeHtml(greetingName)},</p>`,
+    bodyHtml: bodyParts.join(""),
+    cta: { label: "View booking tracker", href: input.trackerUrl },
+    footerNote: "Reply to this email if you have questions about your request.",
+  });
+
+  return { subject: `${input.reference} — ${input.status}`, text, html };
+}
+
 export function buildBookingConfirmationMail(input: {
   contactName: string;
   reference: string;
