@@ -38,6 +38,9 @@ const SAMPLE = {
     city: "Lagos",
     country: "Nigeria",
     adminUrl: `${siteUrl()}/admin/requests/detail?id=sample`,
+    requestAreaLabel: "AALD",
+    platformKey: "aald",
+    platformLabel: "AALD",
   },
   trackerUrl: `${siteUrl()}/booking/DAA-8492`,
 };

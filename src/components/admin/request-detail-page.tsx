@@ -6,7 +6,7 @@ import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Textarea } from "@/components/ui/textarea";
-import { formatEventLocation } from "@/lib/booking/format-rules";
+import { bookingRequestAreaLabel } from "@/lib/contact/platform-labels";
 import {
   getBookingRequestById,
   updateBookingStatus,
@@ -120,7 +120,10 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               <User className="size-4 shrink-0 text-[var(--ploy-text-tertiary)]" />
               <div>
                 <p className="font-medium">{request.form.name}</p>
-                <p className="text-[var(--ploy-text-secondary)]">{request.form.organization}</p>
+                <p className="text-[var(--ploy-text-secondary)]">
+                Request area: {bookingRequestAreaLabel(request.form.requestArea)}
+              </p>
+              <p className="text-[var(--ploy-text-secondary)]">{request.form.organization}</p>
                 <p className="text-[var(--ploy-text-tertiary)]">{request.form.email}</p>
                 <p className="text-[var(--ploy-text-tertiary)]">{request.form.phone}</p>
               </div>

@@ -6,6 +6,7 @@ import type {
   OrganizerStatus,
   StatusEvent,
 } from "@/lib/booking/types";
+import { normalizeBookingRequestArea } from "@/lib/contact/platform-context";
 import {
   createBookingRequest as createLocalBooking,
   getBookingByReference as getLocalBooking,
@@ -54,6 +55,9 @@ function normalizeBookingForm(raw: unknown): BookingFormData {
     email: form.email ?? "",
     phone: form.phone ?? "",
     timezone: form.timezone ?? "",
+    requestArea: normalizeBookingRequestArea(
+      (form.requestArea as string | undefined) ?? (form.platform as string | undefined),
+    ),
     engagementType: form.engagementType ?? "",
     eventTitle: form.eventTitle ?? "",
     audienceSize: form.audienceSize ?? "",

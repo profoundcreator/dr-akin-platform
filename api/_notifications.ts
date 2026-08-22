@@ -198,16 +198,27 @@ export interface BookingMailInput {
   city: string | null;
   country: string | null;
   adminUrl: string;
+  requestAreaLabel?: string | null;
+  platformKey?: string | null;
+  platformLabel?: string | null;
 }
 
 export function buildBookingAdminMail(input: BookingMailInput) {
   const headline = input.eventTitle?.trim() || "Booking request";
-  const subjectLine = `[Booking ${input.reference}] ${headline}`;
+  const isFutureAfrica = input.platformKey === "future-africa";
+  const subjectLine = isFutureAfrica
+    ? `[Future Africa booking ${input.reference}] ${headline}`
+    : input.platformLabel
+      ? `[Booking ${input.platformLabel} ${input.reference}] ${headline}`
+      : `[Booking ${input.reference}] ${headline}`;
   const location = [input.city, input.country].filter(Boolean).join(", ") || null;
   const textLines = [
-    "New booking request on the website.",
+    isFutureAfrica
+      ? futureAfricaRoutingCalloutText()
+      : "New booking request on the website.",
     "",
     field("Reference", input.reference),
+    field("Request area", input.requestAreaLabel),
     field("Name", input.contactName),
     field("Email", input.contactEmail),
     field("Phone", input.contactPhone),
@@ -217,17 +228,25 @@ export function buildBookingAdminMail(input: BookingMailInput) {
     field("Format", input.format),
     field("Preferred date", input.preferredDate),
     field("Location", location),
+    ...(isFutureAfrica
+      ? [field("Delivered to", "Erudio Hub (interim inbox for Future Africa)")]
+      : []),
     "",
     `Open in admin: ${input.adminUrl}`,
   ].filter(Boolean);
 
+  const introHtml = isFutureAfrica
+    ? `${futureAfricaRoutingCalloutHtml()}<p style="margin:0;">A new booking request was submitted for Future Africa.</p>`
+    : `<p style="margin:0;">A new speaking or engagement request was submitted on the website.</p>`;
+
   const html = renderBrandedEmail({
     siteUrl: siteUrl(),
     preheader: `New booking request ${input.reference} from ${input.contactName}`,
-    eyebrow: "Admin alert",
+    eyebrow: isFutureAfrica ? "Future Africa booking" : "Admin alert",
     title: headline,
-    introHtml: `${renderReferenceBadge(input.reference)}<p style="margin:0;">A new speaking or engagement request was submitted on the website.</p>`,
+    introHtml: `${renderReferenceBadge(input.reference)}${introHtml}`,
     bodyHtml: renderDetailTable([
+      { label: "Request area", value: input.requestAreaLabel },
       { label: "Name", value: input.contactName },
       { label: "Email", value: input.contactEmail },
       { label: "Phone", value: input.contactPhone },
@@ -237,6 +256,9 @@ export function buildBookingAdminMail(input: BookingMailInput) {
       { label: "Format", value: input.format },
       { label: "Preferred date", value: input.preferredDate },
       { label: "Location", value: location },
+      ...(isFutureAfrica
+        ? [{ label: "Delivered to", value: "Erudio Hub (interim inbox for Future Africa)" }]
+        : []),
     ]),
     cta: { label: "Open booking in admin", href: input.adminUrl },
     footerNote: "Reply directly to this email to reach the organizer.",
@@ -403,6 +425,7 @@ export async function sendMail(
   config: NotificationMailConfig,
   message: {
     to: string | string[];
+    cc?: string | string[];
     subject: string;
     html: string;
     text: string;
@@ -412,6 +435,7 @@ export async function sendMail(
   const { data, error } = await config.resend.emails.send({
     from: config.from,
     to: message.to,
+    cc: message.cc,
     subject: message.subject,
     html: message.html,
     text: message.text,

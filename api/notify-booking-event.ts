@@ -11,7 +11,10 @@ import {
 } from "./_notifications.js";
 import {
   getBrandInboxes,
+  platformLabel,
   resolveBookingNotificationRecipients,
+  resolveBookingPlatformFromForm,
+  bookingRequestAreaLabel,
 } from "./_notification-routing.js";
 
 type BookingEventBody =
@@ -91,10 +94,16 @@ export async function POST(request: Request): Promise<Response> {
     : `${baseUrl}/booking/${booking.reference}`;
 
   const brandInboxes = getBrandInboxes();
-  const teamRecipients = resolveBookingNotificationRecipients(brandInboxes);
+  const bookingPlatform = resolveBookingPlatformFromForm(form);
+  const requestAreaRaw =
+    readFormField(form, "requestArea") ?? readFormField(form, "platform") ?? "speaking-office";
+  const teamRecipients = resolveBookingNotificationRecipients({
+    platform: bookingPlatform,
+    inboxes: brandInboxes,
+  });
 
   if (body.kind === "conversion") {
-    if (teamRecipients.length === 0) {
+    if (teamRecipients.to.length === 0) {
       return json(503, { error: "ADMIN_NOTIFICATION_EMAIL is not configured." });
     }
 
@@ -125,10 +134,14 @@ export async function POST(request: Request): Promise<Response> {
       country: readFormField(form, "country"),
       adminUrl,
       enquirySubject,
+      requestAreaLabel: bookingRequestAreaLabel(requestAreaRaw),
+      platformKey: bookingPlatform,
+      platformLabel: platformLabel(bookingPlatform),
     });
 
     const adminResult = await sendMail(mailConfig, {
-      to: teamRecipients,
+      to: teamRecipients.to,
+      cc: teamRecipients.cc.length > 0 ? teamRecipients.cc : undefined,
       subject: adminMail.subject,
       html: adminMail.html,
       text: adminMail.text,

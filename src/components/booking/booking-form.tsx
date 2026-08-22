@@ -37,6 +37,13 @@ import {
   stepDescriptionForFormat,
   VOIDED_FIELDS_ON_VIRTUAL,
 } from "@/lib/booking/format-rules";
+import {
+  normalizeBookingRequestArea,
+  BOOKING_REQUEST_AREAS,
+  readContactSubmissionContext,
+  type BookingRequestArea,
+} from "@/lib/contact/platform-context";
+import { bookingRoutingHint } from "@/lib/contact/platform-labels";
 import { cn } from "@/lib/utils";
 
 const SESSION_KEY = "daa_booking_form_draft";
@@ -72,7 +79,16 @@ export function BookingForm({
   const [copiedRef, setCopiedRef] = useState(false);
 
   useEffect(() => {
-    setForm(loadDraft());
+    const draft = loadDraft();
+    const { platform } = readContactSubmissionContext();
+    const inferredArea: BookingRequestArea = platform ?? "speaking-office";
+    setForm({
+      ...draft,
+      requestArea:
+        draft.requestArea && draft.requestArea !== "speaking-office"
+          ? normalizeBookingRequestArea(draft.requestArea)
+          : inferredArea,
+    });
   }, []);
 
   useEffect(() => {
@@ -274,6 +290,32 @@ export function BookingForm({
                 />
                 {errors.name && (
                   <p className="text-xs text-[var(--ploy-status-error)]">{errors.name}</p>
+                )}
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="requestArea" required>
+                  Which area is this request for?
+                </Label>
+                <Select
+                  id="requestArea"
+                  value={form.requestArea}
+                  onChange={(e) =>
+                    updateField("requestArea", normalizeBookingRequestArea(e.target.value))
+                  }
+                >
+                  {BOOKING_REQUEST_AREAS.map((area) => (
+                    <option key={area.value} value={area.value}>
+                      {area.label}
+                    </option>
+                  ))}
+                </Select>
+                {bookingRoutingHint(form.requestArea) && (
+                  <p className="text-xs leading-relaxed text-[var(--ploy-text-secondary)]">
+                    {bookingRoutingHint(form.requestArea)}
+                  </p>
+                )}
+                {errors.requestArea && (
+                  <p className="text-xs text-[var(--ploy-status-error)]">{errors.requestArea}</p>
                 )}
               </div>
               <div className="space-y-2 sm:col-span-2">

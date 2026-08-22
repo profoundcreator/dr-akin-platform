@@ -33,6 +33,38 @@ export function contactPathForPlatform(platform: BrandRoutedPlatform): string {
   return `/contact?platform=${encodeURIComponent(platform)}`;
 }
 
+export function bookingPathForPlatform(platform: BrandRoutedPlatform): string {
+  return `/book-dr-akin?platform=${encodeURIComponent(platform)}`;
+}
+
+/** Stored on booking form submissions — speaking office or a brand platform slug. */
+export type BookingRequestArea = "speaking-office" | BrandRoutedPlatform;
+
+export const BOOKING_REQUEST_AREAS: { value: BookingRequestArea; label: string }[] = [
+  { value: "speaking-office", label: "Dr. Akin Akinpelu — speaking & advisory" },
+  { value: "aald", label: "AALD" },
+  { value: "performx", label: "PerformX Nexus" },
+  { value: "erudio-hub", label: "Erudio Hub" },
+  { value: "auctus-africa", label: "Auctus Africa" },
+  { value: "future-africa", label: "Future Africa" },
+];
+
+export function normalizeBookingRequestArea(
+  value: string | null | undefined,
+): BookingRequestArea {
+  const trimmed = (value ?? "").trim().toLowerCase();
+  if (!trimmed || trimmed === "speaking-office") return "speaking-office";
+  return CONTACT_PLATFORMS.includes(trimmed as ContactPlatform)
+    ? (trimmed as BrandRoutedPlatform)
+    : "speaking-office";
+}
+
+export function bookingPlatformFromArea(
+  area: BookingRequestArea,
+): ContactPlatform | null {
+  return area === "speaking-office" ? null : area;
+}
+
 export function inferPlatformFromPath(path: string | null | undefined): ContactPlatform | null {
   const normalized = (path ?? "").trim().replace(/\/$/, "");
   if (!normalized) return null;
