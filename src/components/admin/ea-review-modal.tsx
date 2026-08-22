@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Calendar, MapPin, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
-import { formatEventLocation } from "@/lib/booking/format-rules";
+import { formatEventLocation, isLogisticsNotApplicable, isProtocolNotApplicable } from "@/lib/booking/format-rules";
 import type { BookingRequest } from "@/lib/booking/types";
 import { cn } from "@/lib/utils";
 
@@ -152,10 +152,35 @@ export function EaReviewModal({ request, open, onClose }: EaReviewModalProps) {
             </div>
           </dl>
 
+          {request.form?.travelDetails?.trim() && (
+            <div className="rounded-[var(--ploy-radius-lg)] bg-[var(--ploy-background-secondary)] p-4 text-sm">
+              <p className="font-medium">Logistics</p>
+              <p
+                className={cn(
+                  "mt-1",
+                  isLogisticsNotApplicable(request.form.travelDetails)
+                    ? "italic text-[var(--ploy-text-tertiary)]"
+                    : "text-[var(--ploy-text-secondary)]",
+                )}
+              >
+                {request.form.travelDetails}
+              </p>
+            </div>
+          )}
+
           {request.form?.vipProtocol?.trim() && (
             <div className="rounded-[var(--ploy-radius-lg)] bg-[var(--ploy-background-secondary)] p-4 text-sm">
               <p className="font-medium">Event security & reception</p>
-              <p className="mt-1 text-[var(--ploy-text-secondary)]">{request.form.vipProtocol}</p>
+              <p
+                className={cn(
+                  "mt-1",
+                  isProtocolNotApplicable(request.form.vipProtocol)
+                    ? "italic text-[var(--ploy-text-tertiary)]"
+                    : "text-[var(--ploy-text-secondary)]",
+                )}
+              >
+                {request.form.vipProtocol}
+              </p>
             </div>
           )}
         </div>

@@ -29,12 +29,17 @@ import {
   countryLabelForFormat,
   fieldsForFormat,
   isHybridFormat,
+  LOGISTICS_NOT_APPLICABLE_VALUE,
   LOGISTICS_PLACEHOLDER,
   logisticsHelperForFormat,
   logisticsLabelForFormat,
+  isLogisticsNotApplicable,
+  isProtocolNotApplicable,
+  PROTOCOL_NOT_APPLICABLE_VALUE,
   PROTOCOL_HELPER,
   PROTOCOL_PLACEHOLDER,
   stepDescriptionForFormat,
+  syncBookingOptionalFieldFlags,
   VOIDED_FIELDS_ON_VIRTUAL,
 } from "@/lib/booking/format-rules";
 import {
@@ -82,13 +87,14 @@ export function BookingForm({
     const draft = loadDraft();
     const { platform } = readContactSubmissionContext();
     const inferredArea: BookingRequestArea = platform ?? "speaking-office";
-    setForm({
+    const merged = {
       ...draft,
       requestArea:
         draft.requestArea && draft.requestArea !== "speaking-office"
           ? normalizeBookingRequestArea(draft.requestArea)
           : inferredArea,
-    });
+    };
+    setForm({ ...merged, ...syncBookingOptionalFieldFlags(merged) });
   }, []);
 
   useEffect(() => {
@@ -153,7 +159,8 @@ export function BookingForm({
     setSubmitError(null);
 
     try {
-      const result = await createBookingRequest(form, variant === "modal" ? "modal" : "web");
+      const payload = { ...form, ...syncBookingOptionalFieldFlags(form) };
+      const result = await createBookingRequest(payload, variant === "modal" ? "modal" : "web");
       sessionStorage.removeItem(SESSION_KEY);
       setSubmittedRef(result.reference);
       const url = result.accessToken
@@ -533,16 +540,43 @@ export function BookingForm({
               </>
             )}
             {showLogistics && (
-              <div className="space-y-2 sm:col-span-2">
+              <div className="space-y-3 sm:col-span-2">
                 <Label htmlFor="travelDetails">{logisticsLabelForFormat(form.format)}</Label>
                 <p className="text-xs text-[var(--ploy-text-tertiary)]">
                   {logisticsHelperForFormat(form.format)}
                 </p>
                 <Textarea
                   id="travelDetails"
-                  value={form.travelDetails}
-                  onChange={(e) => updateField("travelDetails", e.target.value)}
+                  value={
+                    form.logisticsNotApplicable ? "" : form.travelDetails
+                  }
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      logisticsNotApplicable: false,
+                      travelDetails: e.target.value,
+                    }));
+                  }}
                   placeholder={LOGISTICS_PLACEHOLDER}
+                  disabled={form.logisticsNotApplicable}
+                  aria-disabled={form.logisticsNotApplicable}
+                />
+                <Checkbox
+                  id="logisticsNotApplicable"
+                  checked={form.logisticsNotApplicable}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setForm((prev) => ({
+                      ...prev,
+                      logisticsNotApplicable: checked,
+                      travelDetails: checked
+                        ? LOGISTICS_NOT_APPLICABLE_VALUE
+                        : isLogisticsNotApplicable(prev.travelDetails)
+                          ? ""
+                          : prev.travelDetails,
+                    }));
+                  }}
+                  label="No logistics support required from our side at this stage"
                 />
               </div>
             )}
@@ -605,14 +639,39 @@ export function BookingForm({
               </div>
             </div>
             {fieldsForFormat(form.format).showProtocol && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="vipProtocol">Event security & reception</Label>
                 <p className="text-xs text-[var(--ploy-text-tertiary)]">{PROTOCOL_HELPER}</p>
                 <Textarea
                   id="vipProtocol"
-                  value={form.vipProtocol}
-                  onChange={(e) => updateField("vipProtocol", e.target.value)}
+                  value={form.protocolNotApplicable ? "" : form.vipProtocol}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      protocolNotApplicable: false,
+                      vipProtocol: e.target.value,
+                    }));
+                  }}
                   placeholder={PROTOCOL_PLACEHOLDER}
+                  disabled={form.protocolNotApplicable}
+                  aria-disabled={form.protocolNotApplicable}
+                />
+                <Checkbox
+                  id="protocolNotApplicable"
+                  checked={form.protocolNotApplicable}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setForm((prev) => ({
+                      ...prev,
+                      protocolNotApplicable: checked,
+                      vipProtocol: checked
+                        ? PROTOCOL_NOT_APPLICABLE_VALUE
+                        : isProtocolNotApplicable(prev.vipProtocol)
+                          ? ""
+                          : prev.vipProtocol,
+                    }));
+                  }}
+                  label="No special security or reception requirements for this engagement"
                 />
               </div>
             )}

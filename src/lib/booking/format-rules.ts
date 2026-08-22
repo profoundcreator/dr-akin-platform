@@ -49,15 +49,30 @@ export function logisticsLabelForFormat(format: string): string {
 }
 
 export function logisticsHelperForFormat(format: string): string {
-  const base = "Tell us what travel and on-site support your team will arrange for Akin Akinpelu.";
+  const base =
+    "Tell us what travel and on-site support your team will arrange for Akin Akinpelu. If this does not apply to your request, you may indicate that below.";
   return isHybridFormat(format) ? `${base} (For the in-person portion.)` : base;
 }
 
 export const LOGISTICS_PLACEHOLDER =
   "e.g. Business-class flights covered, hotel for 2 nights, airport pickup and local driver";
 
+export const LOGISTICS_NOT_APPLICABLE_VALUE =
+  "Not applicable — no logistics support required from our side at this stage.";
+
+export const PROTOCOL_NOT_APPLICABLE_VALUE =
+  "Not applicable — no special security or reception requirements for this engagement.";
+
+export function isLogisticsNotApplicable(value: string | null | undefined): boolean {
+  return (value ?? "").trim() === LOGISTICS_NOT_APPLICABLE_VALUE;
+}
+
+export function isProtocolNotApplicable(value: string | null | undefined): boolean {
+  return (value ?? "").trim() === PROTOCOL_NOT_APPLICABLE_VALUE;
+}
+
 export const PROTOCOL_HELPER =
-  "Describe any security, reception, or on-site protocol expectations for this event. Akin's team will share speaker requirements after review.";
+  "Describe any security, reception, or on-site protocol expectations for this engagement. Akin's team will share speaker requirements after review. If this does not apply, you may indicate that below.";
 
 export const PROTOCOL_PLACEHOLDER =
   "e.g. Airport VIP reception, security detail at venue, dress code, head-of-state attendance";
@@ -68,6 +83,8 @@ export const VOIDED_FIELDS_ON_VIRTUAL = [
   "country",
   "travelDetails",
   "vipProtocol",
+  "logisticsNotApplicable",
+  "protocolNotApplicable",
 ] as const satisfies readonly (keyof BookingFormData)[];
 
 export function applyFormatChange(
@@ -83,6 +100,28 @@ export function applyFormatChange(
     country: "",
     travelDetails: "",
     vipProtocol: "",
+    logisticsNotApplicable: false,
+    protocolNotApplicable: false,
+  };
+}
+
+/** Sync N/A booleans with stored sentinel values (drafts and legacy rows). */
+export function syncBookingOptionalFieldFlags(
+  form: Pick<
+    BookingFormData,
+    "travelDetails" | "vipProtocol" | "logisticsNotApplicable" | "protocolNotApplicable"
+  >,
+): Pick<BookingFormData, "travelDetails" | "vipProtocol" | "logisticsNotApplicable" | "protocolNotApplicable"> {
+  const logisticsNotApplicable =
+    form.logisticsNotApplicable || isLogisticsNotApplicable(form.travelDetails);
+  const protocolNotApplicable =
+    form.protocolNotApplicable || isProtocolNotApplicable(form.vipProtocol);
+
+  return {
+    logisticsNotApplicable,
+    protocolNotApplicable,
+    travelDetails: logisticsNotApplicable ? LOGISTICS_NOT_APPLICABLE_VALUE : form.travelDetails,
+    vipProtocol: protocolNotApplicable ? PROTOCOL_NOT_APPLICABLE_VALUE : form.vipProtocol,
   };
 }
 

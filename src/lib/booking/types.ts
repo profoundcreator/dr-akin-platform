@@ -53,10 +53,12 @@ export interface BookingFormData {
   city: string;
   country: string;
   travelDetails: string;
+  logisticsNotApplicable: boolean;
   // Step 4 — Requirements
   budgetRange: string;
   recordingPermission: string;
   vipProtocol: string;
+  protocolNotApplicable: boolean;
   termsAgreed: boolean;
   marketingOptIn: boolean;
 }
@@ -109,9 +111,11 @@ export const EMPTY_BOOKING_FORM: BookingFormData = {
   city: "",
   country: "",
   travelDetails: "",
+  logisticsNotApplicable: false,
   budgetRange: "",
   recordingPermission: "",
   vipProtocol: "",
+  protocolNotApplicable: false,
   termsAgreed: false,
   marketingOptIn: false,
 };

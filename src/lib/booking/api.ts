@@ -7,6 +7,7 @@ import type {
   StatusEvent,
 } from "@/lib/booking/types";
 import { normalizeBookingRequestArea } from "@/lib/contact/platform-context";
+import { syncBookingOptionalFieldFlags } from "@/lib/booking/format-rules";
 import {
   createBookingRequest as createLocalBooking,
   getBookingByReference as getLocalBooking,
@@ -49,6 +50,13 @@ export function getStoredAccessToken(reference: string): string | null {
 function normalizeBookingForm(raw: unknown): BookingFormData {
   const form = raw && typeof raw === "object" ? (raw as Partial<BookingFormData>) : {};
 
+  const optionalFields = syncBookingOptionalFieldFlags({
+    travelDetails: form.travelDetails ?? "",
+    vipProtocol: form.vipProtocol ?? "",
+    logisticsNotApplicable: Boolean(form.logisticsNotApplicable),
+    protocolNotApplicable: Boolean(form.protocolNotApplicable),
+  });
+
   return {
     name: form.name ?? "",
     organization: form.organization ?? "",
@@ -66,10 +74,9 @@ function normalizeBookingForm(raw: unknown): BookingFormData {
     alternativeDate: form.alternativeDate ?? "",
     city: form.city ?? "",
     country: form.country ?? "",
-    travelDetails: form.travelDetails ?? "",
+    ...optionalFields,
     budgetRange: form.budgetRange ?? "",
     recordingPermission: form.recordingPermission ?? "",
-    vipProtocol: form.vipProtocol ?? "",
     termsAgreed: Boolean(form.termsAgreed),
     marketingOptIn: Boolean(form.marketingOptIn),
   };
@@ -121,8 +128,9 @@ export async function createBookingRequest(
   const supabase = tryGetSupabaseClient();
 
   if (supabase) {
+    const payload = { ...form, ...syncBookingOptionalFieldFlags(form) };
     const { data, error } = await supabase.rpc("create_booking_request", {
-      p_form: form as unknown as Record<string, unknown>,
+      p_form: payload as unknown as Record<string, unknown>,
       p_source: source,
     });
 

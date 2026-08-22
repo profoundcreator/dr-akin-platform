@@ -8,6 +8,11 @@ import { Heading } from "@/components/ui/heading";
 import { Textarea } from "@/components/ui/textarea";
 import { bookingRequestAreaLabel } from "@/lib/contact/platform-labels";
 import {
+  formatEventLocation,
+  isLogisticsNotApplicable,
+  isProtocolNotApplicable,
+} from "@/lib/booking/format-rules";
+import {
   getBookingRequestById,
   updateBookingStatus,
 } from "@/lib/booking/api";
@@ -147,12 +152,24 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                 {request.form.engagementType} · {request.form.format} · {request.form.audienceSize}
               </p>
               {request.form.travelDetails.trim() && (
-                <p className="text-[var(--ploy-text-secondary)]">
+                <p
+                  className={
+                    isLogisticsNotApplicable(request.form.travelDetails)
+                      ? "italic text-[var(--ploy-text-tertiary)]"
+                      : "text-[var(--ploy-text-secondary)]"
+                  }
+                >
                   Logistics: {request.form.travelDetails}
                 </p>
               )}
               {request.form.vipProtocol.trim() && (
-                <p className="text-[var(--ploy-text-secondary)]">
+                <p
+                  className={
+                    isProtocolNotApplicable(request.form.vipProtocol)
+                      ? "italic text-[var(--ploy-text-tertiary)]"
+                      : "text-[var(--ploy-text-secondary)]"
+                  }
+                >
                   Event security & reception: {request.form.vipProtocol}
                 </p>
               )}
