@@ -24,13 +24,25 @@ const EMAIL_FILE_WIDTH = 440;
 const SITE_FILE_WIDTH = 520;
 const TRIM_PADDING = 20;
 
+/** Wide lockups are ~5–7:1; square/tall masters truncate in the header. */
+const MIN_LOCKUP_ASPECT = 4;
+
+async function isWideLockup(filePath) {
+  const { width, height } = await sharp(filePath).metadata();
+  if (!width || !height) return false;
+  return width / height >= MIN_LOCKUP_ASPECT;
+}
+
 async function findSource() {
   for (const base of SOURCE_BASENAMES) {
     for (const ext of SOURCE_EXTENSIONS) {
       const candidate = path.join(INCOMING, `${base}${ext}`);
       try {
         await access(candidate);
-        return candidate;
+        if (await isWideLockup(candidate)) return candidate;
+        console.warn(
+          `Skipping ${path.relative(ROOT, candidate)} — not a wide lockup (need ≥${MIN_LOCKUP_ASPECT}:1).`,
+        );
       } catch {
         /* try next */
       }
