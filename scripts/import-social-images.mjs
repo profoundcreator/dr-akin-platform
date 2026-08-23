@@ -11,7 +11,8 @@
  * Then: npm run import:social-images
  *
  * Bootstrap (interim crops from studio portrait until stage sources are added):
- *   npm run import:social-images -- --bootstrap
+ *   npm run import:social-images -- --bootstrap-og     — default link preview only
+ *   npm run import:social-images -- --bootstrap        — all four (overwrites stage assets)
  */
 import { access, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
@@ -96,25 +97,34 @@ async function convertOne(source, target) {
 }
 
 async function main() {
-  const bootstrap = process.argv.includes("--bootstrap");
+  const bootstrapAll = process.argv.includes("--bootstrap");
+  const bootstrapOg = process.argv.includes("--bootstrap-og");
   await mkdir(INCOMING_DIR, { recursive: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
 
-  if (bootstrap) {
+  if (bootstrapAll || bootstrapOg) {
     try {
       await access(FORMAL_PORTRAIT);
     } catch {
       console.error("Bootstrap requires public/images/marketing/dr-akin-portrait-formal.webp");
       process.exit(1);
     }
+
+    const targets = bootstrapOg && !bootstrapAll ? [TARGETS[0]] : TARGETS;
     console.warn(
-      "Bootstrap mode: generating interim crops from studio portrait.\n" +
-        "Replace by adding stage sources to assets/social-images-incoming/ and rerunning without --bootstrap.\n",
+      bootstrapOg && !bootstrapAll
+        ? "Bootstrap OG: updating default link preview from formal portrait only.\n"
+        : "Bootstrap mode: generating interim crops from studio portrait.\n" +
+            "Replace by adding stage sources to assets/social-images-incoming/ and rerunning without --bootstrap.\n",
     );
-    for (const target of TARGETS) {
+    for (const target of targets) {
       await convertOne(FORMAL_PORTRAIT, target);
     }
-    console.log("\nDone — interim social images ready. Add stage JPEGs and rerun to replace.");
+    console.log(
+      bootstrapOg && !bootstrapAll
+        ? "\nDone — default OG updated. Stage assets unchanged."
+        : "\nDone — interim social images ready. Add stage JPEGs and rerun to replace.",
+    );
     return;
   }
 
