@@ -1,6 +1,5 @@
 "use client";
 
-import { FooterNewsletterSignup } from "@/components/marketing/footer-newsletter-signup";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/ui/reveal";
@@ -9,6 +8,10 @@ import { PERSON_IDENTITY } from "@/data/person-identity";
 import { APPROVED_SOCIAL_LINKS, SITE_CONTACT } from "@/data/site-contact";
 import { FOOTER_COLUMNS } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
+import { openNewsletterModal } from "@/lib/newsletter-modal";
+
+const footerLinkClassName =
+  "text-sm text-[var(--ploy-text-secondary)] transition-colors hover:text-[var(--ploy-text-primary)]";
 
 export function Footer() {
   return (
@@ -35,7 +38,7 @@ export function Footer() {
       </section>
 
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-14 md:px-10 lg:px-14 xl:px-20">
-        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)_1fr]">
+        <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)]">
           <div>
             <a
               href="/"
@@ -44,13 +47,6 @@ export function Footer() {
             >
               <BrandLogo variant="footer" />
             </a>
-            <p className="mt-4 text-sm font-medium text-[var(--ploy-text-primary)]">
-              {PERSON_IDENTITY.publicName}
-            </p>
-            <p className="mt-5 max-w-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              Leadership scholar, governance strategist, diplomat, and institution builder
-              working across Governance, Enterprise, and Education.
-            </p>
             <div className="mt-6 text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
               <p><a href={`tel:${SITE_CONTACT.phone.replace(/\s/g, "")}`}>{SITE_CONTACT.phone}</a></p>
               <p><a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a></p>
@@ -79,22 +75,30 @@ export function Footer() {
               <ul className="mt-5 space-y-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-[var(--ploy-text-secondary)] transition-colors hover:text-[var(--ploy-text-primary)]"
-                      {...("external" in link && link.external
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                    >
-                      {link.label}
-                    </a>
+                    {link.action === "newsletter" ? (
+                      <button
+                        type="button"
+                        onClick={openNewsletterModal}
+                        className={footerLinkClassName}
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className={footerLinkClassName}
+                        {...(link.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
           ))}
-
-          <FooterNewsletterSignup />
         </div>
       </div>
 

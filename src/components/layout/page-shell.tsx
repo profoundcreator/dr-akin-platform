@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Footer } from "@/components/layout/footer";
 import { EnquiryModalHost } from "@/components/layout/enquiry-modal-host";
+import { NewsletterModalHost } from "@/components/layout/newsletter-modal-host";
 
 interface PageShellProps {
   children: ReactNode;
@@ -18,6 +19,7 @@ export function PageShell({ children }: PageShellProps) {
         <Footer />
       </div>
       <EnquiryModalHost />
+      <NewsletterModalHost />
     </>
   );
 }
