@@ -16,7 +16,7 @@ export const SITE_CONTACT = {
   responseTime: "We aim to respond within 3–5 business days.",
   socialLinks: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/akinakinpelu/" },
-    { label: "X", href: "https://x.com/iamakinakinpelu" },
+    { label: "Twitter", href: "https://x.com/iamakinakinpelu" },
     { label: "Instagram", href: "https://www.instagram.com/iamakinakinpelu/" },
     { label: "TikTok", href: "https://www.tiktok.com/@theakinakinpelu" },
   ] satisfies ApprovedSocialLink[],

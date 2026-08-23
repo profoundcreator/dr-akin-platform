@@ -13,6 +13,26 @@ import { openNewsletterModal } from "@/lib/newsletter-modal";
 const footerLinkClassName =
   "text-sm text-[var(--ploy-text-secondary)] transition-colors hover:text-[var(--ploy-text-primary)]";
 
+function FooterSocialLinks({ links }: { links: readonly { label: string; href: string }[] }) {
+  return (
+    <ul className="mt-5 space-y-3 text-sm">
+      {links.map((link) => (
+        <li key={link.href}>
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={footerLinkClassName}
+            {...(link.label === "Twitter" ? { "aria-label": "X (Twitter)" } : {})}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="bg-[var(--ploy-background-primary)]">
@@ -62,20 +82,7 @@ export function Footer() {
             {APPROVED_SOCIAL_LINKS.length > 0 && (
               <>
                 <p className="ploy-eyebrow mt-5">Follow</p>
-                <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                  {APPROVED_SOCIAL_LINKS.map((link) => (
-                    <li key={link.href}>
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={footerLinkClassName}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <FooterSocialLinks links={APPROVED_SOCIAL_LINKS} />
               </>
             )}
           </div>
