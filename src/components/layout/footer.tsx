@@ -40,32 +40,43 @@ export function Footer() {
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-14 md:px-10 lg:px-14 xl:px-20">
         <div className="mx-auto grid max-w-[var(--ploy-canvas-main)] gap-12 lg:grid-cols-[1.25fr_repeat(4,0.75fr)]">
           <div>
-            <a
-              href="/"
-              aria-label={`${PERSON_IDENTITY.publicName} — Home`}
-              className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
-            >
-              <BrandLogo variant="footer" />
-            </a>
-            <div className="mt-6 text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-              <p><a href={`tel:${SITE_CONTACT.phone.replace(/\s/g, "")}`}>{SITE_CONTACT.phone}</a></p>
-              <p><a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a></p>
+            <div className="flex items-center gap-2.5">
+              <a
+                href="/"
+                aria-label={`${PERSON_IDENTITY.publicName} — Home`}
+                className="inline-flex shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
+              >
+                <BrandLogo variant="footerMark" />
+              </a>
+              <p className="ploy-eyebrow">Contact</p>
             </div>
+            <ul className="mt-5 space-y-3 text-sm text-[var(--ploy-text-secondary)]">
+              <li>
+                <a href={`tel:${SITE_CONTACT.phone.replace(/\s/g, "")}`}>{SITE_CONTACT.phone}</a>
+              </li>
+              <li>
+                <a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
+              </li>
+            </ul>
+
             {APPROVED_SOCIAL_LINKS.length > 0 && (
-              <ul className="mt-5 grid max-w-xs grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                {APPROVED_SOCIAL_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[var(--ploy-text-link)] hover:underline"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <p className="ploy-eyebrow mt-5">Follow</p>
+                <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  {APPROVED_SOCIAL_LINKS.map((link) => (
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={footerLinkClassName}
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </div>
 
