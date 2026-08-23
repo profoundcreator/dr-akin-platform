@@ -67,6 +67,8 @@ export interface FooterLink {
   href?: string;
   external?: boolean;
   action?: "newsletter";
+  /** Invisible row to keep footer link columns aligned */
+  spacer?: boolean;
 }
 
 export interface FooterColumn {
@@ -81,6 +83,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Governance", href: "/work#governance" },
       { label: "Enterprise", href: "/work#enterprise" },
       { label: "Education", href: "/work#education" },
+      { label: "", spacer: true },
     ],
   },
   {

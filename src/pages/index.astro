@@ -2,7 +2,6 @@
 import Layout from "@/layouts/Layout.astro";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Footer } from "@/components/layout/footer";
-import { EnquiryModalHost } from "@/components/layout/enquiry-modal-host";
 import { HeroSection } from "@/components/sections/hero-section";
 import { CorporateTransformationSection } from "@/components/sections/corporate-transformation-section";
 import { AaldSection } from "@/components/sections/aald-section";
@@ -30,6 +29,5 @@ const site = Astro.site ?? Astro.url.origin;
       <LibraryFeaturedSection client:load />
     </main>
     <Footer client:visible />
-    <EnquiryModalHost client:idle />
   </div>
 </Layout>

@@ -6,7 +6,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { PERSON_IDENTITY } from "@/data/person-identity";
 import { APPROVED_SOCIAL_LINKS, SITE_CONTACT } from "@/data/site-contact";
-import { FOOTER_COLUMNS } from "@/lib/navigation";
+import { FOOTER_COLUMNS, type FooterLink } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { openNewsletterModal } from "@/lib/newsletter-modal";
 
@@ -27,30 +27,54 @@ function FooterSocialLink({ link }: { link: { label: string; href: string } }) {
   );
 }
 
-function FooterSocialLinks({ links }: { links: readonly { label: string; href: string }[] }) {
-  const rows = [links.slice(0, 2), links.slice(2, 4)];
+function FooterSocialPair({ links }: { links: readonly { label: string; href: string }[] }) {
+  return (
+    <span className="flex flex-wrap items-center">
+      {links.map((link, index) => (
+        <span key={link.href} className="inline-flex items-center">
+          {index > 0 && (
+            <span className="mx-2 text-[var(--ploy-text-secondary)]" aria-hidden="true">
+              ·
+            </span>
+          )}
+          <FooterSocialLink link={link} />
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function FooterColumnLink({ link }: { link: FooterLink }) {
+  if (link.spacer) {
+    return (
+      <span aria-hidden="true" className="pointer-events-none block select-none opacity-0">
+        &nbsp;
+      </span>
+    );
+  }
+
+  if (link.action === "newsletter") {
+    return (
+      <button type="button" onClick={openNewsletterModal} className={footerLinkClassName}>
+        {link.label}
+      </button>
+    );
+  }
 
   return (
-    <ul className="mt-5 space-y-3 text-sm">
-      {rows.map((pair) => (
-        <li key={pair.map((link) => link.href).join("-")} className="flex flex-wrap items-center">
-          {pair.map((link, index) => (
-            <span key={link.href} className="inline-flex items-center">
-              {index > 0 && (
-                <span className="mx-2 text-[var(--ploy-text-secondary)]" aria-hidden="true">
-                  ·
-                </span>
-              )}
-              <FooterSocialLink link={link} />
-            </span>
-          ))}
-        </li>
-      ))}
-    </ul>
+    <a
+      href={link.href}
+      className={footerLinkClassName}
+      {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
+      {link.label}
+    </a>
   );
 }
 
 export function Footer() {
+  const [socialRowOne, socialRowTwo] = [APPROVED_SOCIAL_LINKS.slice(0, 2), APPROVED_SOCIAL_LINKS.slice(2, 4)];
+
   return (
     <footer className="bg-[var(--ploy-background-primary)]">
       <section className="bg-[var(--ploy-background-secondary)] px-6 py-16 md:px-10 md:py-24 lg:px-14 xl:px-20">
@@ -94,41 +118,26 @@ export function Footer() {
               <li>
                 <a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
               </li>
+              {socialRowOne.length > 0 && (
+                <li>
+                  <FooterSocialPair links={socialRowOne} />
+                </li>
+              )}
+              {socialRowTwo.length > 0 && (
+                <li>
+                  <FooterSocialPair links={socialRowTwo} />
+                </li>
+              )}
             </ul>
-
-            {APPROVED_SOCIAL_LINKS.length > 0 && (
-              <>
-                <p className="ploy-eyebrow mt-5">Follow</p>
-                <FooterSocialLinks links={APPROVED_SOCIAL_LINKS} />
-              </>
-            )}
           </div>
 
           {FOOTER_COLUMNS.map((column) => (
             <div key={column.title}>
               <p className="ploy-eyebrow">{column.title}</p>
               <ul className="mt-5 space-y-3">
-                {column.links.map((link) => (
-                  <li key={link.label}>
-                    {link.action === "newsletter" ? (
-                      <button
-                        type="button"
-                        onClick={openNewsletterModal}
-                        className={footerLinkClassName}
-                      >
-                        {link.label}
-                      </button>
-                    ) : (
-                      <a
-                        href={link.href}
-                        className={footerLinkClassName}
-                        {...(link.external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                      >
-                        {link.label}
-                      </a>
-                    )}
+                {column.links.map((link, index) => (
+                  <li key={link.spacer ? `${column.title}-spacer` : link.label ?? index}>
+                    <FooterColumnLink link={link} />
                   </li>
                 ))}
               </ul>
