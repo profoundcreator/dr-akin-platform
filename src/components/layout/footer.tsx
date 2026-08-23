@@ -13,20 +13,37 @@ import { openNewsletterModal } from "@/lib/newsletter-modal";
 const footerLinkClassName =
   "text-sm text-[var(--ploy-text-secondary)] transition-colors hover:text-[var(--ploy-text-primary)]";
 
+function FooterSocialLink({ link }: { link: { label: string; href: string } }) {
+  return (
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={footerLinkClassName}
+      {...(link.label === "Twitter" ? { "aria-label": "X (Twitter)" } : {})}
+    >
+      {link.label}
+    </a>
+  );
+}
+
 function FooterSocialLinks({ links }: { links: readonly { label: string; href: string }[] }) {
+  const rows = [links.slice(0, 2), links.slice(2, 4)];
+
   return (
     <ul className="mt-5 space-y-3 text-sm">
-      {links.map((link) => (
-        <li key={link.href}>
-          <a
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={footerLinkClassName}
-            {...(link.label === "Twitter" ? { "aria-label": "X (Twitter)" } : {})}
-          >
-            {link.label}
-          </a>
+      {rows.map((pair) => (
+        <li key={pair.map((link) => link.href).join("-")} className="flex flex-wrap items-center">
+          {pair.map((link, index) => (
+            <span key={link.href} className="inline-flex items-center">
+              {index > 0 && (
+                <span className="mx-2 text-[var(--ploy-text-secondary)]" aria-hidden="true">
+                  ·
+                </span>
+              )}
+              <FooterSocialLink link={link} />
+            </span>
+          ))}
         </li>
       ))}
     </ul>
