@@ -3,8 +3,10 @@
 Drop retouched studio portraits here, then run:
 
 ```bash
-npm run import:portraits
+npm run import:portraits -- --no-beard-pass
 ```
+
+**Important:** If your files still match the old `IMG_3662` / `IMG_3663` content (GitHub commit from 23 Aug), the import **stops** with an error — you must overwrite them with retouched exports first.
 
 Homepage hero is **not** replaced by default. To update it:
 

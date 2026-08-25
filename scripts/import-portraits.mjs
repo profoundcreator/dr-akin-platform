@@ -10,16 +10,24 @@
  * Then:
  *   npm run import:portraits                  — formal + approachable (homepage unchanged)
  *   npm run import:portraits -- --include-homepage
+ *   npm run import:portraits -- --no-beard-pass   — alias; fails if sources match legacy hashes
  *
  * See assets/portraits-incoming/README.md for slot mapping.
  */
-import { access, mkdir, readdir } from "node:fs/promises";
+import { access, mkdir, readdir, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const INCOMING_DIR = path.join(ROOT, "assets/portraits-incoming");
 const OUTPUT_DIR = path.join(ROOT, "public/images/marketing");
+
+/** Known legacy source hashes (renamed IMG_3662/3663) — still contain grey/white beard. */
+const LEGACY_SOURCE_SHA256 = new Set([
+  "347ad5e2c38e93a0052cb4e7d223e0fbfd7d308502a5a7803574a5ba3c96e18e", // formal / IMG_3662
+  "649699c00a421fff6c1b1ffab66205630981a60995f1c66cfa0410a7af050ac2", // approachable / IMG_3663
+]);
 
 /** @typedef {{ basename: string; output: string; maxWidth: number; homepage?: boolean }} PortraitTarget */
 
@@ -46,6 +54,12 @@ const TARGETS = [
 const SOURCE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".JPG", ".JPEG", ".PNG"];
 
 const includeHomepage = process.argv.includes("--include-homepage");
+const noBeardPass = process.argv.includes("--no-beard-pass");
+
+async function sha256File(filePath) {
+  const buffer = await readFile(filePath);
+  return createHash("sha256").update(buffer).digest("hex");
+}
 
 async function findSource(basename) {
   for (const ext of SOURCE_EXTENSIONS) {
@@ -85,6 +99,15 @@ async function main() {
     if (!source) {
       console.warn(`Skip: missing ${target.basename}.{jpg,jpeg,png,webp}`);
       continue;
+    }
+
+    const sourceHash = await sha256File(source);
+    if (noBeardPass && LEGACY_SOURCE_SHA256.has(sourceHash)) {
+      console.error(
+        `\n❌ ${path.basename(source)} matches the legacy unretouched source (grey/white beard still present).\n` +
+          "   Replace the file in assets/portraits-incoming/ with your retouched master, commit, push, then rerun.\n",
+      );
+      process.exit(1);
     }
 
     const dest = path.join(OUTPUT_DIR, target.output);
