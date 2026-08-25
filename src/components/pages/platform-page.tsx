@@ -60,13 +60,13 @@ export function PlatformPage({ content, heroImage, heroImageAlt }: PlatformPageP
           {hasHeroImage && heroImage && (
             <Reveal
               delay={0.15}
-              className="relative min-h-[24rem] overflow-x-hidden border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] lg:min-h-full lg:border-l lg:border-t-0"
+              className="relative min-h-[24rem] overflow-x-hidden border-t border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] sm:min-h-[28rem] md:min-h-[32rem] lg:min-h-full lg:border-l lg:border-t-0"
             >
               <img
                 src={heroImage}
                 alt={heroImageAlt ?? content.headline}
                 loading="eager"
-                className="absolute inset-0 size-full object-cover object-center"
+                className="absolute inset-0 size-full object-cover object-center lg:object-[25%_center]"
               />
               <div
                 className="absolute right-0 top-0 h-24 w-3 bg-[var(--ploy-accent-primary)]"
