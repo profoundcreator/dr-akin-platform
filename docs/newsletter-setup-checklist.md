@@ -153,10 +153,56 @@ If sync is skipped (no env vars), Audience row still appears but `esp_provider` 
 
 ---
 
+## Historical contacts — privacy rules
+
+Dr. Akin may have a wide contact list built over many years (spreadsheets, Outlook, business cards, old CRM exports, event attendee lists, prior speaking engagements). **Do not bulk-import that list into Beehiiv or the platform marketing audience** without documented opt-in that matches the live privacy notice.
+
+This is operational guidance aligned with [`/privacy`](https://theakinakinpelu.org/privacy) and project docs — **not legal advice**. Get counsel to review before the first campaign at scale (see [`privacy-lawyer-brief.md`](./privacy-lawyer-brief.md)).
+
+### What the site commits to
+
+The published privacy notice states:
+
+- Marketing is **opt-in only** — separate checkbox, **unchecked by default**
+- Marketing is **never bundled** with contact or booking form submission
+- Lawful basis for newsletters and campaigns is **consent** (NDPA + GDPR Art. 6(1)(a)), not prior relationship alone
+
+Operational processing (replying to an enquiry, coordinating a booking) uses a different lawful basis. **That does not automatically cover newsletter or campaign sends.**
+
+### What is allowed for marketing
+
+| Source of contact | OK for newsletter / Beehiiv? |
+|-------------------|------------------------------|
+| Spreadsheet, Outlook, business cards, “people I’ve emailed over the years” | **No** — no documented opt-in under the current model |
+| Old site enquiries/bookings **without** the marketing checkbox | **No** — operational data only; do not backfill |
+| People who opted in on **theakinakinpelu.org** (footer, contact, booking, summit) | **Yes** — intended path via `audience_members` → ESP sync |
+| Old external list with recorded consent (e.g. prior Mailchimp signup) | **Maybe** — only if counsel confirms consent still meets NDPA/GDPR and matches today’s notice |
+
+**Source of truth for who may receive marketing:** Admin → **Audience** (`/admin/audience`). Only rows created by an explicit opt-in on the site (or a future approved re-consent flow) should sync to Beehiiv.
+
+### Compliant ways to use a historical list
+
+1. **Re-consent campaign (recommended)** — Send a **one-time** email (not Newsletter #1) that explains what is launching and links to the site signup (footer or landing page). Recipients must **tick the marketing opt-in themselves**. Silence, past replies, or “they know who I am” is **not** consent under the published policy.
+
+2. **Operational one-to-one email** — Individual follow-ups about an existing engagement, speaking inquiry, or prior conversation may sit on a relationship/legitimate-interest basis. That is **not** bulk newsletter sending. When in doubt, treat as re-consent territory.
+
+3. **Site opt-ins only for Beehiiv** — Mirror to Beehiiv only contacts who have opted in through the live platform forms.
+
+4. **Lawyer review** — Have counsel bless re-consent email wording before sending at scale, especially if the list includes EU/UK contacts.
+
+### What NOT to do with historical contacts
+
+- Do **not** CSV-import a historical list into Beehiiv as subscribers
+- Do **not** backfill old `enquiries` or `booking_requests` into the marketing list without re-consent
+- Do **not** assume event attendees, LinkedIn connections, or partner-shared lists are opted in unless consent is documented and counsel agrees
+
+---
+
 ## What NOT to do
 
 - Do **not** use Resend for marketing campaigns — transactional only
-- Do **not** backfill old enquiries/bookings into marketing list without re-consent
+- Do **not** backfill old enquiries/bookings into marketing list without re-consent (see **Historical contacts** above)
+- Do **not** bulk-import legacy contact spreadsheets into Beehiiv without re-consent
 - Do **not** remove Zoho MX records when adding Beehiiv DNS
 
 ---
