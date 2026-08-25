@@ -4,7 +4,15 @@ import { PERSON_IDENTITY } from "@/data/person-identity";
 import { SITE_CONTACT } from "@/data/site-contact";
 import { BRAND_ASSETS } from "@/lib/brand/assets";
 import { GlobalModalHosts } from "@/components/layout/global-modal-hosts";
+import { PwaShell } from "@/components/pwa/pwa-shell";
 import type { JsonLdValue } from "@/lib/seo/json-ld";
+
+let pwaInfo: { webManifest: { linkTag: string } } | undefined;
+try {
+  ({ pwaInfo } = await import("virtual:pwa-info"));
+} catch {
+  pwaInfo = undefined;
+}
 
 interface Props {
   title?: string;
@@ -38,6 +46,9 @@ const resolvedOgImage = ogImage.startsWith("http")
 const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : []).map((item) =>
   JSON.stringify(item).replace(/</g, "\\u003c"),
 );
+const isAdminRoute = Astro.url.pathname.startsWith("/admin");
+const pwaThemeColor = "#f5f2ee";
+const appleWebAppTitle = isAdminRoute ? "Back Office" : "Dr. Akin";
 ---
 
 <!doctype html>
@@ -49,6 +60,13 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.favicon} />
     <link rel="apple-touch-icon" sizes="180x180" href={BRAND_ASSETS.appleTouchIcon} />
+    {!isAdminRoute && pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+    {isAdminRoute && <link rel="manifest" href="/admin/manifest.webmanifest" />}
+    <meta name="theme-color" content={pwaThemeColor} />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content={appleWebAppTitle} />
     {preloadImage && (
       <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
     )}
@@ -72,6 +90,7 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
   <body>
     <slot />
     <GlobalModalHosts client:idle />
+    <PwaShell client:idle isAdmin={isAdminRoute} />
     <script is:inline>
       window.__enquiryModalPending = false;
       window.__newsletterModalPending = false;
