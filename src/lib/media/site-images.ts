@@ -9,7 +9,7 @@ export const SITE_IMAGES = {
   portraitFormal: "/images/marketing/dr-akin-portrait-formal.webp",
   /** Approachable studio portrait (navy suit) — Meet hub + Work hub. */
   portraitApproachable: "/images/marketing/dr-akin-portrait-approachable.webp",
-  /** Default link-preview card — stage side profile (1200×630 JPEG). */
+  /** Default link-preview card — stage side profile addressing audience (1200×630 JPEG). Do not replace with portrait bootstrap. */
   socialOg: "/images/marketing/dr-akin-social-og.jpg",
   /** Speaking page OG — keynote on stage with theme screen. */
   speakingOg: "/images/marketing/dr-akin-speaking-og.jpg",
