@@ -1,0 +1,8 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AdminHelpPage } from "@/components/pages/admin-help-page";
+---
+
+<Layout title="Admin — Help Center" noIndex>
+  <AdminHelpPage client:only="react" />
+</Layout>
