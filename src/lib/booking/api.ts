@@ -151,12 +151,18 @@ export async function createBookingRequest(
             reference: result.reference,
             engagementType: form.engagementType,
             eventTitle: form.eventTitle,
+            requestArea: form.requestArea,
+            platform: form.requestArea !== "speaking-office" ? form.requestArea : null,
           },
         });
         syncAudienceToEsp({
           email: form.email,
           name: form.name,
           consentSource: "booking",
+          engagementContext: {
+            requestArea: form.requestArea,
+            platform: form.requestArea !== "speaking-office" ? form.requestArea : null,
+          },
         });
       } catch (err) {
         console.warn("[marketing] booking opt-in failed:", err);

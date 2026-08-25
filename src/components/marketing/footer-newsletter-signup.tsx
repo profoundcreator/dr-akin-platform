@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { MarketingOptInField } from "@/components/marketing/marketing-opt-in-field";
 import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
 import { syncAudienceToEsp } from "@/lib/marketing/sync-audience-esp";
+import { inferPlatformFromPath } from "@/lib/contact/platform-context";
 
 export function NewsletterSignupForm() {
   const [email, setEmail] = useState("");
@@ -26,13 +27,28 @@ export function NewsletterSignupForm() {
     setMessage(null);
 
     try {
+      const platform =
+        typeof window !== "undefined"
+          ? inferPlatformFromPath(window.location.pathname)
+          : null;
+      const engagementContext = {
+        source: "footer",
+        referrerPath: typeof window !== "undefined" ? window.location.pathname : null,
+        platform,
+      };
+
       await subscribeAudienceMember({
         email,
         name: name.trim() || undefined,
         consentSource: "newsletter",
-        engagementContext: { source: "footer" },
+        engagementContext,
       });
-      syncAudienceToEsp({ email, name: name.trim() || undefined, consentSource: "newsletter" });
+      syncAudienceToEsp({
+        email,
+        name: name.trim() || undefined,
+        consentSource: "newsletter",
+        engagementContext,
+      });
       setStatus("success");
       setMessage("Thank you — you're on the list.");
       setEmail("");

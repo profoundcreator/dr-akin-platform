@@ -99,12 +99,12 @@ For route maps, role permissions, env var lists, and migration references, see t
 Work **not yet live** but planned or partially built. Ordered by recommended priority.
 
 ### 1. Newsletter connection — **next up**
-**Status:** Code built; account setup pending  
-**Guide:** `docs/newsletter-setup-checklist.md`
+**Status:** Code built; Beehiiv account + editorial strategy workshop pending  
+**Guides:**  
+- Setup: `docs/newsletter-setup-checklist.md`  
+- Editorial planning (Gemini/Claude): `docs/planning/newsletter-editorial-strategy-conversation-guide.md`
 
-What it adds: footer and form signups automatically sync to Beehiiv (or Kit) for campaigns. Admin Audience dashboard already lists subscribers.
-
-**Client action:** Create Beehiiv account, add API keys in Vercel, confirm database migration 028.
+What it adds: personal-letter-style segmented email, lead gen per org (AALD, PerformX, etc.), site as influence hub. Share buttons live on insights + events.
 
 ---
 

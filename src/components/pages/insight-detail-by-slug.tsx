@@ -109,6 +109,7 @@ export function InsightDetailBySlug({ slug, initialInsight = null }: InsightDeta
       category={insight.category}
       date={insight.publishedAt ?? insight.createdAt}
       body={insight.body}
+      summary={insight.summary}
       heroImageUrl={insight.heroImageUrl}
       sourceLabel={insight.sourceLabel}
       sourceUrl={insight.sourceUrl}

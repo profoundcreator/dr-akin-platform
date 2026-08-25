@@ -1,6 +1,7 @@
 "use client";
 
 import { SummitInterestForm } from "@/components/marketing/summit-interest-form";
+import { ContentShareBar } from "@/components/marketing/content-share-bar";
 import { ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/events/constants";
 import {
   getEventCoverUrl,
+  getEventMetaDescription,
   type PlatformEvent,
 } from "@/lib/events/events";
 import { isEventUpcoming } from "@/lib/events/event-visibility";
@@ -69,6 +71,11 @@ export function EventDetailPage({ event }: EventDetailPageProps) {
                 </p>
               )}
               {upcoming && <EventCountdown targetDate={event.startsAt} className="pt-4" />}
+              <ContentShareBar
+                title={event.title}
+                summary={getEventMetaDescription(event)}
+                className="mt-2"
+              />
               <div className="flex flex-wrap gap-4 pt-4">
                 {event.registrationUrl && (
                   <Button

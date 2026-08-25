@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ContentShareBar } from "@/components/marketing/content-share-bar";
 import { InsightArticleBody } from "@/components/insights/insight-article-body";
 import {
   InsightArticleHero,
@@ -136,6 +137,7 @@ interface InsightArticlePageProps {
   category: string;
   date: string;
   body: string;
+  summary?: string;
   heroImageUrl?: string | null;
   sourceLabel?: string | null;
   sourceUrl?: string | null;
@@ -146,6 +148,7 @@ export function InsightArticlePage({
   category,
   date,
   body,
+  summary,
   heroImageUrl,
   sourceLabel,
   sourceUrl,
@@ -168,6 +171,7 @@ export function InsightArticlePage({
               {sourceLabel && (
                 <InsightSourceAttribution sourceLabel={sourceLabel} sourceUrl={sourceUrl} />
               )}
+              <ContentShareBar title={title} summary={summary ?? category} className="mt-2" />
             </Reveal>
             {heroImageUrl && (
               <InsightArticleHero src={heroImageUrl} alt="" />
