@@ -42,7 +42,8 @@ function locationLabel(locationType: string): string {
 }
 
 export function EventDetailPage({ event }: EventDetailPageProps) {
-  const coverUrl = getEventCoverUrl(event.coverImagePath);
+  const coverUrl =
+    !event.coverImageHidden && event.coverImagePath ? getEventCoverUrl(event.coverImagePath) : null;
   const upcoming = isEventUpcoming(event);
 
   return (

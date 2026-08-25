@@ -23,6 +23,7 @@ function mapBuildRow(row: DbEvent): PlatformEvent {
     location: row.location,
     locationType: row.location_type,
     coverImagePath: row.cover_image_path,
+    coverImageHidden: row.cover_image_hidden ?? false,
     registrationUrl: row.registration_url,
     registrationEmbedUrl: row.registration_embed_url,
     paymentUrl: row.payment_url,

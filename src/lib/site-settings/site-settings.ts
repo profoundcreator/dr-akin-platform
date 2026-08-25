@@ -7,6 +7,8 @@ export interface SiteSettings {
   homepageHeroMode: HomepageHeroMode;
   homepageBannerImagePath: string | null;
   homepagePortraitImagePath: string | null;
+  homepageBannerHidden: boolean;
+  homepagePortraitHidden: boolean;
   updatedAt: string;
 }
 
@@ -15,6 +17,8 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   homepageHeroMode: "portrait",
   homepageBannerImagePath: null,
   homepagePortraitImagePath: null,
+  homepageBannerHidden: false,
+  homepagePortraitHidden: false,
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -24,6 +28,8 @@ function mapRow(row: DbSiteSettings): SiteSettings {
     homepageHeroMode: row.homepage_hero_mode,
     homepageBannerImagePath: row.homepage_banner_image_path,
     homepagePortraitImagePath: row.homepage_portrait_image_path,
+    homepageBannerHidden: row.homepage_banner_hidden ?? false,
+    homepagePortraitHidden: row.homepage_portrait_hidden ?? false,
     updatedAt: row.updated_at,
   };
 }
@@ -68,6 +74,8 @@ export interface SiteSettingsInput {
   homepageHeroMode: HomepageHeroMode;
   homepageBannerImagePath?: string | null;
   homepagePortraitImagePath?: string | null;
+  homepageBannerHidden?: boolean;
+  homepagePortraitHidden?: boolean;
 }
 
 export async function updateSiteSettings(
@@ -85,6 +93,8 @@ export async function updateSiteSettings(
       homepage_hero_mode: input.homepageHeroMode,
       homepage_banner_image_path: input.homepageBannerImagePath ?? null,
       homepage_portrait_image_path: input.homepagePortraitImagePath ?? null,
+      homepage_banner_hidden: input.homepageBannerHidden ?? false,
+      homepage_portrait_hidden: input.homepagePortraitHidden ?? false,
       updated_by: updatedBy ?? null,
     })
     .select("*")

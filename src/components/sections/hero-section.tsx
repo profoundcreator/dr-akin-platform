@@ -28,8 +28,9 @@ export function HeroSection() {
   const portraitUrl =
     getHomepageAssetUrl(settings.homepagePortraitImagePath) ?? DEFAULT_PORTRAIT_URL;
   const bannerUrl = getHomepageAssetUrl(settings.homepageBannerImagePath);
-  const showPortrait = settings.homepageHeroMode === "portrait";
-  const showBanner = settings.homepageHeroMode === "banner" && Boolean(bannerUrl);
+  const showPortrait = settings.homepageHeroMode === "portrait" && !settings.homepagePortraitHidden;
+  const showBanner =
+    settings.homepageHeroMode === "banner" && Boolean(bannerUrl) && !settings.homepageBannerHidden;
   const isMinimal = settings.homepageHeroMode === "minimal";
 
   return (

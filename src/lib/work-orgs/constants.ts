@@ -16,7 +16,7 @@ export const WORK_ORG_STATUS_LABELS = {
 } as const;
 
 export const WORK_ORG_HERO_IMAGE_HINT =
-  "Best results: 1600×1200 px (4:3), JPG or WebP, under 6 MB. Used on the org detail page hero. Optional — remove to show text only.";
+  "Best results: 1600×1200 px (4:3), JPG or WebP, under 6 MB. Hide temporarily or remove to clear the hero image.";
 
 export const MIGRATION_011_HINT =
   "Run supabase/migrations/011_work_orgs.sql in the Supabase SQL Editor, then refresh.";

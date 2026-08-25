@@ -43,6 +43,7 @@ function mapRow(row: DbLibraryBook): PlatformBook {
     category: row.category,
     description: row.description,
     coverImagePath: row.cover_image_path,
+    coverImageHidden: row.cover_image_hidden ?? false,
     coverUrl,
     purchaseLinks: parsePurchaseLinks(row.purchase_links),
     isFeatured: row.is_featured ?? false,
@@ -164,6 +165,7 @@ function buildInsertPayload(
     category: input.category.trim(),
     description: input.description.trim(),
     cover_image_path: input.coverImagePath ?? null,
+    cover_image_hidden: input.coverImageHidden ?? false,
     purchase_links: input.purchaseLinks ?? [],
     is_featured: false,
     sort_order: input.sortOrder ?? 0,
@@ -240,6 +242,7 @@ export async function updateBook(
   if (input.category !== undefined) payload.category = input.category.trim();
   if (input.description !== undefined) payload.description = input.description.trim();
   if (input.coverImagePath !== undefined) payload.cover_image_path = input.coverImagePath;
+  if (input.coverImageHidden !== undefined) payload.cover_image_hidden = input.coverImageHidden;
   if (input.purchaseLinks !== undefined) payload.purchase_links = input.purchaseLinks;
   if (input.sortOrder !== undefined) payload.sort_order = input.sortOrder;
   if (input.status !== undefined) payload.status = input.status;

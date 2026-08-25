@@ -42,6 +42,8 @@ export function HomepageDashboard() {
   const [portraitFile, setPortraitFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+  const [bannerHidden, setBannerHidden] = useState(false);
+  const [portraitHidden, setPortraitHidden] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
 
   async function loadSettings() {
@@ -54,6 +56,8 @@ export function HomepageDashboard() {
       setHomepageHeroMode(data.homepageHeroMode);
       setBannerPath(data.homepageBannerImagePath);
       setPortraitPath(data.homepagePortraitImagePath);
+      setBannerHidden(data.homepageBannerHidden);
+      setPortraitHidden(data.homepagePortraitHidden);
       setBannerPreview(getHomepageAssetUrl(data.homepageBannerImagePath));
       setPortraitPreview(getHomepageAssetUrl(data.homepagePortraitImagePath) ?? DEFAULT_PORTRAIT_URL);
     } catch (err) {
@@ -71,12 +75,14 @@ export function HomepageDashboard() {
     setBannerFile(null);
     setBannerPath(null);
     setBannerPreview(null);
+    setBannerHidden(false);
   }
 
   function handleRemovePortraitOverride() {
     setPortraitFile(null);
     setPortraitPath(null);
     setPortraitPreview(DEFAULT_PORTRAIT_URL);
+    setPortraitHidden(false);
   }
 
   async function handleSave(event: React.FormEvent) {
@@ -104,6 +110,8 @@ export function HomepageDashboard() {
           homepageHeroMode,
           homepageBannerImagePath: nextBannerPath,
           homepagePortraitImagePath: nextPortraitPath,
+          homepageBannerHidden: bannerHidden,
+          homepagePortraitHidden: portraitHidden,
         },
         profile?.id,
       );
@@ -111,6 +119,8 @@ export function HomepageDashboard() {
       setSettings(updated);
       setBannerPath(updated.homepageBannerImagePath);
       setPortraitPath(updated.homepagePortraitImagePath);
+      setBannerHidden(updated.homepageBannerHidden);
+      setPortraitHidden(updated.homepagePortraitHidden);
       setBannerFile(null);
       setPortraitFile(null);
       setBannerPreview(getHomepageAssetUrl(updated.homepageBannerImagePath));
@@ -230,13 +240,16 @@ export function HomepageDashboard() {
                   previewUrl={bannerPreview}
                   disabled={!canEdit}
                   uploadLabel="Upload banner"
+                  imageHidden={bannerHidden}
                   onFileSelect={(file) => {
                     setBannerFile(file);
+                    if (file) setBannerHidden(false);
                     setBannerPreview(
                       file ? URL.createObjectURL(file) : getHomepageAssetUrl(bannerPath),
                     );
                   }}
                   onRemove={handleRemoveBanner}
+                  onToggleHidden={bannerPreview ? () => setBannerHidden((value) => !value) : undefined}
                 />
               )}
 
@@ -246,13 +259,17 @@ export function HomepageDashboard() {
                   label="Portrait image (optional override)"
                   hint={HOMEPAGE_PORTRAIT_IMAGE_HINT}
                   previewClassName="h-20 w-16 rounded-md object-cover"
-                  previewUrl={portraitPath || portraitFile ? portraitPreview : null}
+                  previewUrl={portraitPreview}
                   disabled={!canEdit}
                   uploadLabel="Upload portrait"
                   removeLabel="Remove custom portrait"
-                  optionalNote="The homepage always shows a portrait in this mode. Remove custom uploads to restore the default site portrait."
+                  hideLabel="Hide portrait"
+                  showLabel="Show portrait"
+                  imageHidden={portraitHidden}
+                  optionalNote="Hide temporarily keeps your uploaded portrait on file. Remove custom portrait restores the default site portrait."
                   onFileSelect={(file) => {
                     setPortraitFile(file);
+                    if (file) setPortraitHidden(false);
                     setPortraitPreview(
                       file
                         ? URL.createObjectURL(file)
@@ -260,6 +277,7 @@ export function HomepageDashboard() {
                     );
                   }}
                   onRemove={handleRemovePortraitOverride}
+                  onToggleHidden={() => setPortraitHidden((value) => !value)}
                 />
               )}
             </div>

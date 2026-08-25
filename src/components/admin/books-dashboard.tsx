@@ -113,6 +113,7 @@ export function BooksDashboard() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [existingCoverPath, setExistingCoverPath] = useState<string | null>(null);
+  const [coverImageHidden, setCoverImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -236,6 +237,7 @@ export function BooksDashboard() {
     setCoverFile(null);
     setCoverPreview(null);
     setExistingCoverPath(null);
+    setCoverImageHidden(false);
   }
 
   function startEdit(book: PlatformBook) {
@@ -256,6 +258,7 @@ export function BooksDashboard() {
       sortOrder: book.sortOrder,
     });
     setExistingCoverPath(book.coverImagePath);
+    setCoverImageHidden(book.coverImageHidden);
     setCoverFile(null);
     setCoverPreview(getBookCoverUrl(book.coverImagePath) ?? book.coverUrl);
     scrollToEditorForm();
@@ -287,6 +290,7 @@ export function BooksDashboard() {
       sortOrder: book.sortOrder,
     });
     setExistingCoverPath(book.coverImagePath);
+    setCoverImageHidden(false);
     setCoverPreview(book.coverUrl);
     setCoverFile(null);
     scrollToEditorForm();
@@ -314,6 +318,7 @@ export function BooksDashboard() {
       category: form.category,
       description: form.description,
       coverImagePath,
+      coverImageHidden,
       purchaseLinks: cleanPurchaseLinks(form.purchaseLinks),
       sortOrder: form.sortOrder,
       status,
@@ -520,6 +525,7 @@ export function BooksDashboard() {
 
   function handleCoverChange(file: File | null) {
     setCoverFile(file);
+    if (file) setCoverImageHidden(false);
     setCoverPreview(file ? URL.createObjectURL(file) : getBookCoverUrl(existingCoverPath));
   }
 
@@ -527,6 +533,7 @@ export function BooksDashboard() {
     setCoverFile(null);
     setExistingCoverPath(null);
     setCoverPreview(null);
+    setCoverImageHidden(false);
   }
 
   function updatePurchaseLink(index: number, field: keyof PurchaseLink, value: string) {
@@ -981,8 +988,10 @@ export function BooksDashboard() {
             previewClassName="h-20 w-14 rounded-md object-cover"
             previewUrl={coverPreview}
             uploadLabel="Upload cover"
+            imageHidden={coverImageHidden}
             onFileSelect={handleCoverChange}
             onRemove={handleRemoveCover}
+            onToggleHidden={coverPreview ? () => setCoverImageHidden((value) => !value) : undefined}
           />
 
           <div className="space-y-3">

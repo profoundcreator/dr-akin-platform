@@ -30,7 +30,8 @@ function mapRow(row: DbInsightArticle): PlatformInsight {
     seoDescription: row.seo_description ?? null,
     body: row.body,
     heroImagePath: row.hero_image_path,
-    heroImageUrl: getInsightHeroUrl(row.hero_image_path),
+    heroImageHidden: row.hero_image_hidden ?? false,
+    heroImageUrl: row.hero_image_hidden ? null : getInsightHeroUrl(row.hero_image_path),
     socialImageAlt: row.social_image_alt ?? null,
     sourceLabel: row.source_label,
     sourceUrl: row.source_url,
@@ -197,6 +198,7 @@ function buildInsertPayload(
     summary: input.summary.trim(),
     body: normalizeBody(input.body),
     hero_image_path: input.heroImagePath ?? null,
+    hero_image_hidden: input.heroImageHidden ?? false,
     ...("seoDescription" in input
       ? { seo_description: input.seoDescription?.trim() || null }
       : {}),
@@ -287,6 +289,7 @@ export async function updateInsight(
   }
   if (input.body !== undefined) payload.body = normalizeBody(input.body);
   if (input.heroImagePath !== undefined) payload.hero_image_path = input.heroImagePath;
+  if (input.heroImageHidden !== undefined) payload.hero_image_hidden = input.heroImageHidden;
   if (input.socialImageAlt !== undefined) {
     payload.social_image_alt = input.socialImageAlt?.trim() || null;
   }

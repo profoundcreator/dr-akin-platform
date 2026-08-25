@@ -69,6 +69,7 @@ interface UseInsightEditorOptions {
   seoSchemaReady: boolean;
   existingHeroPath: string | null;
   heroFile: File | null;
+  heroImageHidden: boolean;
 }
 
 export function useInsightEditorSave({
@@ -80,6 +81,7 @@ export function useInsightEditorSave({
   seoSchemaReady,
   existingHeroPath,
   heroFile,
+  heroImageHidden,
 }: UseInsightEditorOptions) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +110,7 @@ export function useInsightEditorSave({
         summary: form.summary,
         body: form.body,
         heroImagePath,
+        heroImageHidden,
         ...(seoSchemaReady
           ? {
               seoDescription: form.seoDescription.trim() || null,
@@ -121,7 +124,7 @@ export function useInsightEditorSave({
         status,
       };
     },
-    [existingHeroPath, heroFile, mediaSchemaReady, seoSchemaReady],
+    [existingHeroPath, heroFile, heroImageHidden, mediaSchemaReady, seoSchemaReady],
   );
 
   const saveInsight = useCallback(

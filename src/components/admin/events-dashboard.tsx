@@ -104,6 +104,7 @@ export function EventsDashboard() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [existingCoverPath, setExistingCoverPath] = useState<string | null>(null);
+  const [coverImageHidden, setCoverImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -142,6 +143,7 @@ export function EventsDashboard() {
     setCoverFile(null);
     setCoverPreview(null);
     setExistingCoverPath(null);
+    setCoverImageHidden(false);
   }
 
   function startEdit(event: PlatformEvent) {
@@ -165,6 +167,7 @@ export function EventsDashboard() {
       isHomepageFeatured: event.isHomepageFeatured,
     });
     setExistingCoverPath(event.coverImagePath);
+    setCoverImageHidden(event.coverImageHidden);
     setCoverFile(null);
     setCoverPreview(getEventCoverUrl(event.coverImagePath));
   }
@@ -196,6 +199,7 @@ export function EventsDashboard() {
       location: form.location,
       locationType: form.locationType,
       coverImagePath,
+      coverImageHidden,
       registrationUrl: form.registrationUrl,
       registrationEmbedUrl: form.registrationEmbedUrl,
       paymentUrl: form.paymentUrl,
@@ -403,6 +407,7 @@ export function EventsDashboard() {
 
   function handleCoverChange(file: File | null) {
     setCoverFile(file);
+    if (file) setCoverImageHidden(false);
     setCoverPreview(file ? URL.createObjectURL(file) : getEventCoverUrl(existingCoverPath));
   }
 
@@ -410,6 +415,7 @@ export function EventsDashboard() {
     setCoverFile(null);
     setExistingCoverPath(null);
     setCoverPreview(null);
+    setCoverImageHidden(false);
   }
 
   if (!isSupabaseConfigured) {
@@ -678,8 +684,10 @@ export function EventsDashboard() {
             hint={EVENT_COVER_IMAGE_HINT}
             previewUrl={coverPreview}
             uploadLabel="Upload image"
+            imageHidden={coverImageHidden}
             onFileSelect={handleCoverChange}
             onRemove={handleRemoveCover}
+            onToggleHidden={coverPreview ? () => setCoverImageHidden((value) => !value) : undefined}
           />
 
           {isApprover && (

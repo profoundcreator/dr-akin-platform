@@ -9,6 +9,7 @@ export interface PlatformBook {
   category: string;
   description: string;
   coverImagePath: string | null;
+  coverImageHidden: boolean;
   coverUrl: string;
   purchaseLinks: PurchaseLink[];
   isFeatured: boolean;
@@ -27,6 +28,7 @@ export interface BookInput {
   category: string;
   description: string;
   coverImagePath?: string | null;
+  coverImageHidden?: boolean;
   purchaseLinks?: PurchaseLink[];
   isFeatured?: boolean;
   sortOrder?: number;

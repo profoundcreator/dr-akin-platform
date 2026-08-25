@@ -30,6 +30,7 @@ export interface PlatformWorkOrg {
   secondaryCtaHref: string | null;
   relatedLinks: WorkOrgLink[];
   heroImagePath: string | null;
+  heroImageHidden: boolean;
   logoImagePath: string | null;
   externalUrl: string | null;
   sortOrder: number;
@@ -57,6 +58,7 @@ export interface WorkOrgInput {
   secondaryCtaHref?: string;
   relatedLinks?: WorkOrgLink[];
   heroImagePath?: string | null;
+  heroImageHidden?: boolean;
   logoImagePath?: string | null;
   externalUrl?: string;
   sortOrder?: number;

@@ -125,6 +125,7 @@ export function WorkOrgsDashboard() {
   const [heroFile, setHeroFile] = useState<File | null>(null);
   const [heroPreview, setHeroPreview] = useState<string | null>(null);
   const [existingHeroPath, setExistingHeroPath] = useState<string | null>(null);
+  const [heroImageHidden, setHeroImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -161,6 +162,7 @@ export function WorkOrgsDashboard() {
     setHeroFile(null);
     setHeroPreview(null);
     setExistingHeroPath(null);
+    setHeroImageHidden(false);
   }
 
   function startEdit(org: PlatformWorkOrg) {
@@ -185,6 +187,7 @@ export function WorkOrgsDashboard() {
       sortOrder: org.sortOrder,
     });
     setExistingHeroPath(org.heroImagePath);
+    setHeroImageHidden(org.heroImageHidden);
     setHeroFile(null);
     setHeroPreview(getWorkOrgHeroUrl(org.heroImagePath));
   }
@@ -229,6 +232,7 @@ export function WorkOrgsDashboard() {
       secondaryCtaHref: form.secondaryCtaHref,
       externalUrl: form.externalUrl,
       heroImagePath,
+      heroImageHidden,
       sortOrder: form.sortOrder,
       status,
     };
@@ -384,6 +388,7 @@ export function WorkOrgsDashboard() {
 
   function handleHeroChange(file: File | null) {
     setHeroFile(file);
+    if (file) setHeroImageHidden(false);
     setHeroPreview(file ? URL.createObjectURL(file) : getWorkOrgHeroUrl(existingHeroPath));
   }
 
@@ -391,6 +396,7 @@ export function WorkOrgsDashboard() {
     setHeroFile(null);
     setExistingHeroPath(null);
     setHeroPreview(null);
+    setHeroImageHidden(false);
   }
 
   if (!isSupabaseConfigured) {
@@ -591,8 +597,10 @@ export function WorkOrgsDashboard() {
             accept="image/jpeg,image/png,image/webp,image/svg+xml"
             previewUrl={heroPreview}
             uploadLabel="Upload hero"
+            imageHidden={heroImageHidden}
             onFileSelect={handleHeroChange}
             onRemove={handleRemoveHero}
+            onToggleHidden={heroPreview ? () => setHeroImageHidden((value) => !value) : undefined}
           />
 
           <div className="space-y-2">

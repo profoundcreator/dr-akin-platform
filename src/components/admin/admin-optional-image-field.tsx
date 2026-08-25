@@ -1,9 +1,10 @@
 "use client";
 
-import { ImagePlus, X } from "lucide-react";
+import { Eye, EyeOff, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface AdminOptionalImageFieldProps {
   id: string;
@@ -15,9 +16,13 @@ interface AdminOptionalImageFieldProps {
   disabled?: boolean;
   uploadLabel?: string;
   removeLabel?: string;
+  hideLabel?: string;
+  showLabel?: string;
   optionalNote?: string;
+  imageHidden?: boolean;
   onFileSelect: (file: File | null) => void;
   onRemove: () => void;
+  onToggleHidden?: () => void;
 }
 
 export function AdminOptionalImageField({
@@ -30,10 +35,16 @@ export function AdminOptionalImageField({
   disabled = false,
   uploadLabel = "Upload image",
   removeLabel = "Remove image",
-  optionalNote = "Optional — remove to show the page without a hero image.",
+  hideLabel = "Hide image",
+  showLabel = "Show image",
+  optionalNote = "Optional — hide temporarily or remove to clear the image from this page.",
+  imageHidden = false,
   onFileSelect,
   onRemove,
+  onToggleHidden,
 }: AdminOptionalImageFieldProps) {
+  const hasImage = Boolean(previewUrl);
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
@@ -54,9 +65,32 @@ export function AdminOptionalImageField({
             onChange={(e) => onFileSelect(e.target.files?.[0] ?? null)}
           />
         </label>
-        {previewUrl && (
+        {hasImage && (
           <>
-            <img src={previewUrl} alt="" className={previewClassName} />
+            <div className="relative">
+              <img
+                src={previewUrl!}
+                alt=""
+                className={cn(previewClassName, imageHidden && "opacity-45 grayscale-[20%]")}
+              />
+              {imageHidden && (
+                <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-[var(--ploy-background-inverse)]/75 px-1 py-0.5 text-center text-[0.625rem] font-medium uppercase tracking-wide text-[var(--ploy-text-inverse)]">
+                  Hidden
+                </span>
+              )}
+            </div>
+            {onToggleHidden && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={disabled}
+                onClick={onToggleHidden}
+              >
+                {imageHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+                {imageHidden ? showLabel : hideLabel}
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"

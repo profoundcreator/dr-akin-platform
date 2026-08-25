@@ -77,7 +77,8 @@ export function WorkOrgBySlug({ slug, initialOrg = null }: WorkOrgBySlugProps) {
     );
   }
 
-  const heroUrl = getWorkOrgHeroUrl(org.heroImagePath) ?? undefined;
+  const heroUrl =
+    !org.heroImageHidden && org.heroImagePath ? getWorkOrgHeroUrl(org.heroImagePath) ?? undefined : undefined;
 
   return (
     <PlatformPage
