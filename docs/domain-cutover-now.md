@@ -21,6 +21,8 @@ Confirm you have access to:
 
 **Primary URL decision (locked in):** `https://theakinakinpelu.org` — `www` redirects to non-www (configured in `vercel.json`).
 
+**DNS provider:** Cloudflare (confirmed August 2026)
+
 ---
 
 ## Step 1 — Export current DNS (5 min)
@@ -43,7 +45,46 @@ At your registrar, screenshot or export **all** records before changing anything
 
 ---
 
-## Step 3 — Apply DNS at registrar (5 min)
+## Step 3 — Apply DNS in Cloudflare (5 min)
+
+1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Select zone **`theakinakinpelu.org`**
+3. Go to **DNS → Records**
+4. Screenshot all existing records first (especially **MX** and **TXT**)
+
+### Website records (add or edit)
+
+| Type | Name | Content | Proxy status | TTL |
+|------|------|---------|--------------|-----|
+| **A** | `@` | `76.76.21.21` | **DNS only** (grey cloud ☁️) | Auto |
+| **CNAME** | `www` | `cname.vercel-dns.com` | **DNS only** (grey cloud ☁️) | Auto |
+
+**Important — Cloudflare proxy:**
+
+- Set both records to **DNS only** (grey cloud), not **Proxied** (orange cloud).
+- Orange cloud in front of Vercel often causes SSL errors or redirect loops until Cloudflare SSL is tuned.
+- Email records (**MX**, mail **TXT**) are never proxied — leave them as they are.
+
+### If old website records exist
+
+- Edit or remove any old **A** / **CNAME** on `@` or `www` that pointed to a previous host (WordPress, cPanel, etc.).
+- Replace with the Vercel values above.
+
+### Do not delete or change
+
+- **MX** records (email delivery)
+- **TXT** records for SPF, DKIM, `_dmarc`, Google/Microsoft verification
+- **CNAME** for `mail`, `autodiscover`, etc. if present
+
+**Resend sending DNS:** If Resend shows additional TXT/CNAME for `theakinakinpelu.org`, add those **alongside** MX — they are for outbound mail only.
+
+Propagation on Cloudflare is usually fast (minutes). Vercel may take a few more minutes to issue SSL.
+
+---
+
+## Step 3 (other registrars) — Apply DNS (5 min)
+
+*Skip this section if you use Cloudflare — use Step 3 above.*
 
 Add or update **website** records only:
 
@@ -200,6 +241,8 @@ Manual checks:
 | Contact form emails not arriving | Resend domain not verified; check `/api/notifications-status` |
 | Email stopped working | MX records were changed — restore from Step 1 export |
 | www shows wrong site | Confirm CNAME `www` → `cname.vercel-dns.com`; redeploy |
+| Cloudflare SSL error / too many redirects | Set A and www CNAME to **DNS only** (grey cloud); or SSL/TLS → Full (strict) if you must proxy |
+| Vercel “Invalid configuration” | Confirm grey cloud; wait 5 min; check Vercel’s exact A IP hasn’t changed |
 
 ---
 
