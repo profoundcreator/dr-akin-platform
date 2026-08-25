@@ -6,7 +6,6 @@ import {
   Briefcase,
   Check,
   Download,
-  ImagePlus,
   Plus,
   Trash2,
   X,
@@ -15,7 +14,7 @@ import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -126,6 +125,7 @@ export function WorkOrgsDashboard() {
   const [heroFile, setHeroFile] = useState<File | null>(null);
   const [heroPreview, setHeroPreview] = useState<string | null>(null);
   const [existingHeroPath, setExistingHeroPath] = useState<string | null>(null);
+  const [heroImageHidden, setHeroImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -162,6 +162,7 @@ export function WorkOrgsDashboard() {
     setHeroFile(null);
     setHeroPreview(null);
     setExistingHeroPath(null);
+    setHeroImageHidden(false);
   }
 
   function startEdit(org: PlatformWorkOrg) {
@@ -186,6 +187,7 @@ export function WorkOrgsDashboard() {
       sortOrder: org.sortOrder,
     });
     setExistingHeroPath(org.heroImagePath);
+    setHeroImageHidden(org.heroImageHidden);
     setHeroFile(null);
     setHeroPreview(getWorkOrgHeroUrl(org.heroImagePath));
   }
@@ -230,6 +232,7 @@ export function WorkOrgsDashboard() {
       secondaryCtaHref: form.secondaryCtaHref,
       externalUrl: form.externalUrl,
       heroImagePath,
+      heroImageHidden,
       sortOrder: form.sortOrder,
       status,
     };
@@ -385,7 +388,15 @@ export function WorkOrgsDashboard() {
 
   function handleHeroChange(file: File | null) {
     setHeroFile(file);
+    if (file) setHeroImageHidden(false);
     setHeroPreview(file ? URL.createObjectURL(file) : getWorkOrgHeroUrl(existingHeroPath));
+  }
+
+  function handleRemoveHero() {
+    setHeroFile(null);
+    setExistingHeroPath(null);
+    setHeroPreview(null);
+    setHeroImageHidden(false);
   }
 
   if (!isSupabaseConfigured) {
@@ -579,18 +590,18 @@ export function WorkOrgsDashboard() {
             <Input id="org-external" value={form.externalUrl} onChange={(e) => setForm((p) => ({ ...p, externalUrl: e.target.value }))} placeholder="https://..." />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="org-hero">Hero image</Label>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload hero
-                <input id="org-hero" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" className="sr-only" onChange={(e) => handleHeroChange(e.target.files?.[0] ?? null)} />
-              </label>
-              {heroPreview && <img src={heroPreview} alt="" className="h-16 w-24 rounded-md object-cover" />}
-            </div>
-            <ImageUploadHint hint={WORK_ORG_HERO_IMAGE_HINT} />
-          </div>
+          <AdminOptionalImageField
+            id="org-hero"
+            label="Hero image"
+            hint={WORK_ORG_HERO_IMAGE_HINT}
+            accept="image/jpeg,image/png,image/webp,image/svg+xml"
+            previewUrl={heroPreview}
+            uploadLabel="Upload hero"
+            imageHidden={heroImageHidden}
+            onFileSelect={handleHeroChange}
+            onRemove={handleRemoveHero}
+            onToggleHidden={heroPreview ? () => setHeroImageHidden((value) => !value) : undefined}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="org-sort">Sort order</Label>

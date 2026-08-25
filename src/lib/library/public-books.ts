@@ -17,6 +17,7 @@ function staticBookToPlatform(book: LibraryBook): PlatformBook {
     category: book.category,
     description: book.description,
     coverImagePath: book.cover,
+    coverImageHidden: false,
     coverUrl: book.cover,
     purchaseLinks: book.purchaseLinks ?? [],
     isFeatured: Boolean(book.featured),

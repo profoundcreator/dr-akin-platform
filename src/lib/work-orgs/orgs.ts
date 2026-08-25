@@ -64,6 +64,7 @@ function mapRow(row: DbWorkOrg): PlatformWorkOrg {
     secondaryCtaHref: row.secondary_cta_href,
     relatedLinks: parseLinks(row.related_links),
     heroImagePath: row.hero_image_path,
+    heroImageHidden: row.hero_image_hidden ?? false,
     logoImagePath: row.logo_image_path,
     externalUrl: row.external_url,
     sortOrder: row.sort_order,
@@ -194,6 +195,7 @@ function buildInsertPayload(
     secondary_cta_href: input.secondaryCtaHref?.trim() || null,
     related_links: input.relatedLinks ?? [],
     hero_image_path: input.heroImagePath ?? null,
+    hero_image_hidden: input.heroImageHidden ?? false,
     logo_image_path: input.logoImagePath ?? null,
     external_url: input.externalUrl?.trim() || null,
     sort_order: input.sortOrder ?? 0,
@@ -280,6 +282,7 @@ export async function updateWorkOrg(
   if (input.secondaryCtaHref !== undefined) payload.secondary_cta_href = input.secondaryCtaHref.trim() || null;
   if (input.relatedLinks !== undefined) payload.related_links = input.relatedLinks;
   if (input.heroImagePath !== undefined) payload.hero_image_path = input.heroImagePath;
+  if (input.heroImageHidden !== undefined) payload.hero_image_hidden = input.heroImageHidden;
   if (input.logoImagePath !== undefined) payload.logo_image_path = input.logoImagePath;
   if (input.externalUrl !== undefined) payload.external_url = input.externalUrl.trim() || null;
   if (input.sortOrder !== undefined) payload.sort_order = input.sortOrder;

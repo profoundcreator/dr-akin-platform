@@ -14,7 +14,7 @@ export const LIBRARY_BOOK_STATUS_LABELS = {
 } as const;
 
 export const BOOK_COVER_IMAGE_HINT =
-  "Best results: 1200×1800 px (2:3 book cover), JPG or WebP, under 6 MB. Keep text away from edges.";
+  "Best results: 1200×1800 px (2:3 book cover), JPG or WebP, under 6 MB. Optional — remove to show the book page without a cover image.";
 
 export const MIGRATION_009_HINT =
   "Run supabase/migrations/009_library_books.sql in the Supabase SQL Editor, then refresh.";

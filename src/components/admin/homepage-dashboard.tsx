@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Home, ImagePlus, Save } from "lucide-react";
+import { ArrowUpRight, Home, Save } from "lucide-react";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { canManageHomepage } from "@/lib/auth/permissions";
@@ -42,6 +42,8 @@ export function HomepageDashboard() {
   const [portraitFile, setPortraitFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+  const [bannerHidden, setBannerHidden] = useState(false);
+  const [portraitHidden, setPortraitHidden] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
 
   async function loadSettings() {
@@ -54,6 +56,8 @@ export function HomepageDashboard() {
       setHomepageHeroMode(data.homepageHeroMode);
       setBannerPath(data.homepageBannerImagePath);
       setPortraitPath(data.homepagePortraitImagePath);
+      setBannerHidden(data.homepageBannerHidden);
+      setPortraitHidden(data.homepagePortraitHidden);
       setBannerPreview(getHomepageAssetUrl(data.homepageBannerImagePath));
       setPortraitPreview(getHomepageAssetUrl(data.homepagePortraitImagePath) ?? DEFAULT_PORTRAIT_URL);
     } catch (err) {
@@ -66,6 +70,20 @@ export function HomepageDashboard() {
   useEffect(() => {
     loadSettings();
   }, []);
+
+  function handleRemoveBanner() {
+    setBannerFile(null);
+    setBannerPath(null);
+    setBannerPreview(null);
+    setBannerHidden(false);
+  }
+
+  function handleRemovePortraitOverride() {
+    setPortraitFile(null);
+    setPortraitPath(null);
+    setPortraitPreview(DEFAULT_PORTRAIT_URL);
+    setPortraitHidden(false);
+  }
 
   async function handleSave(event: React.FormEvent) {
     event.preventDefault();
@@ -92,6 +110,8 @@ export function HomepageDashboard() {
           homepageHeroMode,
           homepageBannerImagePath: nextBannerPath,
           homepagePortraitImagePath: nextPortraitPath,
+          homepageBannerHidden: bannerHidden,
+          homepagePortraitHidden: portraitHidden,
         },
         profile?.id,
       );
@@ -99,6 +119,8 @@ export function HomepageDashboard() {
       setSettings(updated);
       setBannerPath(updated.homepageBannerImagePath);
       setPortraitPath(updated.homepagePortraitImagePath);
+      setBannerHidden(updated.homepageBannerHidden);
+      setPortraitHidden(updated.homepagePortraitHidden);
       setBannerFile(null);
       setPortraitFile(null);
       setBannerPreview(getHomepageAssetUrl(updated.homepageBannerImagePath));
@@ -210,71 +232,53 @@ export function HomepageDashboard() {
           {(homepageHeroMode === "banner" || homepageHeroMode === "portrait") && (
             <div className="space-y-8 border-t border-[var(--ploy-border-primary)] pt-8">
               {homepageHeroMode === "banner" && (
-                <div className="space-y-3">
-                  <Label htmlFor="homepage-banner">Full-width banner image</Label>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                      <ImagePlus className="size-4" />
-                      Upload banner
-                      <input
-                        id="homepage-banner"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="sr-only"
-                        disabled={!canEdit}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null;
-                          setBannerFile(file);
-                          setBannerPreview(file ? URL.createObjectURL(file) : getHomepageAssetUrl(bannerPath));
-                        }}
-                      />
-                    </label>
-                    {bannerPreview && (
-                      <img src={bannerPreview} alt="" className="h-16 w-32 rounded-md object-cover" />
-                    )}
-                  </div>
-                  <ImageUploadHint hint={HOMEPAGE_BANNER_IMAGE_HINT} />
-                  {!bannerPreview && (
-                    <p className="text-xs text-[var(--ploy-status-warning)]">
-                      Upload a banner image before saving, or the homepage will show the headline without a banner.
-                    </p>
-                  )}
-                </div>
+                <AdminOptionalImageField
+                  id="homepage-banner"
+                  label="Full-width banner image"
+                  hint={HOMEPAGE_BANNER_IMAGE_HINT}
+                  previewClassName="h-16 w-32 rounded-md object-cover"
+                  previewUrl={bannerPreview}
+                  disabled={!canEdit}
+                  uploadLabel="Upload banner"
+                  imageHidden={bannerHidden}
+                  onFileSelect={(file) => {
+                    setBannerFile(file);
+                    if (file) setBannerHidden(false);
+                    setBannerPreview(
+                      file ? URL.createObjectURL(file) : getHomepageAssetUrl(bannerPath),
+                    );
+                  }}
+                  onRemove={handleRemoveBanner}
+                  onToggleHidden={bannerPreview ? () => setBannerHidden((value) => !value) : undefined}
+                />
               )}
 
               {homepageHeroMode === "portrait" && (
-                <div className="space-y-3">
-                  <Label htmlFor="homepage-portrait">Portrait image (optional override)</Label>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                      <ImagePlus className="size-4" />
-                      Upload portrait
-                      <input
-                        id="homepage-portrait"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="sr-only"
-                        disabled={!canEdit}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null;
-                          setPortraitFile(file);
-                          setPortraitPreview(
-                            file
-                              ? URL.createObjectURL(file)
-                              : getHomepageAssetUrl(portraitPath) ?? DEFAULT_PORTRAIT_URL,
-                          );
-                        }}
-                      />
-                    </label>
-                    {portraitPreview && (
-                      <img src={portraitPreview} alt="" className="h-20 w-16 rounded-md object-cover" />
-                    )}
-                  </div>
-                  <ImageUploadHint hint={HOMEPAGE_PORTRAIT_IMAGE_HINT} />
-                  <p className="text-xs text-[var(--ploy-text-tertiary)]">
-                    Leave blank to use the default portrait.
-                  </p>
-                </div>
+                <AdminOptionalImageField
+                  id="homepage-portrait"
+                  label="Portrait image (optional override)"
+                  hint={HOMEPAGE_PORTRAIT_IMAGE_HINT}
+                  previewClassName="h-20 w-16 rounded-md object-cover"
+                  previewUrl={portraitPreview}
+                  disabled={!canEdit}
+                  uploadLabel="Upload portrait"
+                  removeLabel="Remove custom portrait"
+                  hideLabel="Hide portrait"
+                  showLabel="Show portrait"
+                  imageHidden={portraitHidden}
+                  optionalNote="Hide temporarily keeps your uploaded portrait on file. Remove custom portrait restores the default site portrait."
+                  onFileSelect={(file) => {
+                    setPortraitFile(file);
+                    if (file) setPortraitHidden(false);
+                    setPortraitPreview(
+                      file
+                        ? URL.createObjectURL(file)
+                        : getHomepageAssetUrl(portraitPath) ?? DEFAULT_PORTRAIT_URL,
+                    );
+                  }}
+                  onRemove={handleRemovePortraitOverride}
+                  onToggleHidden={() => setPortraitHidden((value) => !value)}
+                />
               )}
             </div>
           )}

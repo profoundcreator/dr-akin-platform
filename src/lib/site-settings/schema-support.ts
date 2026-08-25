@@ -54,6 +54,19 @@ export function isMissingPhase5SchemaError(message: string): boolean {
   );
 }
 
+export const MIGRATION_035_HINT =
+  "Run supabase/migrations/035_optional_image_hidden_flags.sql in the Supabase SQL Editor, then refresh.";
+
+export function isMissingPhase7SchemaError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("hero_image_hidden") ||
+    normalized.includes("cover_image_hidden") ||
+    normalized.includes("homepage_banner_hidden") ||
+    normalized.includes("homepage_portrait_hidden")
+  );
+}
+
 export function isMissingPhase6SchemaError(message: string): boolean {
   const normalized = message.toLowerCase();
   return (
@@ -87,6 +100,9 @@ export function formatSchemaSetupError(message: string): string {
   }
   if (isMissingPhase6SchemaError(message)) {
     return `${message} ${MIGRATION_013_HINT}`;
+  }
+  if (isMissingPhase7SchemaError(message)) {
+    return `${message} ${MIGRATION_035_HINT}`;
   }
   return message;
 }

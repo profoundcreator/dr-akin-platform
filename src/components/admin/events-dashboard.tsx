@@ -6,16 +6,15 @@ import {
   CalendarDays,
   Check,
   Download,
-  ImagePlus,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -105,6 +104,7 @@ export function EventsDashboard() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [existingCoverPath, setExistingCoverPath] = useState<string | null>(null);
+  const [coverImageHidden, setCoverImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -143,6 +143,7 @@ export function EventsDashboard() {
     setCoverFile(null);
     setCoverPreview(null);
     setExistingCoverPath(null);
+    setCoverImageHidden(false);
   }
 
   function startEdit(event: PlatformEvent) {
@@ -166,6 +167,7 @@ export function EventsDashboard() {
       isHomepageFeatured: event.isHomepageFeatured,
     });
     setExistingCoverPath(event.coverImagePath);
+    setCoverImageHidden(event.coverImageHidden);
     setCoverFile(null);
     setCoverPreview(getEventCoverUrl(event.coverImagePath));
   }
@@ -197,6 +199,7 @@ export function EventsDashboard() {
       location: form.location,
       locationType: form.locationType,
       coverImagePath,
+      coverImageHidden,
       registrationUrl: form.registrationUrl,
       registrationEmbedUrl: form.registrationEmbedUrl,
       paymentUrl: form.paymentUrl,
@@ -404,7 +407,15 @@ export function EventsDashboard() {
 
   function handleCoverChange(file: File | null) {
     setCoverFile(file);
+    if (file) setCoverImageHidden(false);
     setCoverPreview(file ? URL.createObjectURL(file) : getEventCoverUrl(existingCoverPath));
+  }
+
+  function handleRemoveCover() {
+    setCoverFile(null);
+    setExistingCoverPath(null);
+    setCoverPreview(null);
+    setCoverImageHidden(false);
   }
 
   if (!isSupabaseConfigured) {
@@ -667,26 +678,17 @@ export function EventsDashboard() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="event-cover">Cover image</Label>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload image
-                <input
-                  id="event-cover"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)}
-                />
-              </label>
-              {coverPreview && (
-                <img src={coverPreview} alt="" className="h-16 w-24 rounded-md object-cover" />
-              )}
-            </div>
-            <ImageUploadHint hint={EVENT_COVER_IMAGE_HINT} />
-          </div>
+          <AdminOptionalImageField
+            id="event-cover"
+            label="Cover image"
+            hint={EVENT_COVER_IMAGE_HINT}
+            previewUrl={coverPreview}
+            uploadLabel="Upload image"
+            imageHidden={coverImageHidden}
+            onFileSelect={handleCoverChange}
+            onRemove={handleRemoveCover}
+            onToggleHidden={coverPreview ? () => setCoverImageHidden((value) => !value) : undefined}
+          />
 
           {isApprover && (
             <label className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4">

@@ -40,22 +40,31 @@ function applyClientSeo(book: PlatformBook) {
 
 function BookDetail({ book }: { book: PlatformBook }) {
   const purchaseLinks = sortPurchaseLinks(book.purchaseLinks ?? []);
+  const showCover = !book.coverImageHidden && Boolean(book.coverUrl);
 
   return (
     <section className="border-b border-[var(--ploy-border-primary)] bg-[var(--ploy-background-primary)] px-6 py-20 md:px-10 md:py-28 lg:px-14 xl:px-20">
       <div className="mx-auto max-w-[var(--ploy-canvas-main)]">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:items-start">
-          <Reveal>
-            <div className="overflow-hidden rounded-xl border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] p-6">
-              <img
-                src={book.coverUrl}
-                alt={book.title}
-                className="mx-auto w-full max-w-xs object-contain"
-              />
-            </div>
-          </Reveal>
+        <div
+          className={
+            showCover
+              ? "grid gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:items-start"
+              : "max-w-3xl"
+          }
+        >
+          {showCover && (
+            <Reveal>
+              <div className="overflow-hidden rounded-xl border border-[var(--ploy-border-primary)] bg-[var(--ploy-background-secondary)] p-6">
+                <img
+                  src={book.coverUrl}
+                  alt={book.title}
+                  className="mx-auto w-full max-w-xs object-contain"
+                />
+              </div>
+            </Reveal>
+          )}
 
-          <Reveal delay={0.05} className="space-y-8">
+          <Reveal delay={showCover ? 0.05 : 0} className="space-y-8">
             <div className="space-y-4">
               <p className="ploy-eyebrow">{book.category}</p>
               <Heading as="h1" size="section">

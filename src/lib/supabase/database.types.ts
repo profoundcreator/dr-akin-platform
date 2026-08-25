@@ -150,6 +150,7 @@ export interface DbEvent {
   location: string | null;
   location_type: string;
   cover_image_path: string | null;
+  cover_image_hidden: boolean;
   registration_url: string | null;
   registration_embed_url: string | null;
   payment_url: string | null;
@@ -175,6 +176,7 @@ export interface DbLibraryBook {
   category: string;
   description: string;
   cover_image_path: string | null;
+  cover_image_hidden: boolean;
   purchase_links: unknown;
   is_featured: boolean;
   sort_order: number;
@@ -198,6 +200,7 @@ export interface DbInsightArticle {
   seo_description: string | null;
   body: string;
   hero_image_path: string | null;
+  hero_image_hidden: boolean;
   social_image_alt: string | null;
   source_label: string | null;
   source_url: string | null;
@@ -235,6 +238,7 @@ export interface DbWorkOrg {
   secondary_cta_href: string | null;
   related_links: unknown;
   hero_image_path: string | null;
+  hero_image_hidden: boolean;
   logo_image_path: string | null;
   external_url: string | null;
   sort_order: number;
@@ -255,6 +259,8 @@ export interface DbSiteSettings {
   homepage_hero_mode: HomepageHeroMode;
   homepage_banner_image_path: string | null;
   homepage_portrait_image_path: string | null;
+  homepage_banner_hidden: boolean;
+  homepage_portrait_hidden: boolean;
   hidden_preloaded_insight_slugs: string[];
   hidden_preloaded_book_slugs: string[];
   updated_by: string | null;

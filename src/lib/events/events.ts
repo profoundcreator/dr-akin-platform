@@ -23,6 +23,7 @@ export interface PlatformEvent {
   location: string | null;
   locationType: string;
   coverImagePath: string | null;
+  coverImageHidden: boolean;
   registrationUrl: string | null;
   registrationEmbedUrl: string | null;
   paymentUrl: string | null;
@@ -52,6 +53,7 @@ export interface EventInput {
   location?: string;
   locationType?: string;
   coverImagePath?: string | null;
+  coverImageHidden?: boolean;
   registrationUrl?: string;
   registrationEmbedUrl?: string;
   paymentUrl?: string;
@@ -101,6 +103,7 @@ function mapRow(row: DbEvent): PlatformEvent {
     location: row.location,
     locationType: row.location_type,
     coverImagePath: row.cover_image_path,
+    coverImageHidden: row.cover_image_hidden ?? false,
     registrationUrl: row.registration_url,
     registrationEmbedUrl: row.registration_embed_url,
     paymentUrl: row.payment_url,
@@ -140,6 +143,7 @@ function buildInsertPayload(
     location: input.location?.trim() || null,
     location_type: input.locationType || "in_person",
     cover_image_path: input.coverImagePath ?? null,
+    cover_image_hidden: input.coverImageHidden ?? false,
     registration_url: input.registrationUrl?.trim() || null,
     registration_embed_url: input.registrationEmbedUrl?.trim() || null,
     payment_url: input.paymentUrl?.trim() || null,
@@ -377,6 +381,7 @@ export async function updateEvent(
   if (input.location !== undefined) payload.location = input.location.trim() || null;
   if (input.locationType !== undefined) payload.location_type = input.locationType;
   if (input.coverImagePath !== undefined) payload.cover_image_path = input.coverImagePath;
+  if (input.coverImageHidden !== undefined) payload.cover_image_hidden = input.coverImageHidden;
   if (input.registrationUrl !== undefined) payload.registration_url = input.registrationUrl.trim() || null;
   if (input.registrationEmbedUrl !== undefined) {
     payload.registration_embed_url = input.registrationEmbedUrl.trim() || null;

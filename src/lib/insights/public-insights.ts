@@ -19,6 +19,7 @@ function staticInsightToPlatform(article: InsightArticle): PlatformInsight {
     seoDescription: null,
     body: plainTextToInsightHtml(article.body),
     heroImagePath: null,
+    heroImageHidden: false,
     heroImageUrl: null,
     socialImageAlt: null,
     sourceLabel: null,

@@ -30,6 +30,7 @@ function staticOrgToPlatform(meta: (typeof STATIC_WORK_ORG_META)[number]): Platf
     secondaryCtaHref: content.secondaryCta?.href ?? null,
     relatedLinks: content.relatedLinks ?? [],
     heroImagePath: null,
+    heroImageHidden: false,
     logoImagePath: null,
     externalUrl: null,
     sortOrder: meta.sortOrder,

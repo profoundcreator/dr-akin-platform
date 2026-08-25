@@ -61,6 +61,7 @@ export function InsightMediumEditor() {
   const [editingId, setEditingId] = useState<string | null>(id);
   const [heroFile, setHeroFile] = useState<File | null>(null);
   const [existingHeroPath, setExistingHeroPath] = useState<string | null>(null);
+  const [heroImageHidden, setHeroImageHidden] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -81,6 +82,7 @@ export function InsightMediumEditor() {
     seoSchemaReady,
     existingHeroPath,
     heroFile,
+    heroImageHidden,
   });
 
   useEffect(() => {
@@ -96,6 +98,7 @@ export function InsightMediumEditor() {
             setEditingId(insight.id);
             setForm(insightToForm(insight));
             setExistingHeroPath(insight.heroImagePath);
+            setHeroImageHidden(insight.heroImageHidden);
           }
         } else if (prefill) {
           const preloaded = PRELOADED_INSIGHTS.find((a) => a.slug === prefill);
@@ -105,6 +108,7 @@ export function InsightMediumEditor() {
               setEditingId(managed.id);
               setForm(insightToForm(managed));
               setExistingHeroPath(managed.heroImagePath);
+              setHeroImageHidden(managed.heroImageHidden);
             } else {
               setForm({
                 ...EMPTY_INSIGHT_FORM,
@@ -352,13 +356,17 @@ export function InsightMediumEditor() {
         )}
 
         {mediaSchemaReady && (
-          <div className="mb-10">
+          <div className="mb-10 space-y-3">
             <label className="group block cursor-pointer">
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 className="sr-only"
-                onChange={(e) => setHeroFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setHeroFile(file);
+                  if (file) setHeroImageHidden(false);
+                }}
               />
               {heroPreview ? (
                 <div className="relative overflow-hidden rounded-lg">
@@ -375,6 +383,31 @@ export function InsightMediumEditor() {
                 </div>
               )}
             </label>
+            {heroPreview && (
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setHeroImageHidden((value) => !value)}
+                >
+                  {heroImageHidden ? "Show image" : "Hide image"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setHeroFile(null);
+                    setExistingHeroPath(null);
+                    setHeroImageHidden(false);
+                  }}
+                >
+                  <X className="size-4" />
+                  Remove cover image
+                </Button>
+              </div>
+            )}
           </div>
         )}
 

@@ -6,18 +6,17 @@ import {
   BookOpen,
   Check,
   Download,
-  ImagePlus,
   Plus,
   Star,
   Trash2,
   X,
 } from "lucide-react";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminHelpTip } from "@/components/admin/admin-help-tip";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -114,6 +113,7 @@ export function BooksDashboard() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [existingCoverPath, setExistingCoverPath] = useState<string | null>(null);
+  const [coverImageHidden, setCoverImageHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [schemaReady, setSchemaReady] = useState(true);
@@ -237,6 +237,7 @@ export function BooksDashboard() {
     setCoverFile(null);
     setCoverPreview(null);
     setExistingCoverPath(null);
+    setCoverImageHidden(false);
   }
 
   function startEdit(book: PlatformBook) {
@@ -257,6 +258,7 @@ export function BooksDashboard() {
       sortOrder: book.sortOrder,
     });
     setExistingCoverPath(book.coverImagePath);
+    setCoverImageHidden(book.coverImageHidden);
     setCoverFile(null);
     setCoverPreview(getBookCoverUrl(book.coverImagePath) ?? book.coverUrl);
     scrollToEditorForm();
@@ -288,6 +290,7 @@ export function BooksDashboard() {
       sortOrder: book.sortOrder,
     });
     setExistingCoverPath(book.coverImagePath);
+    setCoverImageHidden(false);
     setCoverPreview(book.coverUrl);
     setCoverFile(null);
     scrollToEditorForm();
@@ -315,6 +318,7 @@ export function BooksDashboard() {
       category: form.category,
       description: form.description,
       coverImagePath,
+      coverImageHidden,
       purchaseLinks: cleanPurchaseLinks(form.purchaseLinks),
       sortOrder: form.sortOrder,
       status,
@@ -521,7 +525,15 @@ export function BooksDashboard() {
 
   function handleCoverChange(file: File | null) {
     setCoverFile(file);
+    if (file) setCoverImageHidden(false);
     setCoverPreview(file ? URL.createObjectURL(file) : getBookCoverUrl(existingCoverPath));
+  }
+
+  function handleRemoveCover() {
+    setCoverFile(null);
+    setExistingCoverPath(null);
+    setCoverPreview(null);
+    setCoverImageHidden(false);
   }
 
   function updatePurchaseLink(index: number, field: keyof PurchaseLink, value: string) {
@@ -969,26 +981,18 @@ export function BooksDashboard() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="book-cover">Cover image</Label>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload cover
-                <input
-                  id="book-cover"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)}
-                />
-              </label>
-              {coverPreview && (
-                <img src={coverPreview} alt="" className="h-20 w-14 rounded-md object-cover" />
-              )}
-            </div>
-            <ImageUploadHint hint={BOOK_COVER_IMAGE_HINT} />
-          </div>
+          <AdminOptionalImageField
+            id="book-cover"
+            label="Cover image"
+            hint={BOOK_COVER_IMAGE_HINT}
+            previewClassName="h-20 w-14 rounded-md object-cover"
+            previewUrl={coverPreview}
+            uploadLabel="Upload cover"
+            imageHidden={coverImageHidden}
+            onFileSelect={handleCoverChange}
+            onRemove={handleRemoveCover}
+            onToggleHidden={coverPreview ? () => setCoverImageHidden((value) => !value) : undefined}
+          />
 
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">

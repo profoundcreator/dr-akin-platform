@@ -7,6 +7,7 @@ export interface PlatformInsight {
   seoDescription: string | null;
   body: string;
   heroImagePath: string | null;
+  heroImageHidden: boolean;
   heroImageUrl: string | null;
   socialImageAlt: string | null;
   sourceLabel: string | null;
@@ -29,6 +30,7 @@ export interface InsightInput {
   seoDescription?: string | null;
   body: string;
   heroImagePath?: string | null;
+  heroImageHidden?: boolean;
   socialImageAlt?: string | null;
   sourceLabel?: string | null;
   sourceUrl?: string | null;
