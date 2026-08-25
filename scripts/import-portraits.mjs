@@ -128,8 +128,8 @@ async function main() {
 
   console.log(`\nDone — ${converted} portrait(s) ready for deploy.`);
   if (!includeHomepage) {
-    console.log("Homepage portrait unchanged. Re-run OG bootstrap if formal was updated:");
-    console.log("  npm run import:social-images -- --bootstrap-og");
+    console.log("Homepage portrait unchanged.");
+    console.log("Do NOT run import:social-images --bootstrap-og unless you intend to replace the stage OG with a studio crop.");
   }
 }
 
