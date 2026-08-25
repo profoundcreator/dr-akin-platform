@@ -66,18 +66,20 @@ In **Authentication → URL Configuration**, set:
 
 | Field | Value |
 |--------|--------|
-| **Site URL** | `https://dr-akin-platform.vercel.app` (or your custom domain) |
+| **Site URL** | `https://theakinakinpelu.org` (production) |
 | **Redirect URLs** | Add each of these (one per line): |
 
 ```
+https://theakinakinpelu.org/admin/login
+https://theakinakinpelu.org/admin/**
 https://dr-akin-platform.vercel.app/admin/login
 http://localhost:4321/admin/login
 http://localhost:4322/admin/login
 ```
 
-If Site URL is still `http://localhost:3000`, invite emails will send people to localhost and fail. Update Site URL and redirect URLs **before** sending invites.
+If Site URL is still `http://localhost:3000` or the old preview URL only, invite emails will send people to the wrong host. Update Site URL and redirect URLs **before** sending invites.
 
-When you connect a custom domain later, add `https://your-domain.com/admin/login` to Redirect URLs and update Site URL.
+Full domain cutover checklist: [`docs/domain-cutover-now.md`](../docs/domain-cutover-now.md).
 
 ### Email rate limits
 

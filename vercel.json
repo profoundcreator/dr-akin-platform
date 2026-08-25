@@ -41,6 +41,12 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.theakinakinpelu.org" }],
+      "destination": "https://theakinakinpelu.org/:path*",
+      "permanent": true
+    },
+    {
       "source": "/work/tc-resource-technology",
       "destination": "/work",
       "permanent": true
