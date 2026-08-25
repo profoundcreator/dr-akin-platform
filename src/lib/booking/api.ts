@@ -493,7 +493,16 @@ function mapEnquiryRow(row: {
   };
 }
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUuid(value: string): boolean {
+  return UUID_PATTERN.test(value.trim());
+}
+
 export async function getEnquiryById(enquiryId: string): Promise<EnquiryRecord | null> {
+  if (!isValidUuid(enquiryId)) return null;
+
   const supabase = tryGetSupabaseClient();
 
   if (!supabase) {

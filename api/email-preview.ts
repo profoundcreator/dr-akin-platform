@@ -22,7 +22,7 @@ const SAMPLE = {
     platformKey: null as string | null,
     platformLabel: null as string | null,
     referrerPath: "/contact",
-    adminUrl: `${siteUrl()}/admin/inbox/detail?id=sample`,
+    adminUrl: `${siteUrl()}/admin/inbox/detail?id=00000000-0000-4000-8000-000000000001`,
   },
   booking: {
     id: "00000000-0000-4000-8000-000000000002",
@@ -37,7 +37,7 @@ const SAMPLE = {
     preferredDate: "2026-11-15",
     city: "Lagos",
     country: "Nigeria",
-    adminUrl: `${siteUrl()}/admin/requests/detail?id=sample`,
+    adminUrl: `${siteUrl()}/admin/requests/detail?id=00000000-0000-4000-8000-000000000002`,
     requestAreaLabel: "AALD",
     platformKey: "aald",
     platformLabel: "AALD",
