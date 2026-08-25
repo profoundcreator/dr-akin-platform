@@ -44,7 +44,7 @@ export function SiteHeader() {
         <a
           href="/"
           aria-label={`${PERSON_IDENTITY.publicName} — Home`}
-          className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
+          className="inline-flex shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ploy-border-accent)] focus-visible:ring-offset-2"
         >
           <BrandLogo variant="header" priority />
         </a>

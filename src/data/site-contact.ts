@@ -14,8 +14,12 @@ export const SITE_CONTACT = {
   privacyPath: "/privacy",
   bookingPath: "/book-dr-akin",
   responseTime: "We aim to respond within 3–5 business days.",
-  socialLinks: [] as ApprovedSocialLink[],
+  socialLinks: [
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/akinakinpelu/" },
+    { label: "Twitter", href: "https://x.com/iamakinakinpelu" },
+    { label: "Instagram", href: "https://www.instagram.com/iamakinakinpelu/" },
+    { label: "TikTok", href: "https://www.tiktok.com/@theakinakinpelu" },
+  ] satisfies ApprovedSocialLink[],
 } as const;
 
-// Social accounts intentionally remain empty until the client approves canonical URLs.
 export const APPROVED_SOCIAL_LINKS: readonly ApprovedSocialLink[] = SITE_CONTACT.socialLinks;

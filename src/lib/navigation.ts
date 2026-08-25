@@ -62,13 +62,28 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export const FOOTER_COLUMNS = [
+export interface FooterLink {
+  label: string;
+  href?: string;
+  external?: boolean;
+  action?: "newsletter";
+  /** Invisible row to keep footer link columns aligned */
+  spacer?: boolean;
+}
+
+export interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Pillars",
     links: [
       { label: "Governance", href: "/work#governance" },
       { label: "Enterprise", href: "/work#enterprise" },
       { label: "Education", href: "/work#education" },
+      { label: "", spacer: true },
     ],
   },
   {
@@ -93,10 +108,8 @@ export const FOOTER_COLUMNS = [
     title: "Connect",
     links: [
       { label: "Events", href: "/events" },
-      { label: "Invite Akin Akinpelu", href: "/book-dr-akin" },
-      { label: "Track a Booking", href: "/track-booking" },
-      { label: "Organizer Resources", href: "/organizer-resources" },
       { label: "Contact", href: "/contact" },
+      { label: "Stay connected", action: "newsletter" },
       { label: "Privacy", href: "/privacy" },
     ],
   },

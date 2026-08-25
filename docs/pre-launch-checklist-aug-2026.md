@@ -4,6 +4,8 @@
 **Primary domain:** `theakinakinpelu.org` (or interim Vercel URL until DNS cutover)  
 **Last updated:** 21 August 2026
 
+> **Interactive version (Aug 2026):** use [`launch-gate-interactive.md`](launch-gate-interactive.md) for checkboxes and Agent-mode task mapping. This file is the detailed reference.
+
 Use this as the single launch gate list. Items marked **Blocker** must pass before public launch.
 
 ---

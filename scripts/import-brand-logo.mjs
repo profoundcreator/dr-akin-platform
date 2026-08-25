@@ -3,8 +3,9 @@
  * Process the Akin wordmark for site header, footer, and transactional email.
  *
  * Drop the master file in assets/brand-incoming/:
- *   akin-wordmark-source.png   — grey or colour lockup; black or transparent background
+ *   akin-wordmark-source.png   — horizontal lockup; black or transparent background
  *
+ * Prefer a wide lockup (~6:1) with the full "akin akinpelu" text visible.
  * Then: npm run import:brand
  */
 import { access, mkdir } from "node:fs/promises";
@@ -14,13 +15,23 @@ import sharp from "sharp";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const INCOMING = path.join(ROOT, "assets/brand-incoming");
 const OUT = path.join(ROOT, "public/brand");
+const FALLBACK_SOURCE = path.join(ROOT, "public/brand/akin-logo-lockup.png");
 const SOURCE_BASENAMES = ["akin-wordmark-source", "akin-logo-source"];
 const SOURCE_EXTENSIONS = [".png", ".webp", ".jpg", ".jpeg"];
 
-/** Rendered width in HTML email clients (height follows aspect ratio). */
-export const EMAIL_LOGO_DISPLAY_WIDTH = 200;
+const EMAIL_LOGO_DISPLAY_WIDTH = 200;
 const EMAIL_FILE_WIDTH = 440;
-const SITE_FILE_WIDTH = 480;
+const SITE_FILE_WIDTH = 520;
+const TRIM_PADDING = 20;
+
+/** Wide lockups are ~5–7:1; square/tall masters truncate in the header. */
+const MIN_LOCKUP_ASPECT = 4;
+
+async function isWideLockup(filePath) {
+  const { width, height } = await sharp(filePath).metadata();
+  if (!width || !height) return false;
+  return width / height >= MIN_LOCKUP_ASPECT;
+}
 
 async function findSource() {
   for (const base of SOURCE_BASENAMES) {
@@ -28,13 +39,22 @@ async function findSource() {
       const candidate = path.join(INCOMING, `${base}${ext}`);
       try {
         await access(candidate);
-        return candidate;
+        if (await isWideLockup(candidate)) return candidate;
+        console.warn(
+          `Skipping ${path.relative(ROOT, candidate)} — not a wide lockup (need ≥${MIN_LOCKUP_ASPECT}:1).`,
+        );
       } catch {
         /* try next */
       }
     }
   }
-  return null;
+  try {
+    await access(FALLBACK_SOURCE);
+    console.warn(`Using fallback source: ${path.relative(ROOT, FALLBACK_SOURCE)}`);
+    return FALLBACK_SOURCE;
+  } catch {
+    return null;
+  }
 }
 
 function normalizeLogoPixels(buffer, channels) {
@@ -47,9 +67,6 @@ function normalizeLogoPixels(buffer, channels) {
     let b = px[i + 2];
     let a = channels === 4 ? px[i + 3] : 255;
 
-    if (a === 0 && r < 20 && g < 20 && b < 20) continue;
-
-    // Un-premultiply faint anti-aliased exports (common from design tools).
     if (a > 0 && a < 242) {
       const alpha = a / 255;
       r = Math.min(255, Math.round(r / alpha));
@@ -57,10 +74,15 @@ function normalizeLogoPixels(buffer, channels) {
       b = Math.min(255, Math.round(b / alpha));
     }
 
-    // Key near-black backgrounds only — keep dark grey glyphs.
     if (r < 18 && g < 18 && b < 18) {
       a = 0;
     } else if (a > 0) {
+      // Charcoal wordmark for light backgrounds (#2E2C2A family).
+      const luma = Math.round(r * 0.2126 + g * 0.7152 + b * 0.0722);
+      const tone = Math.min(255, Math.round(luma * 0.55 + 28));
+      r = tone;
+      g = tone;
+      b = tone;
       a = 255;
     }
 
@@ -76,17 +98,15 @@ function normalizeLogoPixels(buffer, channels) {
 }
 
 function boostForLightBackground(px, maxLuma) {
-  if (maxLuma >= 100) return px;
-  const factor = maxLuma < 55 ? 1.35 : 1.15;
-  const offset = maxLuma < 55 ? 24 : 8;
-
-  for (let i = 0; i < px.length; i += 4) {
-    if (px[i + 3] === 0) continue;
-    px[i] = Math.min(255, Math.round(px[i] * factor + offset));
-    px[i + 1] = Math.min(255, Math.round(px[i + 1] * factor + offset));
-    px[i + 2] = Math.min(255, Math.round(px[i + 2] * factor + offset));
+  if (maxLuma >= 90) return px;
+  const out = Buffer.from(px);
+  for (let i = 0; i < out.length; i += 4) {
+    if (out[i + 3] === 0) continue;
+    out[i] = Math.min(255, out[i] + 12);
+    out[i + 1] = Math.min(255, out[i + 1] + 12);
+    out[i + 2] = Math.min(255, out[i + 2] + 12);
   }
-  return px;
+  return out;
 }
 
 function toDarkModeWordmark(px) {
@@ -100,15 +120,25 @@ function toDarkModeWordmark(px) {
   return out;
 }
 
-async function writePng(raw, width, height, dest, resizeWidth) {
-  let pipeline = sharp(raw, { raw: { width, height, channels: 4 } }).png({
-    compressionLevel: 9,
-    adaptiveFiltering: true,
-  });
-  if (resizeWidth) {
-    pipeline = pipeline.resize(resizeWidth, null, { fit: "inside" });
-  }
-  await pipeline.toFile(dest);
+async function trimTransparentPng(inputBuffer, width, height) {
+  return sharp(inputBuffer, { raw: { width, height, channels: 4 } })
+    .trim({ threshold: 8 })
+    .extend({
+      top: TRIM_PADDING,
+      bottom: TRIM_PADDING,
+      left: TRIM_PADDING,
+      right: TRIM_PADDING,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png()
+    .toBuffer();
+}
+
+async function writeSizedPng(inputBuffer, dest, resizeWidth) {
+  await sharp(inputBuffer)
+    .resize(resizeWidth, null, { fit: "inside", withoutEnlargement: false })
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toFile(dest);
 }
 
 async function main() {
@@ -118,25 +148,27 @@ async function main() {
   const source = await findSource();
   if (!source) {
     console.error(`Missing source in ${path.relative(ROOT, INCOMING)}/`);
-    console.error("Add akin-wordmark-source.png, then rerun.");
+    console.error("Add akin-wordmark-source.png (wide lockup with full name), then rerun.");
     process.exit(1);
   }
 
-  const { data, info } = await sharp(source)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 
   const { px: normalized, maxLuma } = normalizeLogoPixels(data, info.channels);
   const light = boostForLightBackground(Buffer.from(normalized), maxLuma);
   const dark = toDarkModeWordmark(normalized);
 
-  await writePng(light, info.width, info.height, path.join(OUT, "akin-wordmark-light.png"), SITE_FILE_WIDTH);
-  await writePng(light, info.width, info.height, path.join(OUT, "akin-wordmark-email-light.png"), EMAIL_FILE_WIDTH);
-  await writePng(dark, info.width, info.height, path.join(OUT, "akin-wordmark-email-dark.png"), EMAIL_FILE_WIDTH);
+  const lightTrimmed = await trimTransparentPng(light, info.width, info.height);
+  const darkTrimmed = await trimTransparentPng(dark, info.width, info.height);
 
+  await writeSizedPng(lightTrimmed, path.join(OUT, "akin-wordmark-light.png"), SITE_FILE_WIDTH);
+  await writeSizedPng(lightTrimmed, path.join(OUT, "akin-wordmark-email-light.png"), EMAIL_FILE_WIDTH);
+  await writeSizedPng(darkTrimmed, path.join(OUT, "akin-wordmark-email-dark.png"), EMAIL_FILE_WIDTH);
+
+  const meta = await sharp(path.join(OUT, "akin-wordmark-light.png")).metadata();
   console.log(`✓ ${path.basename(source)} → public/brand/akin-wordmark-*.png`);
-  console.log(`  Email: ${EMAIL_LOGO_DISPLAY_WIDTH}px display / ${EMAIL_FILE_WIDTH}px file (@2x)`);
+  console.log(`  Site wordmark: ${meta.width}×${meta.height}px (display ~${meta.height}px tall in header)`);
+  console.log(`  Email: ${EMAIL_LOGO_DISPLAY_WIDTH}px wide`);
 }
 
 main().catch((error) => {

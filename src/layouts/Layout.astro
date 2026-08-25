@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { PERSON_IDENTITY } from "@/data/person-identity";
 import { SITE_CONTACT } from "@/data/site-contact";
 import { BRAND_ASSETS } from "@/lib/brand/assets";
+import { GlobalModalHosts } from "@/components/layout/global-modal-hosts";
 import type { JsonLdValue } from "@/lib/seo/json-ld";
 
 interface Props {
@@ -47,7 +48,7 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.favicon} />
-    <link rel="apple-touch-icon" href={BRAND_ASSETS.appleTouchIcon} />
+    <link rel="apple-touch-icon" sizes="180x180" href={BRAND_ASSETS.appleTouchIcon} />
     {preloadImage && (
       <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
     )}
@@ -70,10 +71,15 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
   </head>
   <body>
     <slot />
+    <GlobalModalHosts client:idle />
     <script is:inline>
       window.__enquiryModalPending = false;
+      window.__newsletterModalPending = false;
       window.addEventListener("open-enquiry-modal", function () {
         window.__enquiryModalPending = true;
+      });
+      window.addEventListener("open-newsletter-modal", function () {
+        window.__newsletterModalPending = true;
       });
     </script>
   </body>

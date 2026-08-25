@@ -7,11 +7,7 @@ import { MarketingOptInField } from "@/components/marketing/marketing-opt-in-fie
 import { subscribeAudienceMember } from "@/lib/marketing/subscribe-audience";
 import { syncAudienceToEsp } from "@/lib/marketing/sync-audience-esp";
 
-interface FooterNewsletterSignupProps {
-  className?: string;
-}
-
-export function FooterNewsletterSignup({ className }: FooterNewsletterSignupProps) {
+export function NewsletterSignupForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [marketingOptIn, setMarketingOptIn] = useState(false);
@@ -49,50 +45,42 @@ export function FooterNewsletterSignup({ className }: FooterNewsletterSignupProp
   }
 
   return (
-    <div className={className}>
-      <p className="ploy-eyebrow">Stay connected</p>
-      <p className="mt-3 text-sm leading-relaxed text-[var(--ploy-text-secondary)]">
-        Occasional updates on insights, events, and announcements.
-      </p>
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-        <Input
-          type="text"
-          name="name"
-          autoComplete="name"
-          placeholder="Name (optional)"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Input
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="Email address"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <MarketingOptInField
-          id="footer-newsletter"
-          checked={marketingOptIn}
-          onChange={setMarketingOptIn}
-        />
-        <Button type="submit" variant="secondary" size="sm" disabled={status === "loading"}>
-          {status === "loading" ? "Subscribing…" : "Subscribe"}
-        </Button>
-        {message && (
-          <p
-            className={
-              status === "success"
-                ? "text-sm text-green-700"
-                : "text-sm text-red-700"
-            }
-            role="status"
-          >
-            {message}
-          </p>
-        )}
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input
+        type="text"
+        name="name"
+        autoComplete="name"
+        placeholder="Name (optional)"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Input
+        type="email"
+        name="email"
+        autoComplete="email"
+        placeholder="Email address"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <MarketingOptInField
+        id="newsletter-signup"
+        checked={marketingOptIn}
+        onChange={setMarketingOptIn}
+      />
+      <Button type="submit" variant="secondary" size="sm" disabled={status === "loading"}>
+        {status === "loading" ? "Subscribing…" : "Subscribe"}
+      </Button>
+      {message && (
+        <p
+          className={
+            status === "success" ? "text-sm text-green-700" : "text-sm text-red-700"
+          }
+          role="status"
+        >
+          {message}
+        </p>
+      )}
+    </form>
   );
 }
