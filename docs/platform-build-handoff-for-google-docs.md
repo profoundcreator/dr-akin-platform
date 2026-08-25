@@ -1,6 +1,7 @@
 # Dr. Akin Platform — What Was Built
 ## Client handoff document · August 2026
 
+**Abridged summary (client + pipeline):** [`docs/what-was-built-abridged.md`](./what-was-built-abridged.md)  
 **Production site:** https://theakinakinpelu.org  
 **Admin login:** https://theakinakinpelu.org/admin/login  
 **Repository:** github.com/profoundcreator/dr-akin-platform  
