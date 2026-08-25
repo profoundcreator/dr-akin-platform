@@ -41,9 +41,15 @@
   ],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/",
       "has": [{ "type": "host", "value": "www.theakinakinpelu.org" }],
-      "destination": "https://theakinakinpelu.org/:path*",
+      "destination": "https://theakinakinpelu.org/",
+      "permanent": true
+    },
+    {
+      "source": "/:path+",
+      "has": [{ "type": "host", "value": "www.theakinakinpelu.org" }],
+      "destination": "https://theakinakinpelu.org/:path+",
       "permanent": true
     },
     {
