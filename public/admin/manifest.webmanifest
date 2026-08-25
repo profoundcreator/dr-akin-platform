@@ -1,0 +1,33 @@
+{
+  "id": "/admin/",
+  "name": "Dr. Akin Back Office",
+  "short_name": "Back Office",
+  "description": "Private workspace for booking requests, inbox, content, and team operations.",
+  "start_url": "/admin/requests",
+  "scope": "/admin/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#f5f2ee",
+  "background_color": "#f5f2ee",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/brand/akin-iconmark.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/akin-iconmark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/akin-iconmark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

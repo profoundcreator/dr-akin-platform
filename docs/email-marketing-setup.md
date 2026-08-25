@@ -75,7 +75,11 @@ Default audience: **whole opted-in list**. Source is tracked, not used to exclud
 
 - Optional marketing checkbox on contact, booking, footer, summit forms — **unchecked by default**.
 - Operational privacy/terms checkboxes remain required and separate.
+- Lawful basis for marketing: **consent** only (NDPA + GDPR Art. 6(1)(a)) — see [`/privacy`](../src/pages/privacy.astro).
 - Do **not** backfill historical enquiries/bookings without re-consent.
+- Do **not** bulk-import legacy contact lists (spreadsheets, old CRM, business cards, years of personal contacts) into Beehiiv without documented opt-in matching the privacy notice.
+
+**Historical contacts:** Use a one-time **re-consent** email with a link to the site signup; only sync people who opt in on the platform. Admin **Audience** is the source of truth for marketing recipients. Full rules: [`newsletter-setup-checklist.md`](newsletter-setup-checklist.md#historical-contacts--privacy-rules).
 
 ## Unsubscribe
 
