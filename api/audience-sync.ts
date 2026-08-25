@@ -20,12 +20,42 @@ function readString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function readSegmentMetadata(body: SyncBody): {
+  consentSource: string;
+  utmCampaign: string | null;
+  utmContent: string | null;
+} {
+  const ctx = body.engagementContext ?? {};
+  const platform = readString(ctx.platform) || readString(ctx.platformKey) || null;
+  const eventSlug = readString(ctx.eventSlug) || null;
+  const requestArea = readString(ctx.requestArea) || null;
+  const consentSource = readString(body.consentSource) || "newsletter";
+
+  const utmCampaign =
+    platform ??
+    (eventSlug ? `event-${eventSlug}` : null) ??
+    (requestArea && requestArea !== "speaking-office" ? requestArea : null) ??
+    consentSource;
+
+  const utmContent = eventSlug ?? platform ?? readString(ctx.referrerPath) ?? null;
+
+  return { consentSource, utmCampaign, utmContent };
+}
+
 async function syncToBeehiiv(
   email: string,
   name: string | undefined,
   publicationId: string,
   apiKey: string,
+  segment: {
+    consentSource: string;
+    utmCampaign: string | null;
+    utmContent: string | null;
+  },
 ): Promise<{ ok: true; subscriberId: string } | { ok: false; error: string }> {
+  const customFields: Array<{ name: string; value: string }> = [];
+  if (name) customFields.push({ name: "name", value: name });
+
   const response = await fetch(
     `https://api.beehiiv.com/v2/publications/${publicationId}/subscriptions`,
     {
@@ -39,7 +69,10 @@ async function syncToBeehiiv(
         reactivate_existing: true,
         send_welcome_email: false,
         utm_source: "dr-akin-platform",
-        custom_fields: name ? [{ name: "name", value: name }] : [],
+        utm_medium: segment.consentSource,
+        ...(segment.utmCampaign ? { utm_campaign: segment.utmCampaign } : {}),
+        ...(segment.utmContent ? { utm_content: segment.utmContent } : {}),
+        custom_fields: customFields,
       }),
     },
   );
@@ -127,9 +160,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const name = readString(body.name) || undefined;
+  const segment = readSegmentMetadata(body);
   const syncResult =
     espProvider === "beehiiv"
-      ? await syncToBeehiiv(email, name, beehiivPublication!, beehiivKey!)
+      ? await syncToBeehiiv(email, name, beehiivPublication!, beehiivKey!, segment)
       : await syncToKit(email, name, kitFormId!, kitKey!);
 
   if (!syncResult.ok) {

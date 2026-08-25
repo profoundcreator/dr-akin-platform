@@ -4,6 +4,8 @@ Items we plan to add to the Dr. Akin platform. Not in active development yet.
 
 **Client summary (what’s live + pipeline):** [`docs/what-was-built-abridged.md`](./what-was-built-abridged.md)
 
+**Newsletter editorial workshop (Gemini/Claude):** [`docs/planning/newsletter-editorial-strategy-conversation-guide.md`](./planning/newsletter-editorial-strategy-conversation-guide.md)
+
 ---
 
 ## Admin help centre

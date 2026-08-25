@@ -50,12 +50,18 @@ export async function submitGeneralEnquiry(input: GeneralEnquiryInput): Promise<
           enquiryId,
           subject: input.subject,
           organization: input.organization ?? null,
+          platform,
+          referrerPath,
         },
       });
       syncAudienceToEsp({
         email: input.email,
         name: input.name,
         consentSource: "contact",
+        engagementContext: {
+          platform,
+          referrerPath,
+        },
       });
     } catch (err) {
       console.warn("[marketing] contact opt-in failed:", err);

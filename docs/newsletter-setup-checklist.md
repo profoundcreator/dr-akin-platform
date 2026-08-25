@@ -21,6 +21,10 @@
 
 **Flow:** Form submit → Supabase `subscribe_audience_member` → background sync to ESP → `esp_provider` stored on record.
 
+**Segmentation (Beehiiv):** Sync sends UTM metadata — `utm_medium` = consent source (newsletter, contact, booking, summit_interest), `utm_campaign` = platform slug or event (e.g. `aald`, `event-performx-summit-2026`). Build Beehiiv segments from these fields.
+
+**Editorial strategy workshop:** [`docs/planning/newsletter-editorial-strategy-conversation-guide.md`](./planning/newsletter-editorial-strategy-conversation-guide.md) — paste into Gemini/Claude for content planning with Dr. Akin.
+
 ---
 
 ## Step 1 — Choose your ESP
