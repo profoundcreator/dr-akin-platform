@@ -42,7 +42,18 @@ Recommendation when we build this: prefer a tool with a **free custom subdomain 
 
 ---
 
+## Post-launch editorial engine & lead-gen resource hub
+
+**Status:** Planning (target ~1 month post-launch)  
+**Priority:** After newsletter setup and EA team stabilisation  
+**Spec:** [`docs/planning/post-launch-editorial-engine-lead-gen.md`](./planning/post-launch-editorial-engine-lead-gen.md)
+
+Gates Notes–grade MDX editorial components, McKinsey-style gated whitepapers, HubSpot-style operational templates, admin-managed gating rules, and extended audience/lead capture — all operable from the back office without code changes.
+
+---
+
 ## Related items (also on the roadmap)
 
+- **Newsletter / Beehiiv setup** — see `docs/newsletter-setup-checklist.md` (do before editorial engine)
 - **Enquiry modal & pages** — UX and workflow fixes before email notifications
 - **Resend (or similar)** — transactional email for enquiry confirmations and admin alerts (separate from Supabase Auth invite emails; auth invites: see `supabase/README.md` § Resend SMTP)
