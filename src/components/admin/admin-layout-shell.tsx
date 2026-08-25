@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen, Mail, Megaphone } from "lucide-react";
+import { CalendarDays, CircleHelp, Headphones, Home, Inbox, LayoutDashboard, LogOut, BookOpen, FileText, Briefcase, Users, ScrollText, PackageOpen, Mail, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/admin-auth-provider";
 import { canAccessAuditLog, canAccessTeamAdmin, canManageResources, formatAdminRole } from "@/lib/auth/permissions";
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { label: "Team", href: "/admin/team", icon: Users, requiresTeamAccess: true },
   { label: "Audit Log", href: "/admin/audit-log", icon: ScrollText, requiresAuditAccess: true },
   { label: "Featured Episodes", href: "/admin/audio", icon: Headphones },
+  { label: "Help", href: "/admin/help", icon: CircleHelp },
 ] as const;
 
 interface AdminLayoutShellProps {

@@ -1,7 +1,5 @@
 # Back Office Help Center
 
-> **Status:** Draft for review — content source for the in-app Help Center (not yet built in the UI).
->
 > **Audience:** Everyone who uses the private back office (Executive Assistants, content editors, approvers, and admins).
 >
 > **Last updated:** August 2026
@@ -56,6 +54,7 @@ After sign-in, most users land on **Requests** — the booking pipeline.
 | **Team** | Invite colleagues and manage roles — admins only |
 | **Audit Log** | History of sign-ins and admin actions — oversight roles only |
 | **Featured Episodes** | Curated podcast list on `/resources/audio` |
+| **Help** | This guide — search, browse, and jump to any back-office page |
 
 Some menu items are **hidden** if your role does not include access. Your name and role appear under the page title in the header.
 
@@ -640,7 +639,3 @@ These public pages are edited in the **codebase**, not the back office (as of Au
 - Default brand assets baked into the site
 
 If you need changes there, flag them for a developer or Super Admin.
-
----
-
-*End of draft. Edit this file freely — the in-app Help Center will be built from this content in a later step.*
