@@ -6,16 +6,15 @@ import {
   CalendarDays,
   Check,
   Download,
-  ImagePlus,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -407,6 +406,12 @@ export function EventsDashboard() {
     setCoverPreview(file ? URL.createObjectURL(file) : getEventCoverUrl(existingCoverPath));
   }
 
+  function handleRemoveCover() {
+    setCoverFile(null);
+    setExistingCoverPath(null);
+    setCoverPreview(null);
+  }
+
   if (!isSupabaseConfigured) {
     return (
       <AdminLayoutShell title="Events" subtitle="Manage public events and registrations">
@@ -667,26 +672,15 @@ export function EventsDashboard() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="event-cover">Cover image</Label>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload image
-                <input
-                  id="event-cover"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)}
-                />
-              </label>
-              {coverPreview && (
-                <img src={coverPreview} alt="" className="h-16 w-24 rounded-md object-cover" />
-              )}
-            </div>
-            <ImageUploadHint hint={EVENT_COVER_IMAGE_HINT} />
-          </div>
+          <AdminOptionalImageField
+            id="event-cover"
+            label="Cover image"
+            hint={EVENT_COVER_IMAGE_HINT}
+            previewUrl={coverPreview}
+            uploadLabel="Upload image"
+            onFileSelect={handleCoverChange}
+            onRemove={handleRemoveCover}
+          />
 
           {isApprover && (
             <label className="flex items-start gap-3 rounded-[var(--ploy-radius-md)] border border-[var(--ploy-border-primary)] p-4">

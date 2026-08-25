@@ -1,11 +1,11 @@
 export const EVENT_COVER_IMAGE_HINT =
-  "Best results: 1600×900 px (16:9), JPG or WebP, under 5 MB. Wider images crop cleanly on mobile.";
+  "Best results: 1600×900 px (16:9), JPG or WebP, under 5 MB. Optional — remove to use the default event layout without a cover image.";
 
 export const HOMEPAGE_BANNER_IMAGE_HINT =
-  "Best results: 2400×1000 px (wide banner), JPG or WebP, under 6 MB. Used full-width at the top of the homepage.";
+  "Best results: 2400×1000 px (wide banner), JPG or WebP, under 6 MB. Optional — remove to show the headline without a banner image.";
 
 export const HOMEPAGE_PORTRAIT_IMAGE_HINT =
-  "Best results: 1200×1500 px (4:5 portrait), JPG or WebP, under 6 MB. Shown in the hero beside the headline.";
+  "Best results: 1200×1500 px (4:5 portrait), JPG or WebP, under 6 MB. Optional override — remove to restore the default site portrait.";
 
 export type HomepageHeroMode = "portrait" | "banner" | "minimal";
 

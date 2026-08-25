@@ -352,7 +352,7 @@ export function InsightMediumEditor() {
         )}
 
         {mediaSchemaReady && (
-          <div className="mb-10">
+          <div className="mb-10 space-y-3">
             <label className="group block cursor-pointer">
               <input
                 type="file"
@@ -375,6 +375,20 @@ export function InsightMediumEditor() {
                 </div>
               )}
             </label>
+            {heroPreview && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setHeroFile(null);
+                  setExistingHeroPath(null);
+                }}
+              >
+                <X className="size-4" />
+                Remove cover image
+              </Button>
+            )}
           </div>
         )}
 

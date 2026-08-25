@@ -6,7 +6,6 @@ import {
   Briefcase,
   Check,
   Download,
-  ImagePlus,
   Plus,
   Trash2,
   X,
@@ -15,7 +14,7 @@ import { AdminSetupNotice } from "@/components/admin/admin-setup-notice";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { AdminRebuildSeoButton } from "@/components/admin/admin-rebuild-seo-button";
 import { Button } from "@/components/ui/button";
-import { ImageUploadHint } from "@/components/ui/image-upload-hint";
+import { AdminOptionalImageField } from "@/components/admin/admin-optional-image-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/admin-auth-provider";
@@ -388,6 +387,12 @@ export function WorkOrgsDashboard() {
     setHeroPreview(file ? URL.createObjectURL(file) : getWorkOrgHeroUrl(existingHeroPath));
   }
 
+  function handleRemoveHero() {
+    setHeroFile(null);
+    setExistingHeroPath(null);
+    setHeroPreview(null);
+  }
+
   if (!isSupabaseConfigured) {
     return (
       <AdminLayoutShell title="Work" subtitle="Manage ecosystem platforms">
@@ -579,18 +584,16 @@ export function WorkOrgsDashboard() {
             <Input id="org-external" value={form.externalUrl} onChange={(e) => setForm((p) => ({ ...p, externalUrl: e.target.value }))} placeholder="https://..." />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="org-hero">Hero image</Label>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--ploy-radius-button)] border border-[var(--ploy-border-primary)] px-4 py-2 text-sm font-medium">
-                <ImagePlus className="size-4" />
-                Upload hero
-                <input id="org-hero" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" className="sr-only" onChange={(e) => handleHeroChange(e.target.files?.[0] ?? null)} />
-              </label>
-              {heroPreview && <img src={heroPreview} alt="" className="h-16 w-24 rounded-md object-cover" />}
-            </div>
-            <ImageUploadHint hint={WORK_ORG_HERO_IMAGE_HINT} />
-          </div>
+          <AdminOptionalImageField
+            id="org-hero"
+            label="Hero image"
+            hint={WORK_ORG_HERO_IMAGE_HINT}
+            accept="image/jpeg,image/png,image/webp,image/svg+xml"
+            previewUrl={heroPreview}
+            uploadLabel="Upload hero"
+            onFileSelect={handleHeroChange}
+            onRemove={handleRemoveHero}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="org-sort">Sort order</Label>
