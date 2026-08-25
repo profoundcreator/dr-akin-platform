@@ -1,14 +1,23 @@
-import { BRAND_ASSETS } from "../src/lib/brand/assets.js";
-import { escapeHtml } from "./_email-layout.js";
+/** Email wordmark paths (public/brand/) — keep in sync with src/lib/brand/assets.ts */
+const EMAIL_WORDMARK_LIGHT = "/brand/akin-wordmark-email-light.png";
+const EMAIL_WORDMARK_DARK = "/brand/akin-wordmark-email-dark.png";
 
 /** Rendered logo width in HTML email (height auto, max 44px). */
 const EMAIL_LOGO_DISPLAY_WIDTH = 200;
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 export function renderEmailLogoBlock(siteUrl: string): string {
   const base = siteUrl.replace(/\/$/, "");
   const homeUrl = escapeHtml(base);
-  const lightSrc = escapeHtml(`${base}${BRAND_ASSETS.wordmarkEmailLight}`);
-  const darkSrc = escapeHtml(`${base}${BRAND_ASSETS.wordmarkEmailDark}`);
+  const lightSrc = escapeHtml(`${base}${EMAIL_WORDMARK_LIGHT}`);
+  const darkSrc = escapeHtml(`${base}${EMAIL_WORDMARK_DARK}`);
   const alt = escapeHtml("Akin Akinpelu");
 
   return `<a href="${homeUrl}" style="text-decoration:none;display:inline-block;line-height:0;" target="_blank" rel="noopener noreferrer">
