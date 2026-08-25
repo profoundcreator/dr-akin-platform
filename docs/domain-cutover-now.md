@@ -40,8 +40,22 @@ At your registrar, screenshot or export **all** records before changing anything
 1. Open [Vercel → profound-creators/dr-akin-platform → Settings → Domains](https://vercel.com/profound-creators/dr-akin-platform/settings/domains)
 2. Add **`theakinakinpelu.org`**
 3. Add **`www.theakinakinpelu.org`**
-4. If Vercel shows a **TXT verification** record, add it at the registrar (one-time)
-5. Note any domain-specific values Vercel displays (A record IP should match below)
+4. If Vercel shows a **TXT verification** record, add it in Cloudflare (one-time)
+
+### Fix domain assignment (avoid redirect loop)
+
+Our site uses **`theakinakinpelu.org`** as primary (non-www). `www` redirects to non-www in `vercel.json`.
+
+In Vercel → Domains → **Edit** each domain:
+
+| Domain | Must be set to |
+|--------|----------------|
+| **`theakinakinpelu.org`** | **Production** (connect to this project) — **not** “Redirect to www” |
+| **`www.theakinakinpelu.org`** | **Production** (same project) — `vercel.json` sends www → non-www |
+
+If apex is “Redirect to www” **and** `vercel.json` sends www → apex, visitors get an **infinite redirect loop**.
+
+5. Open each domain’s DNS panel in Vercel and **copy the exact CNAME value** shown (project-specific), e.g. `7438ec80306aef11.vercel-dns-017.com` — use that in Cloudflare, not generic placeholders.
 
 ---
 
@@ -54,10 +68,21 @@ At your registrar, screenshot or export **all** records before changing anything
 
 ### Website records (add or edit)
 
+Use the **exact CNAME target from Vercel → Domains → DNS Records** for this project (August 2026 example: `7438ec80306aef11.vercel-dns-017.com`). Vercel may show a different hash per project — always copy from the dashboard.
+
 | Type | Name | Content | Proxy status | TTL |
 |------|------|---------|--------------|-----|
-| **A** | `@` | `76.76.21.21` | **DNS only** (grey cloud ☁️) | Auto |
-| **CNAME** | `www` | `cname.vercel-dns.com` | **DNS only** (grey cloud ☁️) | Auto |
+| **CNAME** | `@` | `7438ec80306aef11.vercel-dns-017.com` | **DNS only** (grey cloud ☁️) | Auto |
+| **CNAME** | `www` | `7438ec80306aef11.vercel-dns-017.com` | **DNS only** (grey cloud ☁️) | Auto |
+
+Cloudflare flattens CNAME at `@` (apex) automatically — that is expected.
+
+**Legacy alternative** (only if Vercel shows A record instead of apex CNAME):
+
+| Type | Name | Content | Proxy |
+|------|------|---------|-------|
+| **A** | `@` | `76.76.21.21` | DNS only |
+| **CNAME** | `www` | `cname.vercel-dns.com` or your project CNAME | DNS only |
 
 **Important — Cloudflare proxy:**
 
@@ -235,7 +260,10 @@ Manual checks:
 
 | Problem | Fix |
 |---------|-----|
-| Domain not resolving | Wait for DNS propagation; confirm A/CNAME at registrar |
+| **Invalid Configuration** in Vercel | Match Cloudflare to Vercel’s **exact** CNAME; grey cloud only; click **Refresh** in Vercel after saving |
+| Apex set to “Redirect to www” | **Edit** → set `theakinakinpelu.org` to **Production** (see Step 2) |
+| Redirect loop | Apex must be Production, not redirect to www; www can stay Production |
+| Domain not resolving | Wait for DNS propagation; confirm CNAME at Cloudflare |
 | SSL pending in Vercel | DNS must point to Vercel first; check TXT verification if requested |
 | Admin invite opens localhost | Update Supabase Site URL + Redirect URLs; resend invite |
 | Contact form emails not arriving | Resend domain not verified; check `/api/notifications-status` |
