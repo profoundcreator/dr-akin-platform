@@ -155,12 +155,11 @@ export function Footer() {
               href={SITE_STUDIO_CREDIT.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--ploy-text-link)] hover:underline"
+              className="font-semibold text-[var(--ploy-text-link)] hover:underline"
             >
               {SITE_STUDIO_CREDIT.label}
             </a>
           </p>
-          <p>{PERSON_IDENTITY.auTitle}</p>
         </div>
       </div>
     </footer>
