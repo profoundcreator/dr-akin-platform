@@ -6,6 +6,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { PERSON_IDENTITY } from "@/data/person-identity";
 import { APPROVED_SOCIAL_LINKS, SITE_CONTACT } from "@/data/site-contact";
+import { SITE_STUDIO_CREDIT } from "@/data/site-credits";
 import { FOOTER_COLUMNS, type FooterLink } from "@/lib/navigation";
 import { openEnquiryModal } from "@/lib/enquiry";
 import { openNewsletterModal } from "@/lib/newsletter-modal";
@@ -147,8 +148,18 @@ export function Footer() {
       </div>
 
       <div className="border-t border-[var(--ploy-border-primary)] px-6 py-6 text-xs text-[var(--ploy-text-secondary)] md:px-10 lg:px-14 xl:px-20">
-        <div className="mx-auto flex max-w-[var(--ploy-canvas-main)] flex-col gap-2 md:flex-row md:justify-between">
+        <div className="mx-auto flex max-w-[var(--ploy-canvas-main)] flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} {PERSON_IDENTITY.publicName}. All rights reserved.</p>
+          <p>
+            <a
+              href={SITE_STUDIO_CREDIT.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--ploy-text-link)] hover:underline"
+            >
+              {SITE_STUDIO_CREDIT.label}
+            </a>
+          </p>
           <p>{PERSON_IDENTITY.auTitle}</p>
         </div>
       </div>
