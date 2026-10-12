@@ -2,6 +2,7 @@
 import "@/styles/globals.css";
 import { PERSON_IDENTITY } from "@/data/person-identity";
 import { SITE_CONTACT } from "@/data/site-contact";
+import { GA_MEASUREMENT_ID, shouldLoadGoogleAnalytics } from "@/data/site-analytics";
 import { BRAND_ASSETS } from "@/lib/brand/assets";
 import { GlobalModalHosts } from "@/components/layout/global-modal-hosts";
 import { PwaShell } from "@/components/pwa/pwa-shell";
@@ -47,6 +48,7 @@ const structuredData = (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
   JSON.stringify(item).replace(/</g, "\\u003c"),
 );
 const isAdminRoute = Astro.url.pathname.startsWith("/admin");
+const loadGoogleAnalytics = shouldLoadGoogleAnalytics(Astro.url.pathname);
 const pwaThemeColor = "#f5f2ee";
 const appleWebAppTitle = isAdminRoute ? "Back Office" : "Dr. Akin";
 ---
@@ -85,6 +87,17 @@ const appleWebAppTitle = isAdminRoute ? "Back Office" : "Dr. Akin";
     <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
     {structuredData.map((data) => <script type="application/ld+json" set:html={data} />)}
+    {loadGoogleAnalytics && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />
+        <script is:inline define:vars={{ gaId: GA_MEASUREMENT_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag("js", new Date());
+          gtag("config", gaId);
+        </script>
+      </>
+    )}
     <title>{title}</title>
   </head>
   <body>
