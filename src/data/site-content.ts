@@ -185,7 +185,7 @@ export const SITE_PAGES: Record<string, PageContent> = {
       },
       {
         title: "PerformX Summit 2026",
-        body: "The next edition convenes 20–21 November 2026 at Landmark Event Centre, Lagos, under the theme Leading Frontiers: Innovate, Integrate, Impact.",
+        body: "The next edition convenes 30 November – 1 December 2026 at Landmark Event Centre, Lagos, under the theme Leading Frontiers: Innovate, Integrate, Impact.",
         bullets: [
           "Eight sectors · Power Room sessions · Nexus Honors",
           "Delegate, speaker and partnership pathways",
